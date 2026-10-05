@@ -1,0 +1,70 @@
+# Optional overlay. Base-only Compose never requires Telegram credentials.
+x-telegram-app: &telegram-app
+  image: personal-jarvis:0.4.0
+  build:
+    context: .
+    target: runtime
+  init: true
+  read_only: true
+  tmpfs:
+    - /tmp:size=16m,mode=1777
+  security_opt:
+    - no-new-privileges:true
+  cap_drop: [ALL]
+  pids_limit: 100
+  mem_limit: 256m
+  cpus: 0.5
+  environment:
+    JARVIS_ENVIRONMENT: production
+    JARVIS_DATABASE_URL_FILE: /run/secrets/database_url
+    JARVIS_TOKEN_PEPPER_FILE: /run/secrets/token_pepper
+    JARVIS_TELEGRAM_CONFIG_FILE: /run/secrets/telegram_config
+  networks: [database]
+  secrets: [database_url, token_pepper, telegram_config]
+  entrypoint: ["jarvis"]
+  logging:
+    driver: json-file
+    options:
+      max-size: "5m"
+      max-file: "3"
+
+services:
+  telegram:
+    <<: *telegram-app
+    profiles: [telegram]
+    restart: "on-failure:5"
+    stop_grace_period: 45s
+    command: ["telegram-run"]
+    environment:
+      JARVIS_ENVIRONMENT: production
+      JARVIS_DATABASE_URL_FILE: /run/secrets/database_url
+      JARVIS_TOKEN_PEPPER_FILE: /run/secrets/token_pepper
+      JARVIS_TELEGRAM_CONFIG_FILE: /run/secrets/telegram_config
+      JARVIS_TELEGRAM_BOT_TOKEN_FILE: /run/secrets/telegram_bot_token
+    secrets: [database_url, token_pepper, telegram_config, telegram_bot_token]
+    networks: [database, telegram_egress]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "jarvis", "telegram-health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  telegram-ops:
+    <<: *telegram-app
+    profiles: [telegram-ops]
+    restart: "no"
+    command: ["telegram-status"]
+
+networks:
+  telegram_egress:
+    driver: bridge
+
+secrets:
+  telegram_config:
+    file: ./.secrets/telegram_config.json
+  telegram_bot_token:
+    file: ./.secrets/telegram_bot_token

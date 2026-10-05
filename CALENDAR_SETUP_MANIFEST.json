@@ -1,0 +1,15 @@
+{
+  "kind": "additive_calendar_setup_patch",
+  "base_schema": "0008_executor_binding",
+  "runtime_changed": false,
+  "migration_required": false,
+  "files": {
+    "scripts/setup_calendar.py": "7553fde587e44009ab018833d101091ccd921bbefb57aa7a9d796c9919cb8d70",
+    "tests/unit/test_calendar_setup.py": "de76ced40f5ced645523070d147e747db60361dad9ecab54f48bc80732209d01",
+    "docs/GOOGLE_CALENDAR_WINDOWS.md": "7e11587a73bac5dbfb7751595ff9b5bef9433acaee6c1e56336466f5ff1244cf",
+    "DEVELOPMENT_STATUS.md": "d4b01a0483ebabe67b9849c1f0aafa3e52fc0e647d6e321bf5db1af1efc83629",
+    "docs/RESUME_CHECKPOINT.md": "ea4066e6b114b7cdf0379eed93edc63a31d17a40a9cd95dc79aee03e9e471f5a",
+    "docs/evidence/stage-4g/user-local-acceptance-20261004.json": "9e90883fcdd6cd1d75f0978b84496769a32187092dff644e012d0bacc60d764c",
+    "docs/evidence/stage-4g/calendar-setup-verification.json": "bad3c17399db5252054eccb483e69b612238babef234899280c835d50c665cfd"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "hotfix": "2b-diagnostics-1",
+  "requires": "Jarvis_Tahap_2B_v0.3.0.zip",
+  "original_release_sha256": "b8dbebeeb6a4bcfcd18d459cd5ae3606a87c44d8c56028c529d13c5f4a605163",
+  "changes_schema": false,
+  "changes_credentials": false,
+  "files": [
+    {
+      "path": "src/jarvis/assistant/diagnostics.py",
+      "sha256": "fc71d63a78bd00aface2992d82de14535066d32ec24b51a5af6d2cf15250f327",
+      "bytes": 2552,
+      "previous_sha256": null
+    },
+    {
+      "path": "src/jarvis/assistant/router.py",
+      "sha256": "21c83e36d2b100de7f982ab29ea01b674b342d544976d6c27e3eedffc992f058",
+      "bytes": 10478,
+      "previous_sha256": "357ff4e73e73fd8f669432883415f96d859190b1673acce64fdbb8c70744a01f"
+    },
+    {
+      "path": "src/jarvis/assistant/graph.py",
+      "sha256": "fbf5d2700c7acea883323a71972d7219c55abe3f6500bcf04db227a1a7d025fd",
+      "bytes": 4511,
+      "previous_sha256": "79554103dff5ef8b120a02d31f382a5fcdae7fccefdee50d85be4c27e7271876"
+    },
+    {
+      "path": "src/jarvis/assistant/cli.py",
+      "sha256": "47a8be586e125fcb57130b08b256911dfaec131ece5d40d500551cd217c340b4",
+      "bytes": 3878,
+      "previous_sha256": "baeca25625fb653ce7bd2352dc126537517a6b1d3fca1d1b930cbe0682b90f1f"
+    },
+    {
+      "path": "tests/unit/test_assistant_diagnostics.py",
+      "sha256": "9d445f756d2ddc63b3780b76f123e47859b2630352624bd8135c36663263fb85",
+      "bytes": 4852,
+      "previous_sha256": null
+    },
+    {
+      "path": "tests/unit/test_assistant_graph_setup.py",
+      "sha256": "23cba5359c07143b6d8061d3c8f52c73f627544b73beceb632795159a9e818f1",
+      "bytes": 9197,
+      "previous_sha256": "f90b72037d8bab961bd3be524f79e2800aaaf13d4e8fc3139b61082899102c6d"
+    },
+    {
+      "path": "tests/unit/test_assistant_router.py",
+      "sha256": "f539ebb6e873ddb693691db463d6c5ecd96a998d7285a8f98288d95651de06b6",
+      "bytes": 9433,
+      "previous_sha256": "1e974d99667207a08aaed538a683975690e36b7ca4bc4abc366a53ef868bf430"
+    },
+    {
+      "path": "docs/ASSISTANT_WINDOWS.md",
+      "sha256": "98a3e0ae8dcccfea7dde4ac29183e3baea73c71ebfd998a3e96bda4894affadd",
+      "bytes": 10533,
+      "previous_sha256": "bee303c8bc3e1aaf9bf65115b63fcaa24cbcb4935182ddb7237a1875bf7be820"
+    },
+    {
+      "path": "docs/HOTFIX_ASSISTANT_DIAGNOSTICS.md",
+      "sha256": "d9c02830bc0583612f832d071425813cc33dc6a14172e5ba856933427497e264",
+      "bytes": 6790,
+      "previous_sha256": null
+    },
+    {
+      "path": "docs/STAGE_2B_VERIFICATION.md",
+      "sha256": "3c267f4336ce7a95fd52e5ab9360b508e554f21c73b6549adf7fec1ea74b8303",
+      "bytes": 4302,
+      "previous_sha256": "ed946ebfd66dec856315700129a8cfd5eb8c174fbe9a0cf66a48e9e3f2f2b282"
+    },
+    {
+      "path": "docs/evidence/stage-2b-diagnostics/pytest.xml",
+      "sha256": "9ecb631ae1af0958f931f08b348f223fbbed05ace2ddb91ba5c77365da838b64",
+      "bytes": 42341,
+      "previous_sha256": null
+    },
+    {
+      "path": "docs/evidence/stage-2b-diagnostics/verification.json",
+      "sha256": "46df1d21b679eb70b6149ca3ef187283ce78eca5a9c1ec8360bd16ee33277234",
+      "bytes": 914,
+      "previous_sha256": null
+    }
+  ]
+}

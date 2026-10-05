@@ -1,0 +1,2 @@
+Windows CI platform command check passed; Ubuntu OCR dependencies retained.
+Static RED->GREEN check; Windows execution remains required.

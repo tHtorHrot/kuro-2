@@ -1,0 +1,18 @@
+{
+  "helper_tests": {
+    "passed": 35,
+    "seconds": 0.08,
+    "failed": 0,
+    "skipped": 0
+  },
+  "command": "python -m pytest tests/unit/test_calendar_setup.py -q",
+  "lint_and_format": "pass",
+  "live_google_oauth": "not_run_requires_user_consent",
+  "windows_browser": "not_run_in_this_environment",
+  "scope": "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+  "runtime_or_migration_changed": false,
+  "source_sha256": {
+    "scripts/setup_calendar.py": "7553fde587e44009ab018833d101091ccd921bbefb57aa7a9d796c9919cb8d70",
+    "tests/unit/test_calendar_setup.py": "de76ced40f5ced645523070d147e747db60361dad9ecab54f48bc80732209d01"
+  }
+}

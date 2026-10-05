@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "checks": 17,
+  "pglite_version": "0.5.8",
+  "postgresql_engine": "18.3 WASM",
+  "migration": "0001_foundation",
+  "limitation": "SQL-only verification; does not replace PostgreSQL 16 native integration, driver, pooling or concurrency tests"
+}

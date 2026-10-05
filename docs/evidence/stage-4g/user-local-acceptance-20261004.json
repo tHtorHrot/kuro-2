@@ -1,0 +1,53 @@
+{
+  "recorded_at_utc": "2026-10-04T14:15:54.247638+00:00",
+  "source": "terminal excerpts and bot response supplied by user in this conversation",
+  "native_docker_tests": {
+    "passed": 444,
+    "seconds": 28.5,
+    "exit_code": 0,
+    "full_log_uploaded": false
+  },
+  "deployment": {
+    "project": "personal-jarvis",
+    "directory": "A:\\Kuro2\\kuro-main",
+    "postgres_backup_reported": true,
+    "migration_applied": true,
+    "doctor_database": "ready",
+    "doctor_rls": "enabled_and_forced",
+    "doctor_stage": "4"
+  },
+  "assistant": {
+    "enabled": true,
+    "frozen": false,
+    "worker_recent": true,
+    "config_matches": true,
+    "premium_enabled": false,
+    "llm_chat_reply_reported": false,
+    "healthy": true,
+    "requests_reported": {
+      "failed": 6,
+      "succeeded": 16
+    }
+  },
+  "calendar": {
+    "route_recognized": true,
+    "unconfigured_action_blocked": true,
+    "google_credentials_present": true,
+    "live_provider_acceptance": "read_primary_calendar_matches_user_schedule_user_reported",
+    "oauth_consent_user_reported": true,
+    "google_scope": "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+    "internal_scopes": [
+      "calendar:read"
+    ],
+    "grant_revision": 2,
+    "scheduler_healthy": true,
+    "worker_recent": true,
+    "tmpfs_scalar_fix_user_reported": true,
+    "live_read_reported_at": "2026-10-04T20:42:04+07:00",
+    "readability_patch_acceptance": "accepted_by_user_after_runtime_build_and_assistant_recreate",
+    "readability_patch_reported_at": "2026-10-04T21:01:12+07:00",
+    "write_candidate_preparation": "helper_tested_locally_not_yet_run_by_user",
+    "live_write_acceptance": "pending"
+  },
+  "stages_4_to_8_frozen": false
+}

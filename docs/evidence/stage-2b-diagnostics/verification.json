@@ -1,0 +1,31 @@
+{
+  "release": "2b-diagnostics-1",
+  "base_release": "0.3.0",
+  "tested_at_utc": "2026-09-29T00:47:58.578213+00:00",
+  "local_suite": {
+    "passed": 195,
+    "skipped": 41,
+    "failed": 0,
+    "errors": 0,
+    "skip_reason": "Native PostgreSQL test database unavailable"
+  },
+  "focused_tests": {
+    "passed": 74
+  },
+  "ruff_lint": "passed",
+  "ruff_format": "passed",
+  "wheel_sdist_build": "passed",
+  "wheel_updated_modules_verified": true,
+  "native_docker_after_hotfix": "not_run_here; owner gate required",
+  "native_gate_expected_passed": 236,
+  "previous_release_native_tests": {
+    "reported_by": "user",
+    "passed": 207,
+    "coverage_percent": 75,
+    "scope": "v0.3.0 before this hotfix"
+  },
+  "inference_sent_by_developer": false,
+  "dependency_changes": false,
+  "database_migration_required": false,
+  "initial_inference_failure_root_cause": "not yet known; original exception was masked"
+}

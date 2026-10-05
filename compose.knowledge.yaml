@@ -1,0 +1,221 @@
+# Stage 3: local upload, offline embeddings; isolated parser and vectors.
+services:
+  knowledge-init:
+    image: personal-jarvis:0.4.0
+    profiles:
+    - knowledge-setup
+    user: 0:0
+    read_only: true
+    network_mode: none
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    cap_add:
+    - CHOWN
+    - FOWNER
+    - DAC_OVERRIDE
+    mem_limit: 64m
+    pids_limit: 16
+    volumes:
+    - document-data:/data/documents
+    - embedding-models:/models
+    - qdrant-data:/qdrant/storage
+    entrypoint:
+    - python
+    - -c
+    command:
+    - import os; paths=['/data/documents','/models','/models/huggingface','/models/huggingface/hub','/models/cache','/qdrant/storage']; [(os.makedirs(p,exist_ok=True),os.chmod(p,0o700),os.chown(p,10001,10001)) for p in paths]
+  knowledge-model-download:
+    image: personal-jarvis:0.4.0
+    init: true
+    read_only: true
+    cap_drop: &id001
+    - ALL
+    security_opt: &id002
+    - no-new-privileges:true
+    pids_limit: 128
+    logging: &id003
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '3'
+    profiles:
+    - knowledge-setup
+    tmpfs:
+    - /tmp:size=128m,mode=1777
+    mem_limit: 1200m
+    cpus: 1.0
+    environment:
+      JARVIS_EMBEDDING_CACHE: /models
+      HF_HOME: /models/huggingface
+      HF_HUB_CACHE: /models/huggingface/hub
+      XDG_CACHE_HOME: /models/cache
+      HF_HUB_DISABLE_XET: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '1'
+    volumes:
+    - embedding-models:/models
+    networks:
+    - model_download
+    entrypoint:
+    - jarvis
+    - knowledge-model-download
+    restart: 'no'
+  document-parser:
+    init: true
+    read_only: true
+    cap_drop: *id001
+    security_opt: *id002
+    pids_limit: 64
+    logging: *id003
+    image: personal-jarvis-parser:0.4.0
+    build:
+      context: .
+      target: parser
+    profiles:
+    - knowledge
+    tmpfs:
+    - /tmp:size=256m,mode=1777
+    mem_limit: 1024m
+    cpus: 1.0
+    environment:
+      JARVIS_OCR_LANGUAGES: eng+ind
+      OMP_THREAD_LIMIT: '1'
+    networks:
+    - document_parser
+    restart: on-failure:5
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=4)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  qdrant:
+    init: true
+    read_only: true
+    cap_drop: *id001
+    security_opt: *id002
+    pids_limit: 128
+    logging: *id003
+    image: qdrant/qdrant:v1.19.1
+    profiles:
+    - knowledge
+    user: 10001:10001
+    tmpfs:
+    - /tmp:size=32m,mode=1777
+    mem_limit: 768m
+    cpus: 1.0
+    environment:
+      QDRANT__TELEMETRY_DISABLED: 'true'
+      QDRANT__SERVICE__HOST: 0.0.0.0
+      QDRANT__STORAGE__STORAGE_PATH: /qdrant/storage
+      QDRANT__STORAGE__SNAPSHOTS_PATH: /qdrant/storage/snapshots
+      QDRANT__STORAGE__TEMP_PATH: /tmp
+      QDRANT__STORAGE__PERFORMANCE__MAX_SEARCH_THREADS: '1'
+      QDRANT__STORAGE__OPTIMIZERS__MAX_OPTIMIZATION_THREADS: '1'
+    volumes:
+    - qdrant-data:/qdrant/storage
+    networks:
+    - document_vectors
+    restart: on-failure:5
+  knowledge:
+    image: personal-jarvis:0.4.0
+    init: true
+    read_only: true
+    cap_drop: *id001
+    security_opt: *id002
+    pids_limit: 128
+    logging: *id003
+    build: &id004
+      context: .
+      target: runtime
+    tmpfs: &id005
+    - /tmp:size=32m,mode=1777
+    mem_limit: 1200m
+    cpus: 1.0
+    entrypoint: &id006
+    - jarvis
+    environment: &id007
+      JARVIS_ENVIRONMENT: production
+      JARVIS_DATABASE_URL_FILE: /run/secrets/database_url
+      JARVIS_TOKEN_PEPPER_FILE: /run/secrets/token_pepper
+      JARVIS_ASSISTANT_CONFIG_FILE: /run/secrets/assistant_config
+      JARVIS_DOCUMENT_STORE: /data/documents
+      JARVIS_EMBEDDING_CACHE: /models
+      HF_HUB_OFFLINE: '1'
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '1'
+      LANGSMITH_TRACING: 'false'
+      LANGCHAIN_TRACING_V2: 'false'
+    secrets: &id008
+    - database_url
+    - token_pepper
+    - assistant_config
+    volumes: &id009
+    - document-data:/data/documents
+    - embedding-models:/models:ro
+    networks: &id010
+    - database
+    - document_parser
+    - document_vectors
+    profiles:
+    - knowledge
+    command:
+    - knowledge-run
+    restart: on-failure:5
+    stop_grace_period: 220s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      document-parser:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    healthcheck:
+      test:
+      - CMD
+      - jarvis
+      - knowledge-health
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+  knowledge-ops:
+    image: personal-jarvis:0.4.0
+    init: true
+    read_only: true
+    cap_drop: *id001
+    security_opt: *id002
+    pids_limit: 128
+    logging: *id003
+    build: *id004
+    tmpfs: *id005
+    mem_limit: 1200m
+    cpus: 1.0
+    entrypoint: *id006
+    environment: *id007
+    secrets: *id008
+    volumes: *id009
+    networks: *id010
+    profiles:
+    - knowledge-ops
+    command:
+    - knowledge-status
+    restart: 'no'
+volumes:
+  document-data: null
+  embedding-models: null
+  qdrant-data: null
+networks:
+  document_parser:
+    internal: true
+  document_vectors:
+    internal: true
+  model_download:
+    driver: bridge

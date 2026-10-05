@@ -1,0 +1,109 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0
+rootdir: /workspace/scratch/eaec0131606e/jarvis-stage-2b
+configfile: pyproject.toml
+testpaths: tests
+plugins: asyncio-1.4.0, anyio-4.15.1, platformdirs-4.12.0, langsmith-0.14.1, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 207 items
+
+tests/integration/test_assistant.py ssssssssssssssssss                   [  8%]
+tests/integration/test_postgres.py sssssssssss                           [ 14%]
+tests/integration/test_telegram.py ssssssssssss                          [ 19%]
+tests/unit/test_api.py ................                                  [ 27%]
+tests/unit/test_assistant_graph_setup.py ........                        [ 31%]
+tests/unit/test_assistant_router.py .................................... [ 48%]
+.                                                                        [ 49%]
+tests/unit/test_configuration_logging.py ..............                  [ 56%]
+tests/unit/test_crypto_policy.py .................                       [ 64%]
+tests/unit/test_telegram_client.py ...........................           [ 77%]
+tests/unit/test_telegram_commands.py ................................    [ 92%]
+tests/unit/test_telegram_setup.py ......                                 [ 95%]
+tests/unit/test_windows_secrets.py .........                             [100%]
+
+- generated xml file: /workspace/scratch/eaec0131606e/jarvis-stage-2b/docs/evidence/stage-2b/pytest.xml -
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.14-final-0 _______________
+
+Name                                           Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------
+src/jarvis/__init__.py                             1      0      0      0   100%
+src/jarvis/api/__init__.py                         0      0      0      0   100%
+src/jarvis/api/dependencies.py                    12      0      0      0   100%
+src/jarvis/api/middleware.py                     109      8     32      4    90%   48, 120, 133-136, 141, 149
+src/jarvis/api/routes.py                          62     23      6      0    57%   29-31, 37-41, 46-55, 60-80, 106-115
+src/jarvis/api/schemas.py                         25      0      0      0   100%
+src/jarvis/assistant/__init__.py                   0      0      0      0   100%
+src/jarvis/assistant/cli.py                       49     49     24      0     0%   1-68
+src/jarvis/assistant/config.py                    62     17     10      1    69%   50, 63-70, 76-83
+src/jarvis/assistant/graph.py                     70      6      4      0    92%   67, 70-72, 83-85
+src/jarvis/assistant/policy.py                    34      1     12      1    96%   56
+src/jarvis/assistant/repository.py               313    271    122      1    10%   56, 61, 69-72, 76, 82-89, 101-106, 110-131, 144-310, 315, 318, 328-375, 378-396, 401-405, 416-465, 468-469, 476-508, 511-578, 583-658, 661-666, 674-700, 707-721
+src/jarvis/assistant/router.py                   132     16     58     15    84%   47, 50, 56, 62, 92, 99, 116->118, 147, 169, 172, 176-178, 183, 187, 197, 200, 227
+src/jarvis/assistant/worker.py                    60     46     14      0    19%   19-43, 47-72
+src/jarvis/cli.py                                119    119     40      0     0%   3-172
+src/jarvis/core/__init__.py                        0      0      0      0   100%
+src/jarvis/core/config.py                         90      2     18      2    96%   54, 109
+src/jarvis/core/errors.py                          8      0      0      0   100%
+src/jarvis/core/logging.py                        36      0     10      0   100%
+src/jarvis/identity/__init__.py                    0      0      0      0   100%
+src/jarvis/identity/crypto.py                     30      0      6      0   100%
+src/jarvis/identity/service.py                    99     65     28      0    30%   41, 61-80, 92-110, 119-136, 143-183, 188-198
+src/jarvis/interfaces/__init__.py                  0      0      0      0   100%
+src/jarvis/interfaces/telegram/__init__.py         0      0      0      0   100%
+src/jarvis/interfaces/telegram/cli.py             51     51     20      0     0%   1-78
+src/jarvis/interfaces/telegram/client.py          93      4     38      4    94%   83, 92, 94, 111
+src/jarvis/interfaces/telegram/commands.py        45      1     24      1    97%   58
+src/jarvis/interfaces/telegram/config.py          32      3      8      3    85%   26, 29, 38
+src/jarvis/interfaces/telegram/repository.py     178    141     56      0    16%   35-36, 39, 45-52, 55, 63, 71-94, 101-109, 112-211, 214-260, 271-298, 301-311, 316-327, 334-354
+src/jarvis/interfaces/telegram/worker.py          95     64     20      1    30%   20, 32-58, 64, 75, 80-83, 87-127
+src/jarvis/main.py                                57      7      0      0    88%   48-53, 95-102
+src/jarvis/policies/__init__.py                    0      0      0      0   100%
+src/jarvis/policies/privacy.py                    27      0      8      0   100%
+src/jarvis/storage/__init__.py                     0      0      0      0   100%
+src/jarvis/storage/database.py                    44     28     10      0    30%   30-41, 46-57, 60-88, 91-108, 111
+src/jarvis/storage/models.py                     157      0      0      0   100%
+------------------------------------------------------------------------------------------
+TOTAL                                           2090    922    568     33    51%
+Coverage JSON written to file docs/evidence/stage-2b/coverage.json
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_assistant.py:82: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:101: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:111: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:129: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:146: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:157: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:172: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:185: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:198: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:207: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:220: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:229: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:238: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:261: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:274: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:283: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:300: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:315: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:43: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:62: Native PostgreSQL *_test database not configured
+SKIPPED [2] tests/integration/test_postgres.py:78: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:92: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:123: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:149: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:161: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:179: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:196: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:206: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:90: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:108: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:127: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:135: Native PostgreSQL *_test database not configured
+SKIPPED [2] tests/integration/test_telegram.py:148: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:161: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:179: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:203: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:216: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:239: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:261: Native PostgreSQL *_test database not configured
+======================= 166 passed, 41 skipped in 2.47s ========================

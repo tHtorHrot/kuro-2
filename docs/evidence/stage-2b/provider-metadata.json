@@ -1,0 +1,16 @@
+{
+  "metadata_only": true,
+  "live_inference_tested": false,
+  "retrieved_at_utc": "2026-09-28",
+  "eligible_free_routes": [
+    {
+      "model": "inclusionai/ling-3.0-flash-fin:free",
+      "provider": "novita"
+    },
+    {
+      "model": "inclusionai/ling-3.0-flash-sante:free",
+      "provider": "novita"
+    }
+  ],
+  "preferred_qwen_listing": "Present but status was nonzero; rejected by readiness gate. No route forced."
+}

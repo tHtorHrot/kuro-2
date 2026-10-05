@@ -1,0 +1,34 @@
+{
+  "verified_at_utc": "2026-10-04T14:15:54.247830+00:00",
+  "scope": "Separate opt-in owned-events write enrollment; runtime remains unchanged",
+  "focused_tests": {
+    "passed": 43,
+    "seconds": 0.09,
+    "exit_code": 0,
+    "command": "pytest -q tests/unit/test_calendar_setup.py"
+  },
+  "ruff_lint": "passed",
+  "ruff_format": "passed",
+  "overlay_check": "only 3 Google secret file references change; no services or broad mounts added",
+  "scope_read_default": "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+  "scope_write_candidate": "https://www.googleapis.com/auth/calendar.events.owned",
+  "internal_grant_scopes_in_runbook": [
+    "calendar:read",
+    "calendar:write"
+  ],
+  "live_google_call_by_assistant": false,
+  "windows_run_by_assistant": false,
+  "live_write_acceptance": "pending_user_consent_and_smoke",
+  "runtime_changed": false,
+  "migration_required": false,
+  "image_build_required": false,
+  "activation_requires_idle_queue_and_explicit_grant_change": true,
+  "stage_4_frozen": false,
+  "files": {
+    "scripts/setup_calendar.py": "edb2588869df009288e5d358a98eaca3da112b4f975d37f845bbe8d9c5cdde34",
+    "tests/unit/test_calendar_setup.py": "655de248240632a26bb6ffd41080bc09d787d4751f77fec85fbfb757e98c47f8",
+    "compose.calendar.write.yaml": "d07d3eb41096490a075f4d6bbebc39e366d92fb10da3d768459ed4a7e91a949e",
+    "docs/STAGE4_WRITE_ACCEPTANCE.md": "bfcd28a477101db5b318115f67cecca71b492b7dccef94c8ada2d188e091f69c",
+    "docs/STAGE4_REMAINING.md": "5f4ccc9f1bee0b6bc135d8b6b2de074ae017e88104a75b0e03173272ddf37cd6"
+  }
+}

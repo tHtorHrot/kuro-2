@@ -1,0 +1,20 @@
+{
+  "packaging_check": "passed after failing on original Dockerfile",
+  "stages": [
+    "tests",
+    "parser"
+  ],
+  "engine_explicit": true,
+  "build_checks": [
+    "Poppler/Tesseract executables",
+    "eng and ind language data"
+  ],
+  "docker_build_here": "not available",
+  "user_report_before_fix": "281 passed, 1 failed (real OCR test), exit 1; traceback not provided",
+  "root_cause": "Language packages only recommend tesseract-ocr; --no-install-recommends omitted executable",
+  "official_references": [
+    "https://packages.debian.org/bookworm/tesseract-ocr-eng",
+    "https://packages.debian.org/bookworm/tesseract-ocr-ind",
+    "https://packages.debian.org/bookworm/tesseract-ocr"
+  ]
+}

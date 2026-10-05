@@ -1,0 +1,53 @@
+# Stage 4 Calendar execution boundary. Only this service receives Google OAuth secrets.
+services:
+  scheduler:
+    image: personal-jarvis:0.4.0
+    build:
+      context: .
+      target: runtime
+    init: true
+    read_only: true
+    tmpfs: /tmp:size=16m,mode=1777
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    pids_limit: 100
+    mem_limit: 256m
+    cpus: 0.35
+    restart: unless-stopped
+    stop_grace_period: 150s
+    healthcheck:
+      test: [CMD, jarvis, scheduler-health, --owner-id, "${JARVIS_OWNER_ID:?set JARVIS_OWNER_ID}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    entrypoint: [jarvis]
+    command: [scheduler-run, --owner-id, "${JARVIS_OWNER_ID:?set JARVIS_OWNER_ID}"]
+    environment:
+      JARVIS_ENVIRONMENT: production
+      JARVIS_DATABASE_URL_FILE: /run/secrets/database_url
+      JARVIS_TOKEN_PEPPER_FILE: /run/secrets/token_pepper
+      JARVIS_GOOGLE_CLIENT_ID_FILE: /run/secrets/google_client_id
+      JARVIS_GOOGLE_CLIENT_SECRET_FILE: /run/secrets/google_client_secret
+      JARVIS_GOOGLE_REFRESH_TOKEN_FILE: /run/secrets/google_refresh_token
+      JARVIS_GOOGLE_CALENDAR_ID: primary
+    secrets: [database_url, token_pepper, google_client_id, google_client_secret, google_refresh_token]
+    networks: [database, calendar_egress]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    logging:
+      driver: json-file
+      options: {max-size: '5m', max-file: '3'}
+
+networks:
+  calendar_egress:
+    driver: bridge
+
+secrets:
+  google_client_id:
+    file: ./.secrets/google_client_id
+  google_client_secret:
+    file: ./.secrets/google_client_secret
+  google_refresh_token:
+    file: ./.secrets/google_refresh_token

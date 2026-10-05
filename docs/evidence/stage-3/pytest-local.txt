@@ -1,0 +1,57 @@
+ssssssssssssssssssssssssssssssssssssssssssssssssssssss.................. [ 25%]
+........................................................................ [ 51%]
+........................................................................ [ 76%]
+..................................................................       [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_assistant.py:82: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:101: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:111: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:129: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:146: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:157: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:172: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:185: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:198: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:207: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:220: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:229: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:238: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:261: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:274: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:283: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:300: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_assistant.py:315: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:65: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:81: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:95: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:117: Native PostgreSQL *_test database not configured
+SKIPPED [2] tests/integration/test_knowledge.py:131: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:144: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:153: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:168: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:185: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:198: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_knowledge.py:211: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:43: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:62: Native PostgreSQL *_test database not configured
+SKIPPED [2] tests/integration/test_postgres.py:78: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:92: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:123: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:149: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:161: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:179: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:196: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_postgres.py:206: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:90: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:108: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:127: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:135: Native PostgreSQL *_test database not configured
+SKIPPED [2] tests/integration/test_telegram.py:148: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:161: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:179: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:203: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:216: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:239: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_telegram.py:261: Native PostgreSQL *_test database not configured
+SKIPPED [1] tests/integration/test_vector_service.py:21: Isolated native Qdrant not configured
+228 passed, 54 skipped in 2.75s

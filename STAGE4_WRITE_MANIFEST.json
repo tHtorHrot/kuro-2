@@ -1,0 +1,25 @@
+{
+  "patch": "stage4_write_acceptance_20261004",
+  "apply_to": "A:\\Kuro2\\kuro-main",
+  "requires_existing_runtime": "personal-jarvis:0.4.0 with schema 0008_executor_binding and readable agenda patch already accepted",
+  "runtime_changed": false,
+  "migration_required": false,
+  "image_build_required": false,
+  "read_first": "docs/STAGE4_WRITE_ACCEPTANCE.md",
+  "active_user_calendar_access": "read_only; write candidate not yet activated",
+  "stage_4_frozen": false,
+  "files": {
+    "scripts/setup_calendar.py": "edb2588869df009288e5d358a98eaca3da112b4f975d37f845bbe8d9c5cdde34",
+    "tests/unit/test_calendar_setup.py": "655de248240632a26bb6ffd41080bc09d787d4751f77fec85fbfb757e98c47f8",
+    "compose.calendar.write.yaml": "d07d3eb41096490a075f4d6bbebc39e366d92fb10da3d768459ed4a7e91a949e",
+    "DEVELOPMENT_STATUS.md": "cd2f16fa98e80a18c8ca5731d44817bf67ec92c1ab93b7a0486f54ad5f4f700e",
+    "docs/RESUME_CHECKPOINT.md": "51e8534871463e148020085ab0429c4e5da63e0df2cd205d44bbdb0bd9be1452",
+    "docs/ROADMAP.md": "adfa8a9768abe1405772cf58a6b3b9ecf1cedf6bb7ae308cf97d0d88ddc108b8",
+    "docs/STAGE_4_8_ACCEPTANCE.md": "19dc52c4d0045d861e66dea72498b7212edb4cb124780d3c93eb8b069d1115ed",
+    "docs/GOOGLE_CALENDAR_WINDOWS.md": "35bf6a736d6eb4941c7f538198902164dfe756f2d27301cd0931928c86c43eba",
+    "docs/STAGE4_REMAINING.md": "5f4ccc9f1bee0b6bc135d8b6b2de074ae017e88104a75b0e03173272ddf37cd6",
+    "docs/STAGE4_WRITE_ACCEPTANCE.md": "bfcd28a477101db5b318115f67cecca71b492b7dccef94c8ada2d188e091f69c",
+    "docs/evidence/stage-4g/user-local-acceptance-20261004.json": "2193d49f2ffc58cd23771b3eca82cea672abe85fea930f9aa64259837892c3e9",
+    "docs/evidence/stage-4g/calendar-write-setup-verification.json": "e9fde302ffa0d0e1a10fe992178d42a7e367f05fe30e2f9c94fe9d69e97e0571"
+  }
+}

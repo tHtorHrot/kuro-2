@@ -1,0 +1,126 @@
+name: personal-jarvis
+
+x-logging: &bounded-logs
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "3"
+
+x-app: &app
+  image: personal-jarvis:0.4.0
+  build:
+    context: .
+    target: runtime
+  init: true
+  read_only: true
+  tmpfs:
+    - /tmp:size=16m,mode=1777
+  security_opt:
+    - no-new-privileges:true
+  cap_drop: [ALL]
+  pids_limit: 100
+  mem_limit: 384m
+  cpus: 0.75
+  networks: [database]
+  logging: *bounded-logs
+
+x-runtime-environment: &runtime-environment
+  JARVIS_ENVIRONMENT: production
+  JARVIS_DATABASE_URL_FILE: /run/secrets/database_url
+  JARVIS_TOKEN_PEPPER_FILE: /run/secrets/token_pepper
+  JARVIS_ALLOWED_HOSTS: '["localhost","127.0.0.1"]'
+  JARVIS_INFRASTRUCTURE_TARGET_IDR: "100000"
+  JARVIS_PREMIUM_MODE: confirm_each_use
+  JARVIS_CLOUD_PRIVACY: no_training_zdr
+
+services:
+  postgres:
+    image: postgres:16.15-bookworm@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jarvis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=trust
+    secrets: [postgres_password, app_password, migrator_password]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/bootstrap.sh:/docker-entrypoint-initdb.d/10-roles.sh:ro
+    command: ["postgres", "-c", "max_connections=30", "-c", "shared_buffers=128MB", "-c", "work_mem=4MB", "-c", "log_min_error_statement=panic", "-c", "log_error_verbosity=terse"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d jarvis"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    mem_limit: 512m
+    cpus: 0.75
+    pids_limit: 200
+    networks: [database]
+    logging: *bounded-logs
+
+  migrate:
+    <<: *app
+    restart: "no"
+    command: ["jarvis", "migrate"]
+    environment:
+      JARVIS_MIGRATION_DATABASE_URL_FILE: /run/secrets/migration_database_url
+    secrets: [migration_database_url]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    restart: unless-stopped
+    environment: *runtime-environment
+    secrets: [database_url, token_pepper]
+    # A non-internal endpoint enables host port publishing. Only API joins it.
+    networks: [api_access, database]
+    ports:
+      - "127.0.0.1:${JARVIS_HTTP_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  ops:
+    <<: *app
+    profiles: [ops]
+    restart: "no"
+    entrypoint: ["jarvis"]
+    command: ["doctor"]
+    environment: *runtime-environment
+    secrets: [database_url, token_pepper]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+networks:
+  api_access:
+    driver: bridge
+    internal: false
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+  database:
+    internal: true
+volumes:
+  postgres-data:
+secrets:
+  postgres_password:
+    file: ./.secrets/postgres_password
+  app_password:
+    file: ./.secrets/app_password
+  migrator_password:
+    file: ./.secrets/migrator_password
+  database_url:
+    file: ./.secrets/database_url
+  migration_database_url:
+    file: ./.secrets/migration_database_url
+  token_pepper:
+    file: ./.secrets/token_pepper

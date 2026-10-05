@@ -1,0 +1,9 @@
+{
+  "model_load": "offline",
+  "vectors": 3,
+  "dimensions": 384,
+  "question_similarity": 0.6006,
+  "unrelated_similarity": 0.0642,
+  "inference_sent": false,
+  "note": "Synthetic smoke test; not a retrieval benchmark."
+}

@@ -1,0 +1,44 @@
+{
+  "verified_at_utc": "2026-10-04T13:49:30.095384+00:00",
+  "scope": "Calendar read result presentation and scheduler tmpfs configuration",
+  "schema_head": "0008_executor_binding",
+  "focused_tests": {
+    "passed": 16,
+    "seconds": 0.07,
+    "command": "pytest -q tests/unit/test_calendar_display.py tests/unit/test_stage4_completion.py",
+    "exit_code": 0
+  },
+  "ruff_check": "passed",
+  "ruff_format_check": "passed",
+  "compose_files_parsed": 6,
+  "absolute_tmpfs_entries_checked": 17,
+  "native_integration_rerun": false,
+  "docker_build_run_by_assistant": false,
+  "oauth_or_calendar_calls_by_assistant": false,
+  "ui_smoke_after_patch": "pending_user_installation",
+  "runtime_module_changes": [
+    "src/jarvis/orchestration/calendar_chat.py",
+    "src/jarvis/orchestration/calendar_display.py"
+  ],
+  "image_rebuild_required": true,
+  "recreate_services": [
+    "assistant"
+  ],
+  "migration_required": false,
+  "oauth_setup_required": false,
+  "grant_change_required": false,
+  "baseline_native_tests": "444 passed as reported by user; earlier runtime revision",
+  "files": {
+    "compose.calendar.yaml": "8b35ad5cbff53fda271b0ec339f1ccdf870345b42938cac8505883ee910ba8de",
+    "src/jarvis/orchestration/calendar_chat.py": "1f679cf15acf79afa3c9154121803bff8238003d5c4fccd0fbb64042e0727cf0",
+    "src/jarvis/orchestration/calendar_display.py": "cc02c1782ca41e5ffbe0c395c43c531349f91bcbf8f30d812cb77abd84bdc9be",
+    "tests/unit/test_calendar_display.py": "34dc74a53929eb866b08620869c674b1c022545031fba6077368d2b97851f174",
+    "tests/unit/test_stage4_completion.py": "be57570c2ba74a9adc79a7615e15e20626f03b8b95873cb1cacd9ad458737127",
+    "tests/integration/test_calendar_chat.py": "f890d984b0b5e26082f4359da798dd65f68da86dc3d3f59278f6b46f364ab057",
+    "DEVELOPMENT_STATUS.md": "97aa6308e32cc03b4d92320eb4f9cfd3708cdeec86841e407d579e5cb3859572",
+    "docs/RESUME_CHECKPOINT.md": "7021bc9d50b6769fdef77e31d40e0413cf51240c784a2cf92df6974753ca87cb",
+    "docs/GOOGLE_CALENDAR_WINDOWS.md": "2a9263d63e8a73e252d65e99c8480e20253cdb4959b10ca7421d55c10da72b71",
+    "docs/CALENDAR_AGENDA_PATCH.md": "cef30c44f4e9177c87e59f4562e1e4ec3413bd162a3093a0f4132e5b1157aff0",
+    "docs/evidence/stage-4g/user-local-acceptance-20261004.json": "306baa104a873ef86d0308a644d543c1453ece9ba579b00ad17054cec71ebe7e"
+  }
+}

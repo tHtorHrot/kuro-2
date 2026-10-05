@@ -1,0 +1,8 @@
+{
+  "layout": "current tests Dockerfile COPY inputs, no Docker daemon",
+  "before": "1 failed",
+  "confirmed_cause": "infra/postgres/bootstrap.sh is absent from test image inputs",
+  "after": "121 passed",
+  "user_docker_report": "143 passed, 1 failed before fix; only named failing unit test",
+  "native_docker_retest": "pending on user computer"
+}

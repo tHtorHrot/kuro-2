@@ -1,0 +1,22 @@
+{
+  "version": "0.3.0",
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "41",
+    "tests": "207",
+    "time": "2.454",
+    "timestamp": "2026-09-29T02:11:56.688225+07:00",
+    "hostname": "62c835f80e60"
+  },
+  "passed": 166,
+  "native_skipped": 41,
+  "unit_coverage_percent": 51.43,
+  "dependencies_audited": 53,
+  "known_vulnerabilities": 0,
+  "native_docker_executed": false,
+  "live_inference_executed": false,
+  "build": "wheel and sdist passed",
+  "uv_lock_sha256": "e14d4fc5bfc8688b2cddd83b581e6ca11681977bcc059a1a34cd2ce54d8c9049"
+}

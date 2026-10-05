@@ -1,0 +1,270 @@
+﻿qdrant-1  |            _                 _    
+qdrant-1  |   __ _  __| |_ __ __ _ _ __ | |_  
+tests-1   | Disposable test database roles provisioned
+qdrant-1  |  / _` |/ _` | '__/ _` | '_ \| __| 
+qdrant-1  | | (_| | (_| | | | (_| | | | | |_  
+tests-1   | Populated stage 2B -> 4B native migration: existing owner, identity, enablement and memory preserved
+tests-1   | {"migrations": "applied"}
+qdrant-1  |  \__, |\__,_|_|  \__,_|_| |_|\__| 
+tests-1   | {"migrations": "applied"}
+qdrant-1  |     |_|                           
+qdrant-1  | 
+tests-1   | ============================= test session starts ==============================
+tests-1   | platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0
+tests-1   | rootdir: /app
+tests-1   | configfile: pyproject.toml
+tests-1   | testpaths: tests
+qdrant-1  | Version: 1.19.1, build: 6ab21cac
+tests-1   | plugins: langsmith-0.14.1, anyio-4.15.1, cov-7.1.0, asyncio-1.4.0, platformdirs-4.12.0
+tests-1   | asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+tests-1   | collected 444 items
+qdrant-1  | Access web UI at http://localhost:6333/dashboard
+tests-1   | 
+qdrant-1  | Agentic Skills: https://skills.qdrant.tech/
+tests-1   | tests/integration/test_assistant.py .........................            [  5%]
+tests-1   | tests/integration/test_calendar_chat.py ............                     [  8%]
+tests-1   | tests/integration/test_knowledge.py ............                         [ 11%]
+tests-1   | tests/integration/test_postgres.py ...........                           [ 13%]
+qdrant-1  | 
+qdrant-1  | 2026-10-04T04:08:22.865297Z  WARN qdrant: There is a potential issue with the filesystem for storage path ./storage. Details: Data will be lost on system restart - tmpfs is memory-based
+qdrant-1  | 2026-10-04T04:08:22.865732Z  INFO storage::content_manager::consensus::persistent: Initializing new raft state at ./storage/raft_state.json
+qdrant-1  | 2026-10-04T04:08:22.878037Z  INFO qdrant: Distributed mode disabled
+tests-1   | tests/integration/test_telegram.py ............                          [ 16%]
+tests-1   | tests/integration/test_tool_actions.py .....                             [ 17%]
+tests-1   | tests/integration/test_vector_service.py .                               [ 17%]
+tests-1   | tests/offline/test_calendar_directive.py ..........                      [ 19%]
+tests-1   | tests/offline/test_ingress_contract.py ..............                    [ 22%]
+tests-1   | tests/unit/test_action_journal.py ..                                     [ 23%]
+tests-1   | tests/unit/test_action_scheduler.py ...                                  [ 24%]
+tests-1   | tests/unit/test_agent_registry.py .                                      [ 24%]
+tests-1   | tests/unit/test_api.py ................                                  [ 27%]
+tests-1   | tests/unit/test_assistant_diagnostics.py ................                [ 31%]
+tests-1   | tests/unit/test_assistant_graph_setup.py .....................           [ 36%]
+tests-1   | tests/unit/test_assistant_router.py .................................... [ 44%]
+tests-1   | .                                                                        [ 44%]
+tests-1   | tests/unit/test_calendar_activation.py ..                                [ 45%]
+tests-1   | tests/unit/test_calendar_boundaries.py ................................. [ 52%]
+qdrant-1  | 2026-10-04T04:08:22.878335Z  INFO qdrant: Telemetry reporting disabled
+qdrant-1  | 2026-10-04T04:08:22.921319Z  WARN qdrant::startup: Failed to create init file indicator: failed to create file `.qdrant-initialized`: Read-only file system (os error 30)
+qdrant-1  | 2026-10-04T04:08:22.922957Z  INFO qdrant::actix: REST transport settings: keep_alive=5s, client_request_timeout=5s, client_disconnect_timeout=5s
+qdrant-1  | 2026-10-04T04:08:22.923036Z  INFO qdrant::actix: TLS disabled for REST API
+qdrant-1  | 2026-10-04T04:08:22.923507Z  INFO qdrant::actix: Qdrant HTTP listening on 6333
+qdrant-1  | 2026-10-04T04:08:22.923872Z  INFO actix_server::builder: starting 11 workers
+qdrant-1  | 2026-10-04T04:08:22.924308Z  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+qdrant-1  | 2026-10-04T04:08:22.924383Z  INFO actix_server::server: starting service: "actix-web-service-0.0.0.0:6333", workers: 11, listening on: 0.0.0.0:6333
+qdrant-1  | 2026-10-04T04:08:22.943614Z  INFO qdrant::tonic: Qdrant gRPC listening on 6334
+qdrant-1  | 2026-10-04T04:08:22.943753Z  INFO qdrant::tonic: TLS disabled for gRPC API
+tests-1   | ..                                                                       [ 52%]
+tests-1   | tests/unit/test_calendar_oauth.py .....                                  [ 54%]
+tests-1   | tests/unit/test_calendar_recovery.py ........                            [ 55%]
+tests-1   | tests/unit/test_calendar_service.py ...                                  [ 56%]
+tests-1   | tests/unit/test_calendar_specialist.py ......                            [ 57%]
+tests-1   | tests/unit/test_configuration_logging.py ..............                  [ 61%]
+tests-1   | tests/unit/test_crypto_policy.py .................                       [ 64%]
+tests-1   | tests/unit/test_documents_cli.py ....                                    [ 65%]
+tests-1   | tests/unit/test_execution_broker.py ....                                 [ 66%]
+tests-1   | tests/unit/test_google_calendar_provider.py ....                         [ 67%]
+qdrant-1  | 2026-10-04T04:09:01.206515Z  INFO actix_web::middleware::logger: 172.26.0.4 "GET /collections/jarvis_knowledge_v1 HTTP/1.1" 404 104 "-" "python-httpx/0.28.1" 0.003092
+qdrant-1  | 2026-10-04T04:09:01.218331Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection jarvis_knowledge_v1
+qdrant-1  | 2026-10-04T04:09:01.239104Z  INFO actix_web::middleware::logger: 172.26.0.4 "PUT /collections/jarvis_knowledge_v1 HTTP/1.1" 200 56 "-" "python-httpx/0.28.1" 0.027170
+tests-1   | tests/unit/test_knowledge_compose.py ...                                 [ 68%]
+tests-1   | tests/unit/test_knowledge_content.py .............                       [ 71%]
+qdrant-1  | 2026-10-04T04:09:01.246059Z  INFO actix_web::middleware::logger: 172.26.0.4 "GET /collections/jarvis_knowledge_v1 HTTP/1.1" 200 453 "-" "python-httpx/0.28.1" 0.002906
+qdrant-1  | 2026-10-04T04:09:01.259166Z  INFO actix_web::middleware::logger: 172.26.0.4 "PUT /collections/jarvis_knowledge_v1/points?wait=true HTTP/1.1" 200 82 "-" "python-httpx/0.28.1" 0.009491
+tests-1   | tests/unit/test_knowledge_extraction.py ......                           [ 72%]
+tests-1   | tests/unit/test_knowledge_services.py .............                      [ 75%]
+tests-1   | tests/unit/test_stage4_completion.py ....                                [ 76%]
+qdrant-1  | 2026-10-04T04:09:01.264113Z  INFO actix_web::middleware::logger: 172.26.0.4 "PUT /collections/jarvis_knowledge_v1/points?wait=true HTTP/1.1" 200 79 "-" "python-httpx/0.28.1" 0.001248
+qdrant-1  | 2026-10-04T04:09:01.268362Z  INFO actix_web::middleware::logger: 172.26.0.4 "PUT /collections/jarvis_knowledge_v1/points?wait=true HTTP/1.1" 200 83 "-" "python-httpx/0.28.1" 0.001026
+tests-1   | tests/unit/test_telegram_client.py ...........................           [ 82%]
+tests-1   | tests/unit/test_telegram_commands.py ................................    [ 89%]
+tests-1   | tests/unit/test_telegram_setup.py ......                                 [ 90%]
+tests-1   | tests/unit/test_tool_policy.py ....                                      [ 91%]
+tests-1   | tests/unit/test_tool_registry.py ..                                      [ 92%]
+qdrant-1  | 2026-10-04T04:09:01.279485Z  INFO actix_web::middleware::logger: 172.26.0.4 "POST /collections/jarvis_knowledge_v1/points/search HTTP/1.1" 200 110 "-" "python-httpx/0.28.1" 0.007731
+tests-1   | tests/unit/test_tool_runtime.py ..                                       [ 92%]
+tests-1   | tests/unit/test_trusted_intent.py .......................                [ 97%]
+tests-1   | tests/unit/test_windows_secrets.py .........                             [100%]
+tests-1   | 
+tests-1   | ================================ tests coverage ================================
+qdrant-1  | 2026-10-04T04:09:01.285440Z  INFO actix_web::middleware::logger: 172.26.0.4 "POST /collections/jarvis_knowledge_v1/points/delete?wait=true HTTP/1.1" 200 82 "-" "python-httpx/0.28.1" 0.002233
+qdrant-1  | 2026-10-04T04:09:01.289976Z  INFO actix_web::middleware::logger: 172.26.0.4 "POST /collections/jarvis_knowledge_v1/points/search HTTP/1.1" 200 55 "-" "python-httpx/0.28.1" 0.000720
+qdrant-1  | 2026-10-04T04:09:01.294343Z  INFO actix_web::middleware::logger: 172.26.0.4 "POST /collections/jarvis_knowledge_v1/points/search HTTP/1.1" 200 111 "-" "python-httpx/0.28.1" 0.000616
+qdrant-1  | 2026-10-04T04:09:01.297509Z  INFO actix_web::middleware::logger: 172.26.0.4 "POST /collections/jarvis_knowledge_v1/points/delete?wait=true HTTP/1.1" 200 82 "-" "python-httpx/0.28.1" 0.000756
+qdrant-1  | 2026-10-04T04:09:01.301536Z  INFO actix_web::middleware::logger: 172.26.0.4 "POST /collections/jarvis_knowledge_v1/points/delete?wait=true HTTP/1.1" 200 80 "-" "python-httpx/0.28.1" 0.000900
+qdrant-1  | 2026-10-04T04:09:01.305281Z  INFO actix_web::middleware::logger: 172.26.0.4 "POST /collections/jarvis_knowledge_v1/points/delete?wait=true HTTP/1.1" 200 83 "-" "python-httpx/0.28.1" 0.001090
+tests-1   | _______________ coverage: platform linux, python 3.12.14-final-0 _______________
+tests-1   | 
+tests-1   | Name                                                                            Stmts   Miss Branch BrPart  Cover   Missing
+qdrant-1  | 2026-10-04T04:09:10.354586Z  INFO actix_server::server: SIGTERM received; starting graceful shutdown
+qdrant-1  | 2026-10-04T04:09:10.354721Z  INFO actix_server::worker: shutting down idle worker
+tests-1   | ---------------------------------------------------------------------------------------------------------------------------
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/__init__.py                               1      0      0      0   100%
+qdrant-1  | 2026-10-04T04:09:10.354739Z  INFO actix_server::worker: shutting down idle worker
+qdrant-1  | 2026-10-04T04:09:10.354752Z  INFO actix_server::worker: shutting down idle worker
+qdrant-1  | 2026-10-04T04:09:10.354720Z  INFO actix_server::accept: accept thread stopped
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/agents/__init__.py                        2      0      0      0   100%
+qdrant-1  | 2026-10-04T04:09:10.354771Z  INFO actix_server::worker: shutting down idle worker
+qdrant-1  | 2026-10-04T04:09:10.354813Z  INFO actix_server::worker: shutting down idle worker
+qdrant-1  | 2026-10-04T04:09:10.354816Z  INFO actix_server::worker: shutting down idle worker
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/agents/registry.py                       34      6     12      4    78%   17, 19, 21, 31, 41-42
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/api/__init__.py                           0      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/api/dependencies.py                      12      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/api/middleware.py                       109      8     32      4    90%   48, 120, 133-136, 141, 149
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/api/routes.py                            62     16      6      0    68%   29-31, 39-41, 55, 66-70, 80, 106-115
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/api/schemas.py                           25      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/__init__.py                     0      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/cli.py                         56     20     24      4    58%   26, 28-31, 52, 54-78
+qdrant-1  | 2026-10-04T04:09:10.354931Z  INFO actix_server::worker: shutting down idle worker
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/commands.py                     2      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/config.py                      62     17     10      1    69%   50, 63-70, 76-83
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/diagnostics.py                 23      0      6      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/graph.py                       82      5     10      0    95%   77-79, 96-98
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/policy.py                      34      1     12      1    96%   58
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/repository.py                 374     54    140     29    83%   162-163, 170-175, 200->201, 217, 222-225, 228-238, 241-244, 251-252, 254, 269-270, 281-284, 305-322, 345, 370, 398->395, 424, 441-442, 450, 470, 472-474, 480->483, 521->523, 538, 546, 586, 615, 652, 689, 704-713, 750->exit
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/router.py                     133     16     58     14    84%   50, 53, 59, 65, 95, 102, 150, 173, 176, 180-182, 187, 191, 201, 204, 231
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/assistant/worker.py                      60     30     14      1    45%   32-33, 38->exit, 42-43, 47-72
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/cli.py                                  164    164     68      0     0%   3-236
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/core/__init__.py                          0      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/core/calendar_directive.py               50      4     18      2    91%   31, 49-50, 71
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/core/config.py                           90      2     18      2    96%   54, 109
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/core/errors.py                            8      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/core/logging.py                          36      0     10      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/identity/__init__.py                      0      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/identity/crypto.py                       30      0      6      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/identity/service.py                      99     10     28      7    87%   62, 64, 67, 108->110, 120, 123, 145-146, 170, 190-191
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/__init__.py                  0      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/__init__.py         8      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/activation.py      35      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/agent.py            7      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/config.py          20      4      2      0    73%   28-31
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/google.py         103     23     48      9    74%   31, 42, 45, 47, 49, 51, 83, 100, 103-111, 115, 158, 170-171, 181-182
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/http.py            24      4     10      2    82%   19, 25-27
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/oauth.py           50      6     14      5    83%   43, 68, 72, 75, 85, 87
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/provider.py         4      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/recovery.py        34      5     10      5    77%   29, 32, 36, 40, 47
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/service.py         26      1      0      0    96%   27
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/tools.py           29      6      2      1    77%   41, 52-53, 62-64
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/integrations/calendar/validation.py      45      4     34      4    90%   24, 37, 41, 54
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/interfaces/__init__.py                    0      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/interfaces/telegram/__init__.py           0      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/interfaces/telegram/cli.py               51     51     20      0     0%   1-78
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/interfaces/telegram/client.py            93      4     38      4    94%   83, 92, 94, 111
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/interfaces/telegram/commands.py          50      1     28      1    97%   77
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/interfaces/telegram/config.py            32      3      8      3    85%   26, 29, 38
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/interfaces/telegram/repository.py       178     13     56      8    90%   51, 75, 81, 131, 162, 175, 182, 204->211, 255-256, 301-308
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/interfaces/telegram/worker.py            95     48     20      2    46%   44-46, 51->exit, 57-58, 64, 75, 80-83, 87-127
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/knowledge/__init__.py                     0      0      0      0   100%
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/knowledge/cli.py                         58     58     26      0     0%   1-82
+tests-1   | .venv/lib/python3.12/site-packages/jarvis/knowledge/commands.py                    53     18     16      6    65%   20-38, 42-46, 49-50, 60-67, 83-87, 90-91, 98-99
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/knowledge/config.py                      35      3      4      2    87%   25, 35, 43
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/knowledge/content.py                     56      5     24      6    86%   28, 32->29, 36, 41, 82, 85
+postgres-test-1  | The files belonging to this database system will be owned by user "postgres".
+postgres-test-1  | This user must also own the server process.
+postgres-test-1  | 
+postgres-test-1  | The database cluster will be initialized with locale "en_US.utf8".
+postgres-test-1  | The default database encoding has accordingly been set to "UTF8".
+postgres-test-1  | The default text search configuration will be set to "english".
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/knowledge/extraction.py                 118     18     58     19    79%   32, 38, 47, 64, 70->66, 72->66, 79->74, 86-87, 94, 97, 128->151, 131, 149->151, 151->100, 155, 162, 164, 174, 181-184, 186, 188
+postgres-test-1  | 
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/knowledge/parser_app.py                  74     31     14      5    59%   23, 31, 43, 45-46, 48, 63-69, 71, 74-75, 80-95, 99
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/knowledge/repository.py                 289     53    114     35    76%   61, 63, 74->76, 101->99, 116, 119, 135, 146-148, 156->157, 160->161, 169, 186, 188, 195, 220, 250, 261-262, 275-284, 307, 311, 337, 339-340, 362, 370, 385, 391, 407, 416, 419, 423->exit, 437->exit, 468, 479, 483, 495, 502, 534->exit, 543-558
+postgres-test-1  | Data page checksums are disabled.
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/knowledge/services.py                   131     33     42      8    72%   50->47, 52, 62-63, 66-79, 86, 96, 107, 122-136, 157->164, 168-170, 174
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/knowledge/worker.py                      78     78     18      0     0%   1-94
+postgres-test-1  | 
+postgres-test-1  | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+postgres-test-1  | creating subdirectories ... ok
+postgres-test-1  | selecting dynamic shared memory implementation ... posix
+postgres-test-1  | selecting default max_connections ... 100
+postgres-test-1  | selecting default shared_buffers ... 128MB
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/main.py                                  57      7      0      0    88%   48-53, 95-102
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/orchestration/__init__.py                 2      0      0      0   100%
+postgres-test-1  | selecting default time zone ... Etc/UTC
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/orchestration/calendar_chat.py          121     27     40      9    76%   68, 102, 107, 112-113, 122-128, 142-147, 161, 163-165, 175-176, 180-182, 216-217, 233, 245-248
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/orchestration/trusted_intent.py          81      9     22      5    86%   49, 52-53, 55, 61, 104, 107-108, 110
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/policies/__init__.py                      0      0      0      0   100%
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/policies/privacy.py                      27      0      8      0   100%
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/storage/__init__.py                       0      0      0      0   100%
+postgres-test-1  | creating configuration files ... ok
+postgres-test-1  | running bootstrap script ... ok
+postgres-test-1  | performing post-bootstrap initialization ... ok
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/storage/database.py                      44      5     10      5    81%   52, 76, 85, 93, 102
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/storage/models.py                       231      0      0      0   100%
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/__init__.py                         8      0      0      0   100%
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/authority.py                       22      3      6      3    79%   15, 17, 21
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/contracts.py                       57      6     14      6    83%   38, 40, 42, 44, 46, 48
+postgres-test-1  | initdb: warning: enabling "trust" authentication for local connections
+postgres-test-1  | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/execution.py                       65     11     12      2    83%   52, 57-59, 71-72, 85-87, 98-99
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/journal.py                        235     48     82     19    76%   38, 116-117, 119, 127-128, 131, 133, 136, 145, 147, 169, 208, 210, 212, 225-237, 259-260, 278-281, 318-336, 348, 369, 383, 399, 404-406, 414
+postgres-test-1  | syncing data to disk ... ok
+postgres-test-1  | 
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/operator.py                        86     86      8      0     0%   3-156
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/policy.py                          13      0     10      0   100%
+postgres-test-1  | 
+postgres-test-1  | Success. You can now start the database server using:
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/registry.py                        20      0      4      0   100%
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/runtime.py                         38      6     10      2    83%   30, 37-38, 52, 56-57
+postgres-test-1  | 
+postgres-test-1  |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+postgres-test-1  | 
+postgres-test-1  | waiting for server to start....2026-10-04 04:08:23.446 UTC [49] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-test-1  | 2026-10-04 04:08:23.449 UTC [49] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-test-1  | 2026-10-04 04:08:23.475 UTC [52] LOG:  database system was shut down at 2026-10-04 04:08:23 UTC
+postgres-test-1  | 2026-10-04 04:08:23.481 UTC [49] LOG:  database system is ready to accept connections
+postgres-test-1  |  done
+tests-1          | .venv/lib/python3.12/site-packages/jarvis/tools/scheduler.py                       37      6     14      0    76%   51-56
+tests-1          | ---------------------------------------------------------------------------------------------------------------------------
+tests-1          | TOTAL                                                                            4468   1037   1318    245    74%
+postgres-test-1  | server started
+postgres-test-1  | CREATE DATABASE
+tests-1          | ============================= 444 passed in 28.50s =============================
+postgres-test-1  | 
+postgres-test-1  | 
+postgres-test-1  | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+postgres-test-1  | 
+postgres-test-1  | waiting for server to shut down...2026-10-04 04:08:23.646 UTC [49] LOG:  received fast shutdown request
+postgres-test-1  | .2026-10-04 04:08:23.646 UTC [49] LOG:  aborting any active transactions
+postgres-test-1  | 2026-10-04 04:08:23.650 UTC [49] LOG:  background worker "logical replication launcher" (PID 55) exited with exit code 1
+postgres-test-1  | 2026-10-04 04:08:23.650 UTC [50] LOG:  shutting down
+postgres-test-1  | 2026-10-04 04:08:23.650 UTC [50] LOG:  checkpoint starting: shutdown immediate
+postgres-test-1  | 2026-10-04 04:08:23.662 UTC [50] LOG:  checkpoint complete: wrote 922 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.011 s, sync=0.002 s, total=0.012 s; sync files=301, longest=0.001 s, average=0.001 s; distance=4255 kB, estimate=4255 kB; lsn=0/1912118, redo lsn=0/1912118
+postgres-test-1  | 2026-10-04 04:08:23.673 UTC [49] LOG:  database system is shut down
+postgres-test-1  |  done
+postgres-test-1  | server stopped
+postgres-test-1  | 
+postgres-test-1  | PostgreSQL init process complete; ready for start up.
+postgres-test-1  | 
+postgres-test-1  | 2026-10-04 04:08:23.775 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-test-1  | 2026-10-04 04:08:23.776 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-test-1  | 2026-10-04 04:08:23.776 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-test-1  | 2026-10-04 04:08:23.806 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-test-1  | 2026-10-04 04:08:23.810 UTC [65] LOG:  database system was shut down at 2026-10-04 04:08:23 UTC
+postgres-test-1  | 2026-10-04 04:08:23.817 UTC [1] LOG:  database system is ready to accept connections
+postgres-test-1  | 2026-10-04 04:08:47.609 UTC [195] ERROR:  new row violates row-level security policy for table "profile_memory"
+postgres-test-1  | 2026-10-04 04:08:47.609 UTC [195] STATEMENT:  INSERT INTO app.profile_memory (owner_id, key, value, data_class) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR) RETURNING app.profile_memory.updated_at
+postgres-test-1  | 2026-10-04 04:08:57.267 UTC [263] ERROR:  new row violates row-level security policy for table "users"
+postgres-test-1  | 2026-10-04 04:08:57.267 UTC [263] STATEMENT:  INSERT INTO app.users (id, display_name, timezone, status) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR) RETURNING app.users.created_at
+postgres-test-1  | 2026-10-04 04:08:57.343 UTC [264] ERROR:  permission denied for schema app at character 14
+postgres-test-1  | 2026-10-04 04:08:57.343 UTC [264] STATEMENT:  CREATE TABLE app.forbidden (id integer)
+postgres-test-1  | 2026-10-04 04:08:57.347 UTC [264] ERROR:  permission denied to set role "jarvis_migrator"
+postgres-test-1  | 2026-10-04 04:08:57.347 UTC [264] STATEMENT:  SET ROLE jarvis_migrator
+postgres-test-1  | 2026-10-04 04:08:57.405 UTC [265] ERROR:  permission denied for table audit_events
+postgres-test-1  | 2026-10-04 04:08:57.405 UTC [265] STATEMENT:  UPDATE app.audit_events SET action='forged'
+postgres-test-1  | 2026-10-04 04:08:57.459 UTC [266] ERROR:  permission denied for table audit_events
+postgres-test-1  | 2026-10-04 04:08:57.459 UTC [266] STATEMENT:  DELETE FROM app.audit_events
+postgres-test-1  | 2026-10-04 04:08:58.187 UTC [281] ERROR:  duplicate key value violates unique constraint "identity_channel_user"
+postgres-test-1  | 2026-10-04 04:08:58.187 UTC [281] STATEMENT:  INSERT INTO app.external_identities (id, owner_id, channel, external_user_id, chat_id, enabled) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::BIGINT, $5::BIGINT, $6) RETURNING app.external_identities.created_at
+postgres-test-1  | 2026-10-04 04:09:00.030 UTC [302] ERROR:  new row violates row-level security policy for table "telegram_receipts"
+postgres-test-1  | 2026-10-04 04:09:00.030 UTC [302] STATEMENT:  INSERT INTO app.telegram_receipts (owner_id, bot_id, update_id, chat_id, reply_kind, reply_text, requires_pairing, delivery_status, attempts, next_attempt_at, telegram_message_id) VALUES ($1::UUID, $2::BIGINT, $3::BIGINT, $4::BIGINT, $5::VARCHAR, $6::VARCHAR, $7, $8::VARCHAR, $9::INTEGER, $10::TIMESTAMP WITH TIME ZONE, $11::BIGINT) RETURNING app.telegram_receipts.created_at
+postgres-test-1  | 2026-10-04 04:09:00.985 UTC [309] ERROR:  tool action payload is immutable
+postgres-test-1  | 2026-10-04 04:09:00.985 UTC [309] CONTEXT:  PL/pgSQL function app.reject_tool_action_payload_update() line 17 at RAISE
+postgres-test-1  | 2026-10-04 04:09:00.985 UTC [309] STATEMENT:  UPDATE app.tool_actions SET arguments=$1::JSONB WHERE app.tool_actions.id = $2::UUID
+postgres-test-1  | 2026-10-04 04:09:10.371 UTC [1] LOG:  received fast shutdown request
+postgres-test-1  | 2026-10-04 04:09:10.371 UTC [1] LOG:  aborting any active transactions
+postgres-test-1  | 2026-10-04 04:09:10.375 UTC [1] LOG:  background worker "logical replication launcher" (PID 68) exited with exit code 1
+postgres-test-1  | 2026-10-04 04:09:10.376 UTC [63] LOG:  shutting down
+postgres-test-1  | 2026-10-04 04:09:10.376 UTC [63] LOG:  checkpoint starting: shutdown immediate
+postgres-test-1  | 2026-10-04 04:09:10.380 UTC [63] LOG:  checkpoint complete: wrote 338 buffers (2.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.001 s, total=0.005 s; sync files=164, longest=0.001 s, average=0.001 s; distance=1835 kB, estimate=1835 kB; lsn=0/1ADD0C0, redo lsn=0/1ADD0C0
+postgres-test-1  | 2026-10-04 04:09:10.389 UTC [1] LOG:  database system is shut down

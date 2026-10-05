@@ -1,0 +1,53 @@
+# Isolated ephemeral tests. Never merge with compose.yaml.
+name: personal-jarvis-tests
+services:
+  postgres-test:
+    image: postgres:16.15-bookworm@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test-only-admin-not-a-production-secret
+      POSTGRES_DB: jarvis_test
+    tmpfs:
+    - /var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U postgres -d jarvis_test
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  tests:
+    build:
+      context: .
+      target: tests
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    environment:
+      JARVIS_TEST_ADMIN_URL: postgresql://postgres:test-only-admin-not-a-production-secret@postgres-test:5432/jarvis_test
+      JARVIS_MIGRATION_DATABASE_URL: postgresql+psycopg://jarvis_migrator:test-only-migrator@postgres-test:5432/jarvis_test
+      JARVIS_TEST_DATABASE_URL: postgresql+psycopg://jarvis_app:test-only-app@postgres-test:5432/jarvis_test
+      JARVIS_REQUIRE_INTEGRATION: '1'
+      JARVIS_TEST_QDRANT: '1'
+    command:
+    - sh
+    - -ec
+    - python scripts/bootstrap_test_db.py && python scripts/check_test_upgrade.py && jarvis migrate && jarvis migrate && pytest
+      --cov=jarvis --cov-report=term-missing
+  qdrant:
+    image: qdrant/qdrant:v1.19.1
+    user: 10001:10001
+    read_only: true
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    tmpfs:
+    - /qdrant/storage:size=256m,mode=1777
+    - /tmp:size=32m,mode=1777
+    environment:
+      QDRANT__TELEMETRY_DISABLED: 'true'
+      QDRANT__STORAGE__SNAPSHOTS_PATH: /qdrant/storage/snapshots
+      QDRANT__STORAGE__TEMP_PATH: /tmp

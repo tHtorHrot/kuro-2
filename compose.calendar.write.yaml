@@ -1,0 +1,9 @@
+# Opt-in overlay, AFTER compose.calendar.yaml. Existing read credentials stay in place.
+# Activation requires a deliberate grant change bound to this candidate token.
+secrets:
+  google_client_id:
+    file: ./.secrets/calendar_write/google_client_id
+  google_client_secret:
+    file: ./.secrets/calendar_write/google_client_secret
+  google_refresh_token:
+    file: ./.secrets/calendar_write/google_refresh_token

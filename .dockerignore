@@ -1,0 +1,15 @@
+.git
+.secrets
+.env
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+.coverage*
+htmlcov
+dist
+backups
+test-results
+node_modules
+docs

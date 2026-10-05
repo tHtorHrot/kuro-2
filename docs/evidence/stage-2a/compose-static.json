@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "official_schema": [
+    "base",
+    "telegram overlay",
+    "merged static",
+    "test"
+  ],
+  "network_secret_exposure": "passed",
+  "limitation": "Static only, not Docker Compose merge/runtime verification"
+}

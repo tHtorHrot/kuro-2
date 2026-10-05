@@ -1,0 +1,16 @@
+{
+  "base_version": "0.4.0",
+  "hotfix": "OCR-1",
+  "purpose": "Install Tesseract executable with eng+ind data in tests/parser images",
+  "files": {
+    ".github/workflows/ci.yml": "7338d855b3b44305f1e4f6a352d1a3ce81e60267868eeef36050e3f3b4d51bda",
+    "Dockerfile": "2727547ba6c44c30c9df6cb633d4a10b7b31c49159d3294277919c5a7574d485",
+    "README.md": "ffe844a0f6c9d23e41e9b09f4581a13fc76fc5053144a22118cb78404f0ba1d3",
+    "docs/HOTFIX_OCR_1.md": "49eedff49e26aec7de81ee48c5898d4f6b3c705ae60ce1ca9c7597427f078479",
+    "docs/KNOWLEDGE_WINDOWS.md": "c25ffa21f470c226848b271afb1c8cb8f8626ab91eec894467e840355e568dc5",
+    "docs/STAGE_3_VERIFICATION.md": "1c067724025739c64d01d2d2e09f12ddd9f575d929c1eebdc4c7cbac2666729b",
+    "docs/evidence/stage-3/ocr-hotfix-1/extraction-tests.txt": "3000927c23fb697a948f80ed8a877aab76ee6ed4d52d4ad2dda14c7fa0e10692",
+    "docs/evidence/stage-3/ocr-hotfix-1/packaging-check.json": "f180f401bae82405d1da02fac60d822584dd919fe27f125f95b7fa2311a75cd5",
+    "docs/evidence/stage-3/progress.md": "3461cd83f8dd5216ffc3e1092c33996ca99831f9a8646ef17199b553b4758c7e"
+  }
+}
