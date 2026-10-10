@@ -149,10 +149,10 @@ async def test_read_uses_owner_timezone_and_same_durable_result_path(test_db):
 async def test_incomplete_create_requests_details_without_action_or_llm(test_db):
     tg, repo, journal, provider, scheduler = await setup(test_db)
     assert await submit(tg, repo, "buat rapat besok jam 10") is None
-    assert "jam mulai/selesai" in (await receipt(tg)).reply_text
+    assert "durasi/jam selesai" in (await receipt(tg)).reply_text
     assert (await scheduler.run_pass()).processed == 0
     async with test_db.tenant(repo.owner) as session:
-        assert (await session.scalar(select(AssistantRequest))).status == "succeeded"
+        assert (await session.scalar(select(AssistantRequest))).status == "clarified"
 
 
 async def test_regrant_does_not_revive_an_older_approval(test_db):
@@ -183,3 +183,265 @@ async def test_reconciliation_reads_the_stable_id_without_repeating_post(test_db
     provider.create_event.assert_not_awaited()
     await repo.heartbeat()
     assert "kuro" + row.id.hex in (await receipt(tg)).reply_text
+
+
+async def test_proposal_is_readable_and_prefix_cancel_works(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+    from jarvis.orchestration.calendar_chat import (
+        approval_text,
+        resolve_action,
+        short_id,
+    )
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await tg.ingest([incoming(tg, 100, "buat rapat besok jam 10")], "TestBot")
+    router = AsyncMock()
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    await tg.ingest([incoming(tg, 101, 'judul "Review"; durasi 60 menit')], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    assert "usulan 1 dari 1 menunggu" in (await receipt(tg, 101)).reply_text
+    async with test_db.tenant(repo.owner) as session:
+        row = await session.scalar(
+            select(ToolAction).where(ToolAction.status == "awaiting_approval")
+        )
+    text = approval_text(row)
+    assert "10.00–11.00 (WIB)" in text
+    assert f"Ref: {short_id(row.id)}" in text
+    assert f"/toolapprove {row.id} {row.action_fingerprint}" in text
+    async with test_db.tenant(repo.owner) as session:
+        assert (await resolve_action(session, repo.owner, short_id(row.id))).id == row.id
+        assert await resolve_action(session, repo.owner, "babecafe") is None
+    await tg.ingest([incoming(tg, 102, f"/cancel {short_id(row.id)}")], "TestBot")
+    async with test_db.tenant(repo.owner) as session:
+        assert (await session.get(ToolAction, row.id)).status == "cancelled"
+
+
+def tap(tg, number, action_id, kind="approve", query_id="cb-1"):
+    from datetime import UTC, datetime
+
+    sender = tg.config.sender_id
+    return {
+        "update_id": number,
+        "callback_query": {
+            "id": query_id,
+            "from": {"id": sender, "is_bot": False},
+            "message": {
+                "message_id": 60,
+                "date": int(datetime.now(UTC).timestamp()),
+                "text": "proposal",
+                "chat": {"id": sender, "type": "private"},
+            },
+            "data": f"{kind}:{action_id}",
+        },
+    }
+
+
+async def test_inline_button_tap_approves_exact_action_once(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await tg.ingest([incoming(tg, 100, "buat rapat besok jam 10")], "TestBot")
+    router = AsyncMock()
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    await tg.ingest([incoming(tg, 101, 'judul "Review"; durasi 60 menit')], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    async with test_db.tenant(repo.owner) as session:
+        row = await session.scalar(
+            select(ToolAction).where(ToolAction.status == "awaiting_approval")
+        )
+    await tg.ingest([tap(tg, 102, row.id)], "TestBot")
+    answers = tg.take_callback_outbox()
+    assert [a["answer"] for a in answers] == ["Disetujui ✓"]
+    assert answers[0]["callback_id"] == "cb-1" and answers[0]["message_id"] == 60
+    async with test_db.tenant(repo.owner) as session:
+        assert (await session.get(ToolAction, row.id)).status == "queued"
+    await tg.ingest([tap(tg, 103, row.id, query_id="cb-2")], "TestBot")
+    assert [a["answer"] for a in tg.take_callback_outbox()] == [
+        "Sudah diputuskan / kedaluwarsa / izin berubah."
+    ]
+
+
+async def test_inline_button_tap_cancels_before_dispatch(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await tg.ingest([incoming(tg, 100, "buat rapat besok jam 10")], "TestBot")
+    router = AsyncMock()
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    await tg.ingest([incoming(tg, 101, 'judul "Review"; durasi 60 menit')], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    async with test_db.tenant(repo.owner) as session:
+        row = await session.scalar(
+            select(ToolAction).where(ToolAction.status == "awaiting_approval")
+        )
+    await tg.ingest([tap(tg, 102, row.id, kind="cancel")], "TestBot")
+    assert [a["answer"] for a in tg.take_callback_outbox()] == ["Dibatalkan."]
+    async with test_db.tenant(repo.owner) as session:
+        assert (await session.get(ToolAction, row.id)).status == "cancelled"
+
+
+async def _two_pendings(tg, repo):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    router = AsyncMock()
+    await tg.ingest([incoming(tg, 100, "buat rapat besok jam 10")], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    await tg.ingest([incoming(tg, 101, 'judul "Pagi"; durasi 60 menit')], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    await tg.ingest([incoming(tg, 102, "buat rapat besok jam 12")], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    await tg.ingest([incoming(tg, 103, 'judul "Siang"; durasi 60 menit')], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+
+
+async def test_bare_ya_lists_when_several_wait(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await _two_pendings(tg, repo)
+    await tg.ingest([incoming(tg, 104, "ya")], "TestBot")
+    await AssistantWorkflow(repo, AsyncMock(), AsyncMock()).invoke(await repo.next_request())
+    text = (await receipt(tg, 104)).reply_text
+    assert "2 usulan menunggu" in text and "setujui nomor 1" in text
+    async with test_db.tenant(repo.owner) as session:
+        rows = (
+            await session.scalars(
+                select(ToolAction).where(ToolAction.status == "awaiting_approval")
+            )
+        ).all()
+    assert len(rows) == 2
+
+
+async def test_setujui_nomor_approves_that_queue_entry(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await _two_pendings(tg, repo)
+    await tg.ingest([incoming(tg, 104, "setujui nomor 2")], "TestBot")
+    await AssistantWorkflow(repo, AsyncMock(), AsyncMock()).invoke(await repo.next_request())
+    text = (await receipt(tg, 104)).reply_text
+    assert "Menyetujui usulan 2" in text
+    async with test_db.tenant(repo.owner) as session:
+        rows = (
+            await session.scalars(
+                select(ToolAction).where(ToolAction.status == "awaiting_approval")
+            )
+        ).all()
+        queued = (
+            await session.scalars(select(ToolAction).where(ToolAction.status == "queued"))
+        ).all()
+    assert len(rows) == 1 and len(queued) == 1
+
+
+async def test_single_ya_approves_and_batal_cancels(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await tg.ingest([incoming(tg, 100, "buat rapat besok jam 10")], "TestBot")
+    router = AsyncMock()
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    await tg.ingest([incoming(tg, 101, 'judul "Pagi"; durasi 60 menit')], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    await tg.ingest([incoming(tg, 102, "ya")], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    assert "Menyetujui usulan 1" in (await receipt(tg, 102)).reply_text
+    async with test_db.tenant(repo.owner) as session:
+        assert not (
+            await session.scalars(
+                select(ToolAction).where(ToolAction.status == "awaiting_approval")
+            )
+        ).all()
+
+
+async def test_compound_approves_then_cancels_in_order(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await _two_pendings(tg, repo)
+    router = AsyncMock()
+    await tg.ingest([incoming(tg, 104, "setujui nomor 2 dan batalkan nomor 1")], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    text = (await receipt(tg, 104)).reply_text
+    assert "Menyetujui usulan 2" in text and "dibatalkan" in text
+    async with test_db.tenant(repo.owner) as session:
+        assert not (
+            await session.scalars(
+                select(ToolAction).where(ToolAction.status == "awaiting_approval")
+            )
+        ).all()
+
+
+async def test_compound_with_vague_clause_executes_nothing(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await _two_pendings(tg, repo)
+    await tg.ingest([incoming(tg, 104, "setujui nomor 5 dan batalkan nomor 1")], "TestBot")
+    router = AsyncMock()
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    assert "Nomor 1–2 saja" in (await receipt(tg, 104)).reply_text
+    async with test_db.tenant(repo.owner) as session:
+        rows = (
+            await session.scalars(
+                select(ToolAction).where(ToolAction.status == "awaiting_approval")
+            )
+        ).all()
+    assert len(rows) == 2
+
+
+async def test_salvage_reports_known_missing_and_ignored(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await tg.ingest(
+        [incoming(tg, 100, "buat rapat jijik besok sore jam 3 durasi 20 menit")], "TestBot"
+    )
+    router = AsyncMock()
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    router.plan.assert_not_awaited()
+    router.complete.assert_not_awaited()
+    text = (await receipt(tg, 100)).reply_text
+    assert "Diketahui:" in text and "judul" in text
+    assert "Abaikan: 'jijik'" in text
+
+
+async def test_bulk_cancel_all_reports_each_and_approve_all_refuses(test_db):
+    from unittest.mock import AsyncMock
+
+    from jarvis.assistant.graph import AssistantWorkflow
+
+    tg, repo, journal, provider, scheduler = await setup(test_db)
+    await _two_pendings(tg, repo)
+    router = AsyncMock()
+    await tg.ingest([incoming(tg, 104, "setujui semuanya")], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    assert "Setujui massal ditolak" in (await receipt(tg, 104)).reply_text
+    await tg.ingest([incoming(tg, 105, "batalin semua")], "TestBot")
+    await AssistantWorkflow(repo, router, AsyncMock()).invoke(await repo.next_request())
+    assert (await receipt(tg, 105)).reply_text.count("dibatalkan") == 2
+    async with test_db.tenant(repo.owner) as session:
+        assert not (
+            await session.scalars(
+                select(ToolAction).where(ToolAction.status == "awaiting_approval")
+            )
+        ).all()

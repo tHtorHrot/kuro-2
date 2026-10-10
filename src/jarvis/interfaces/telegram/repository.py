@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
+from uuid import UUID
 
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.postgresql import insert
@@ -10,10 +11,16 @@ from sqlalchemy.exc import IntegrityError
 from jarvis.core.config import ConfigurationError
 from jarvis.identity.service import consume_pairing_in_session
 from jarvis.interfaces.telegram.client import TelegramError
-from jarvis.interfaces.telegram.commands import REPLIES, parse_update
+from jarvis.interfaces.telegram.commands import REPLIES, parse_callback, parse_update
 from jarvis.interfaces.telegram.config import TelegramConfig
 from jarvis.storage.database import Database
-from jarvis.storage.models import ExternalIdentity, TelegramReceipt, TelegramState, User
+from jarvis.storage.models import (
+    CalendarNotification,
+    ExternalIdentity,
+    TelegramReceipt,
+    TelegramState,
+    User,
+)
 
 MAX_PENDING = 100
 MAX_ATTEMPTS = 5
@@ -28,12 +35,19 @@ class Delivery:
     reply_kind: str
     attempt: int
     text: str | None = field(default=None, repr=False)
+    notification_id: UUID | None = None
 
 
 class TelegramRepository:
     def __init__(self, db: Database, config: TelegramConfig):
         self.db = db
         self.config = config
+        self._callback_outbox: list[dict] = []
+
+    def take_callback_outbox(self) -> list[dict]:
+        """Ephemeral tap feedback/network edits collected during ingest; best-effort delivery."""
+        pending, self._callback_outbox = self._callback_outbox, []
+        return pending
 
     def receipt_filter(self):
         return (
@@ -97,6 +111,16 @@ class TelegramRepository:
                 .values(delivery_status="uncertain", reply_text=None)
             )
 
+            await session.execute(
+                update(CalendarNotification)
+                .where(
+                    CalendarNotification.owner_id == self.config.owner_id,
+                    CalendarNotification.bot_id == self.config.bot_id,
+                    CalendarNotification.delivery_status == "sending",
+                )
+                .values(delivery_status="uncertain", reply_text=None)
+            )
+
     async def offset(self) -> int | None:
         async with self.db.tenant(self.config.owner_id) as session:
             state = await self.state(session)
@@ -113,9 +137,19 @@ class TelegramRepository:
 
         now = datetime.now(UTC)
         # Validate before beginning a transaction. Unknown payloads are safely ignored.
-        parsed = [
-            (row["update_id"], parse_update(row, self.config, bot_username, now)) for row in updates
-        ]
+        parsed = []
+        for row in updates:
+            if not isinstance(row, dict) or type(row.get("update_id")) is not int:
+                continue
+            if isinstance(row.get("callback_query"), dict):
+                parsed.append(
+                    (
+                        row["update_id"],
+                        parse_callback(row["update_id"], row["callback_query"], self.config, now),
+                    )
+                )
+            else:
+                parsed.append((row["update_id"], parse_update(row, self.config, bot_username, now)))
         async with self.db.tenant(self.config.owner_id) as session:
             state = await self.state(session)
             user = await session.get(User, self.config.owner_id)
@@ -180,6 +214,23 @@ class TelegramRepository:
                     kind = "unpaired"
                 elif incoming.command in ("start", "help"):
                     kind = "help"
+                elif incoming.command == "callback":
+                    from jarvis.interfaces.telegram.callbacks import handle_callback
+
+                    answer = await handle_callback(session, self.config.owner_id, incoming)
+                    self._callback_outbox.append(
+                        {
+                            "callback_id": incoming.callback_id,
+                            "answer": answer,
+                            "chat_id": incoming.chat_id,
+                            "message_id": incoming.callback_message_id,
+                            "message_text": incoming.callback_message_text,
+                        }
+                    )
+                    state.rate_count += 1
+                    pending += 1
+                    await session.flush()
+                    continue
                 elif incoming.command in COMMANDS or incoming.command == "chat":
                     await handle_command(
                         session,
@@ -237,7 +288,12 @@ class TelegramRepository:
                 .with_for_update()
             )
             if row is None:
-                return None
+                from jarvis.interfaces.telegram.notifications import claim_notification
+
+                delivery = await claim_notification(self, session, now)
+                if delivery:
+                    state.send_not_before = now + timedelta(seconds=1)
+                return delivery
             user, identity = (
                 await session.get(User, self.config.owner_id),
                 await self.identity(session),
@@ -271,6 +327,15 @@ class TelegramRepository:
         now = datetime.now(UTC)
         async with self.db.tenant(self.config.owner_id) as session:
             state = await self.state(session)
+            if delivery.notification_id is not None:
+                from jarvis.interfaces.telegram.notifications import finish_notification
+
+                if error is not None and error.retry_after:
+                    state.send_not_before = max(
+                        state.send_not_before or now, now + timedelta(seconds=error.retry_after)
+                    )
+                await finish_notification(self, session, delivery, now, message_id, error)
+                return
             row = await session.get(
                 TelegramReceipt, (self.config.owner_id, self.config.bot_id, delivery.update_id)
             )
@@ -304,6 +369,15 @@ class TelegramRepository:
                     *self.receipt_filter(), TelegramReceipt.delivery_status == "pending"
                 )
             )
+            notification_due = await session.scalar(
+                select(func.min(CalendarNotification.next_attempt_at)).where(
+                    CalendarNotification.owner_id == self.config.owner_id,
+                    CalendarNotification.bot_id == self.config.bot_id,
+                    CalendarNotification.delivery_status == "pending",
+                )
+            )
+            if notification_due is not None:
+                earliest = min(earliest, notification_due) if earliest else notification_due
             state = await self.state(session)
             if earliest is None:
                 return self.config.poll_seconds

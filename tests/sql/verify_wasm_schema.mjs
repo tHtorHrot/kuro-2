@@ -22,17 +22,17 @@ const mustFail = async (sql) => {
 };
 try {
   const engine = (await db.query('SELECT version() AS version')).rows[0].version;
+  await db.exec('CREATE ROLE jarvis_migrator LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT');
+  await db.exec('CREATE ROLE jarvis_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT');
+  await db.exec("DO $$ BEGIN EXECUTE format('GRANT CREATE ON DATABASE %I TO jarvis_migrator', current_database()); END $$;");
   await db.exec(`
-    CREATE ROLE jarvis_migrator LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT;
-    CREATE ROLE jarvis_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT;
-    DO $$ BEGIN EXECUTE format('GRANT CREATE ON DATABASE %I TO jarvis_migrator', current_database()); END $$;
     REVOKE ALL ON SCHEMA public FROM PUBLIC;
     GRANT USAGE, CREATE ON SCHEMA public TO jarvis_migrator;
     GRANT USAGE ON SCHEMA public TO jarvis_app;
     SET ROLE jarvis_migrator;
   `);
   await db.exec(migration);
-  check((await db.query('SELECT version_num FROM public.jarvis_schema_version')).rows[0].version_num === '0008_executor_binding');
+  check((await db.query('SELECT version_num FROM public.jarvis_schema_version')).rows[0].version_num === '0015_memory_kinds');
   // SET ROLE alone would leave a superuser session authorized to switch roles again.
   await db.exec('RESET ROLE; SET SESSION AUTHORIZATION jarvis_app');
   const a = '00000000-0000-4000-8000-000000000001';
@@ -63,7 +63,7 @@ try {
   }
   check((await db.query("SELECT app.current_owner_id() AS id")).rows[0].id === null);
   const security = await db.query("SELECT bool_and(relrowsecurity AND relforcerowsecurity) AS secured, count(*)::int AS n FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='app' AND c.relkind='r'");
-  check(security.rows[0].secured && security.rows[0].n === 17);
+  check(security.rows[0].secured && security.rows[0].n === 26);
   await tenant(a);
   await db.query("INSERT INTO app.telegram_state(owner_id,bot_id,rate_window_at) VALUES ($1,100,now())", [a]);
   await db.query("INSERT INTO app.telegram_receipts(owner_id,bot_id,update_id,chat_id,reply_kind,delivery_status,next_attempt_at) VALUES ($1,100,1000,111,'status','pending',now())", [a]);
@@ -155,6 +155,33 @@ try {
   await db.exec('COMMIT');
   await tenant(a);
   await mustFail("UPDATE app.tool_actions SET arguments='{\"date\":\"tomorrow\"}'::jsonb");
+  const task = '00000000-0000-4000-8000-000000000051';
+  const identity = '00000000-0000-4000-8000-000000000052';
+  const notification = '00000000-0000-4000-8000-000000000053';
+  await tenant(a);
+  await db.query("INSERT INTO app.external_identities(id,owner_id,channel,external_user_id,chat_id) VALUES ($1,$2,'telegram',111,111)", [identity,a]);
+  await db.query("UPDATE app.assistant_requests SET status='handed_off' WHERE id=$1", [request]);
+  await db.query("INSERT INTO app.calendar_tasks(id,owner_id,bot_id,chat_id,identity_id,conversation_id,source_request_id,state_revision,config_hash,grant_revision,revision,channel,anchor_at,timezone,slots,provenance,status,current_action_id,expires_at) VALUES ($1,$2,100,111,$3,$2,$4,1,'hash',1,1,'telegram',now(),'Asia/Jakarta','{}','{}','submitted',$5,now()+interval '30 minutes')", [task,a,identity,request,action]);
+  await db.query("INSERT INTO app.calendar_notifications(id,owner_id,bot_id,chat_id,task_id,action_id,event_key,reply_text,delivery_status,next_attempt_at) VALUES ($1,$2,100,111,$3,$4,'terminal-fixture','result','pending',now())", [notification,a,task,action]);
+  check(await count('calendar_tasks') === 1);
+  check(await count('calendar_notifications') === 1);
+  await db.exec('COMMIT');
+  await tenant(b);
+  check(await count('calendar_tasks') === 0);
+  check(await count('calendar_notifications') === 0);
+  await mustFail(`INSERT INTO app.calendar_notifications(id,owner_id,bot_id,chat_id,task_id,action_id,event_key,delivery_status,next_attempt_at) VALUES (gen_random_uuid(),'${b}',100,111,'${task}','${action}','cross-owner','pending',now())`);
+  await tenant(a);
+  await mustFail(`UPDATE app.calendar_notifications SET attempts=6 WHERE id='${notification}'`);
+  await tenant(a);
+  await mustFail(`INSERT INTO app.calendar_notifications(id,owner_id,bot_id,chat_id,task_id,action_id,event_key,delivery_status,next_attempt_at) VALUES (gen_random_uuid(),'${a}',100,111,'${task}','${action}','terminal-fixture','pending',now())`);
+  await tenant(a);
+  await mustFail(`UPDATE app.tool_actions SET fingerprint_version=2, latest_dispatch_at=due_at+interval '15 minutes' WHERE id='${action}'`);
+  await tenant(a);
+  await mustFail(`DELETE FROM app.calendar_tasks WHERE id='${task}'`);
+  await tenant(a);
+  await db.query("INSERT INTO app.assistant_requests(id,owner_id,bot_id,source_update_id,reply_update_id,conversation_id,revision,config_hash,status) VALUES (gen_random_uuid(),$1,100,300,300,$1,1,'hash','queued')", [a]);
+  check(await count('assistant_requests') === 2); // Detached job does not consume the LLM slot.
+  await db.exec('COMMIT');
   console.log(JSON.stringify({ status: 'passed', checks, engine, limitation: 'WASM SQL only; not native PostgreSQL 16, networking, pooling or concurrency verification' }));
 } finally {
   await db.close();

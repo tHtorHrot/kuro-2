@@ -76,6 +76,7 @@ class ExternalIdentity(Base):
     __tablename__ = "external_identities"
     __table_args__ = (
         UniqueConstraint("channel", "external_user_id", name="identity_channel_user"),
+        UniqueConstraint("owner_id", "id", name="identity_owner_id"),
         UniqueConstraint("owner_id", "channel", name="identity_owner_channel"),
         CheckConstraint("channel = 'telegram'", name="identity_supported_channel"),
         {"schema": "app"},
@@ -162,6 +163,12 @@ class ProfileMemory(Base):
     key: Mapped[str] = mapped_column(String(40), primary_key=True)
     value: Mapped[str] = mapped_column(Text)
     data_class: Mapped[str] = mapped_column(String(16), default="private")
+    kind: Mapped[str] = mapped_column(String(16), default="profile")
+    provenance: Mapped[str | None] = mapped_column(Text)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(16), default="active")
+    importance: Mapped[float] = mapped_column(default=0.5)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -231,7 +238,8 @@ class LLMCall(Base):
     )
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"))
-    request_id: Mapped[UUID]
+    request_id: Mapped[UUID | None]
+    task_run_id: Mapped[UUID | None]
     kind: Mapped[str] = mapped_column(String(12))
     model: Mapped[str] = mapped_column(String(200))
     provider: Mapped[str] = mapped_column(String(120))
@@ -312,6 +320,7 @@ class ToolAction(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), index=True)
     request_id: Mapped[UUID | None]
+    task_run_id: Mapped[UUID | None]
     agent: Mapped[str] = mapped_column(String(80))
     tool_name: Mapped[str] = mapped_column(String(80))
     effect: Mapped[str] = mapped_column(String(24))
@@ -331,5 +340,229 @@ class ToolAction(Base):
     source_key: Mapped[str | None] = mapped_column(String(200))
     grant_revision: Mapped[int | None]
     spec_fingerprint: Mapped[str | None] = mapped_column(String(64))
+    fingerprint_version: Mapped[int] = mapped_column(default=1)
+    latest_dispatch_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     result: Mapped[dict | list | None] = mapped_column(JSONB(none_as_null=True))
     error_code: Mapped[str | None] = mapped_column(String(80))
+
+
+class CalendarTask(Base):
+    __tablename__ = "calendar_tasks"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "id"),
+        ForeignKeyConstraint(
+            ["owner_id", "identity_id"],
+            ["app.external_identities.owner_id", "app.external_identities.id"],
+        ),
+        ForeignKeyConstraint(
+            ["owner_id", "source_request_id"],
+            ["app.assistant_requests.owner_id", "app.assistant_requests.id"],
+        ),
+        ForeignKeyConstraint(
+            ["owner_id", "current_action_id"], ["app.tool_actions.owner_id", "app.tool_actions.id"]
+        ),
+        ForeignKeyConstraint(
+            ["owner_id", "bot_id"], ["app.telegram_state.owner_id", "app.telegram_state.bot_id"]
+        ),
+        {"schema": "app"},
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"))
+    bot_id: Mapped[int] = mapped_column(BigInteger)
+    chat_id: Mapped[int] = mapped_column(BigInteger)
+    identity_id: Mapped[UUID]
+    conversation_id: Mapped[UUID]
+    source_request_id: Mapped[UUID]
+    state_revision: Mapped[int]
+    config_hash: Mapped[str] = mapped_column(String(64))
+    grant_revision: Mapped[int]
+    revision: Mapped[int] = mapped_column(default=1)
+    channel: Mapped[str] = mapped_column(String(16), default="telegram")
+    anchor_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    timezone: Mapped[str] = mapped_column(String(64))
+    slots: Mapped[dict] = mapped_column(JSONB)
+    provenance: Mapped[dict] = mapped_column(JSONB)
+    status: Mapped[str] = mapped_column(String(24), default="draft")
+    current_action_id: Mapped[UUID | None]
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class CalendarNotification(Base):
+    __tablename__ = "calendar_notifications"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "event_key"),
+        ForeignKeyConstraint(
+            ["owner_id", "bot_id"], ["app.telegram_state.owner_id", "app.telegram_state.bot_id"]
+        ),
+        ForeignKeyConstraint(
+            ["owner_id", "task_id"], ["app.calendar_tasks.owner_id", "app.calendar_tasks.id"]
+        ),
+        ForeignKeyConstraint(
+            ["owner_id", "action_id"], ["app.tool_actions.owner_id", "app.tool_actions.id"]
+        ),
+        {"schema": "app"},
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"))
+    bot_id: Mapped[int] = mapped_column(BigInteger)
+    chat_id: Mapped[int] = mapped_column(BigInteger)
+    task_id: Mapped[UUID]
+    action_id: Mapped[UUID]
+    event_key: Mapped[str] = mapped_column(String(100))
+    reply_text: Mapped[str | None] = mapped_column(Text)
+    delivery_status: Mapped[str] = mapped_column(String(16), default="pending")
+    attempts: Mapped[int] = mapped_column(default=0)
+    next_attempt_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    telegram_message_id: Mapped[int | None] = mapped_column(BigInteger)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Task(Base):
+    """Goal/task KURO Ultimate. Root task memuat goal + plan_json/plan_revision."""
+
+    __tablename__ = "tasks"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "id"),
+        CheckConstraint(
+            "status IN ('draft','queued','running','waiting_approval',"
+            "'waiting_dependency','succeeded','failed','uncertain','cancelled')",
+            name="task_status_check",
+        ),
+        {"schema": "app"},
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), index=True)
+    parent_id: Mapped[UUID | None]
+    root_id: Mapped[UUID | None]
+    client_request_key: Mapped[str | None] = mapped_column(String(128))
+    payload_hash: Mapped[str | None] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(120))
+    goal: Mapped[str | None] = mapped_column(Text)
+    role: Mapped[str] = mapped_column(String(32), default="research")
+    input_refs: Mapped[dict | list | None] = mapped_column(JSONB(none_as_null=True))
+    acceptance: Mapped[dict] = mapped_column(JSONB, default=dict)
+    plan_json: Mapped[dict | list | None] = mapped_column(JSONB(none_as_null=True))
+    plan_revision: Mapped[int] = mapped_column(default=1)
+    status: Mapped[str] = mapped_column(String(24), default="queued")
+    priority: Mapped[int] = mapped_column(default=0)
+    not_before: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    deadline_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cost_ceiling_usd: Mapped[Decimal] = mapped_column(Numeric(20, 10), default=Decimal("1"))
+    cost_spent_usd: Mapped[Decimal] = mapped_column(Numeric(20, 10), default=Decimal("0"))
+    repair_passes: Mapped[int] = mapped_column(default=0)
+    error_code: Mapped[str | None] = mapped_column(String(80))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class TaskDependency(Base):
+    __tablename__ = "task_dependencies"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "task_id", "depends_on_id", name="task_edge_unique"),
+        CheckConstraint("task_id != depends_on_id", name="task_no_self_reference"),
+        {"schema": "app"},
+    )
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), primary_key=True)
+    task_id: Mapped[UUID] = mapped_column(primary_key=True)
+    depends_on_id: Mapped[UUID] = mapped_column(primary_key=True)
+
+
+class TaskRun(Base):
+    """Satu usaha worker menjalankan task. Satu live attempt per task."""
+
+    __tablename__ = "task_runs"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "id"),
+        CheckConstraint(
+            "status IN ('claimed','running','succeeded','failed','lost','cancelled','uncertain')",
+            name="task_run_status_check",
+        ),
+        {"schema": "app"},
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), index=True)
+    task_id: Mapped[UUID]
+    attempt: Mapped[int] = mapped_column(default=1)
+    worker_instance: Mapped[str] = mapped_column(String(80), default="inline")
+    generation: Mapped[int] = mapped_column(default=1)
+    lease_token: Mapped[UUID | None]
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(16), default="claimed")
+    model_route: Mapped[str | None] = mapped_column(String(120))
+    reserved_usd: Mapped[Decimal] = mapped_column(Numeric(20, 10), default=Decimal("0"))
+    actual_usd: Mapped[Decimal | None] = mapped_column(Numeric(20, 10))
+    error_code: Mapped[str | None] = mapped_column(String(80))
+    provider_session_id: Mapped[str | None] = mapped_column(String(128))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class Artifact(Base):
+    """Output immutable dengan hash, owner dan provenance."""
+
+    __tablename__ = "artifacts"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "id"),
+        {"schema": "app"},
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), index=True)
+    task_id: Mapped[UUID]
+    run_id: Mapped[UUID | None]
+    rel_path: Mapped[str] = mapped_column(String(256))
+    object_key: Mapped[str | None] = mapped_column(String(512))
+    sha256: Mapped[str] = mapped_column(String(64))
+    byte_size: Mapped[int] = mapped_column(BigInteger, default=0)
+    media_type: Mapped[str] = mapped_column(String(80), default="text/plain")
+    data_class: Mapped[str] = mapped_column(String(16), default="private")
+    evaluation_status: Mapped[str] = mapped_column(String(16), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class TaskEvent(Base):
+    """Progress events; ditulis satu transaksi dengan perubahan state."""
+
+    __tablename__ = "task_events"
+    __table_args__ = ({"schema": "app"},)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), index=True)
+    task_id: Mapped[UUID | None]
+    run_id: Mapped[UUID | None]
+    event_type: Mapped[str] = mapped_column(String(48))
+    payload: Mapped[dict | None] = mapped_column(JSONB(none_as_null=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AutomationDefinition(Base):
+    __tablename__ = "automation_definitions"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "id"),
+        {"schema": "app"},
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), index=True)
+    title: Mapped[str] = mapped_column(String(120))
+    timezone: Mapped[str] = mapped_column(String(64), default="UTC")
+    rrule: Mapped[str] = mapped_column(String(256))
+    goal_template: Mapped[str] = mapped_column(Text)
+    enabled: Mapped[bool] = mapped_column(default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AutomationRun(Base):
+    __tablename__ = "automation_runs"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "occurrence_key"),
+        {"schema": "app"},
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), index=True)
+    definition_id: Mapped[UUID]
+    occurrence_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    occurrence_key: Mapped[str] = mapped_column(String(128))
+    task_id: Mapped[UUID | None]
+    status: Mapped[str] = mapped_column(String(16), default="launched")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -1,0 +1,16 @@
+{
+  "recorded_utc": "2026-10-05T14:27:29.303536+00:00",
+  "source_hash": "3bd113d5a1b43da56b2f17b841060d6ff443a73bfcd5a77db5573d4c830ef97a",
+  "user_reported": {
+    "preflight_checks": 96,
+    "preflight": "passed",
+    "apply": "failed before file copy",
+    "diagnostic": "Set-Acl SeSecurityPrivilege PrivilegeNotHeldException, exit 1",
+    "database_migration": "NOT_RUN",
+    "docker_gate_after_apply": "NOT_RUN"
+  },
+  "fix": "only DACL Access section persisted with .NET and verified readback",
+  "windows_enforcement": "NOT_RUN",
+  "tests": "mock bridge guards; full offline regression",
+  "evidence": "release-dacl-fix/verification.json"
+}

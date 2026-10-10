@@ -1,0 +1,747 @@
+ Image personal-jarvis-tests-tests Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 542B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.81kB 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.12.14-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e
+#3 DONE 3.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 180B 0.0s done
+#4 DONE 0.0s
+
+#5 [base 1/2] FROM docker.io/library/python:3.12.14-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 533.68kB 0.2s done
+#6 DONE 0.3s
+
+#7 [base 2/2] WORKDIR /app
+#7 CACHED
+
+#8 [builder 1/4] RUN python -m pip install --no-cache-dir uv==0.12.18
+#8 CACHED
+
+#9 [builder 2/4] COPY pyproject.toml uv.lock ./
+#9 CACHED
+
+#10 [builder 3/4] COPY src ./src
+#10 DONE 0.1s
+
+#11 [builder 4/4] RUN uv sync --frozen --no-dev --no-editable
+#11 0.483 Using CPython 3.12.14 interpreter at: /usr/local/bin/python3
+#11 0.483 Creating virtual environment at: .venv
+#11 0.572    Building personal-jarvis @ file:///app
+#11 2.352 Downloading pillow (6.6MiB)
+#11 2.355 Downloading sqlalchemy (3.3MiB)
+#11 2.372 Downloading tokenizers (3.2MiB)
+#11 2.373 Downloading numpy (15.9MiB)
+#11 2.375 Downloading pydantic-core (2.0MiB)
+#11 2.377 Downloading psycopg-binary (5.0MiB)
+#11 2.380 Downloading hf-xet (4.3MiB)
+#11 2.381 Downloading onnxruntime (22.5MiB)
+#11 2.384 Downloading zstandard (5.3MiB)
+#11 97.53       Built personal-jarvis @ file:///app
+#11 236.9  Downloaded pydantic-core
+#11 317.9  Downloaded sqlalchemy
+#11 318.7  Downloaded tokenizers
+#11 345.9  Downloaded hf-xet
+#11 359.2  Downloaded psycopg-binary
+#11 369.8  Downloaded zstandard
+#11 384.6  Downloaded pillow
+#11 448.4  Downloaded numpy
+#11 462.4  Downloaded onnxruntime
+#11 462.4 Prepared 70 packages in 7m 41s
+#11 462.5 Installed 70 packages in 170ms
+#11 462.5  + alembic==1.20.0
+#11 462.5  + annotated-doc==0.0.5
+#11 462.5  + annotated-types==0.8.0
+#11 462.5  + anyio==4.15.1
+#11 462.5  + certifi==2026.7.22
+#11 462.5  + charset-normalizer==3.5.1
+#11 462.5  + click==8.5.0
+#11 462.5  + defusedxml==0.7.1
+#11 462.5  + distro==1.9.0
+#11 462.5  + fastapi==0.141.1
+#11 462.5  + fastembed==0.8.1
+#11 462.5  + filelock==4.0.4
+#11 462.5  + flatbuffers==25.12.19
+#11 462.5  + fsspec==2026.9.0
+#11 462.5  + greenlet==3.5.6
+#11 462.5  + h11==0.16.0
+#11 462.5  + hf-xet==1.6.0
+#11 462.5  + httpcore==1.0.9
+#11 462.5  + httpcore2==2.13.1
+#11 462.5  + httpx==0.28.1
+#11 462.5  + httpx2==2.13.1
+#11 462.5  + huggingface-hub==1.33.0
+#11 462.5  + idna==3.20
+#11 462.5  + jsonpatch==1.33
+#11 462.5  + jsonpointer==3.1.1
+#11 462.5  + langchain-core==1.6.5
+#11 462.5  + langchain-protocol==0.0.19
+#11 462.5  + langgraph==1.2.12
+#11 462.5  + langgraph-checkpoint==4.2.0
+#11 462.5  + langgraph-prebuilt==1.1.0
+#11 462.5  + langgraph-sdk==0.4.5
+#11 462.5  + langsmith==0.14.1
+#11 462.5  + loguru==0.7.3
+#11 462.5  + mako==1.4.3
+#11 462.5  + markupsafe==3.0.3
+#11 462.5  + mmh3==5.3.0
+#11 462.5  + numpy==2.5.3
+#11 462.5  + onnxruntime==1.30.0
+#11 462.5  + orjson==3.12.0
+#11 462.5  + ormsgpack==1.12.2
+#11 462.5  + packaging==26.3
+#11 462.5  + personal-jarvis==0.4.0 (from file:///app)
+#11 462.5  + pillow==12.3.0
+#11 462.5  + prometheus-client==0.26.0
+#11 462.5  + protobuf==7.36.2
+#11 462.5  + psycopg==3.3.6
+#11 462.5  + psycopg-binary==3.3.6
+#11 462.5  + py-rust-stemmers==0.1.8
+#11 462.5  + pydantic==2.13.5
+#11 462.5  + pydantic-core==2.46.5
+#11 462.5  + pydantic-settings==2.15.0
+#11 462.5  + python-dotenv==1.2.3
+#11 462.5  + pyyaml==6.0.3
+#11 462.5  + requests==2.34.2
+#11 462.5  + requests-toolbelt==1.0.0
+#11 462.5  + sniffio==1.3.1
+#11 462.5  + sqlalchemy==2.0.54
+#11 462.5  + starlette==1.7.0
+#11 462.5  + tenacity==9.1.4
+#11 462.5  + tokenizers==0.23.2
+#11 462.5  + tqdm==4.70.1
+#11 462.5  + truststore==0.10.4
+#11 462.5  + typing-extensions==4.16.0
+#11 462.5  + typing-inspection==0.4.4
+#11 462.5  + urllib3==2.8.0
+#11 462.5  + uuid-utils==0.17.1
+#11 462.5  + uvicorn==0.54.0
+#11 462.5  + websockets==16.1.1
+#11 462.5  + xxhash==4.0.1
+#11 462.5  + zstandard==0.25.0
+#11 DONE 462.6s
+
+#12 [tests  1/10] RUN apt-get update && apt-get install -y --no-install-recommends openssl poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
+#12 0.459 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#12 0.720 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#12 0.848 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
+#12 0.889 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
+#12 15.95 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+#12 15.96 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [349 kB]
+#12 16.84 Fetched 9388 kB in 17s (569 kB/s)
+#12 16.84 Reading package lists...
+#12 17.48 Reading package lists...
+#12 18.19 Building dependency tree...
+#12 18.36 Reading state information...
+#12 18.57 The following additional packages will be installed:
+#12 18.57   fontconfig fontconfig-config libarchive13 libbrotli1 libbsd0 libcairo2
+#12 18.57   libcurl4 libdatrie1 libdeflate0 libexpat1 libfontconfig1 libfreetype6
+#12 18.57   libfribidi0 libgif7 libglib2.0-0 libgomp1 libgraphite2-3 libharfbuzz0b
+#12 18.57   libicu72 libjbig0 libjpeg62-turbo liblcms2-2 libldap-2.5-0 liblept5 liblerc4
+#12 18.57   libnghttp2-14 libnspr4 libnss3 libopenjp2-7 libpango-1.0-0
+#12 18.57   libpangocairo-1.0-0 libpangoft2-1.0-0 libpixman-1-0 libpng16-16
+#12 18.57   libpoppler126 libpsl5 librtmp1 libsasl2-2 libsasl2-modules-db libssh2-1
+#12 18.57   libssl3 libtesseract5 libthai-data libthai0 libtiff6 libwebp7 libwebpmux3
+#12 18.57   libx11-6 libx11-data libxau6 libxcb-render0 libxcb-shm0 libxcb1 libxdmcp6
+#12 18.57   libxext6 libxml2 libxrender1 tesseract-ocr-osd
+#12 18.57 Suggested packages:
+#12 18.57   lrzip low-memory-monitor liblcms2-utils
+#12 18.57 Recommended packages:
+#12 18.57   libglib2.0-data shared-mime-info xdg-user-dirs libldap-common poppler-data
+#12 18.57   publicsuffix libsasl2-modules
+#12 18.85 The following NEW packages will be installed:
+#12 18.85   fontconfig fontconfig-config fonts-dejavu-core libarchive13 libbrotli1
+#12 18.85   libbsd0 libcairo2 libcurl4 libdatrie1 libdeflate0 libexpat1 libfontconfig1
+#12 18.85   libfreetype6 libfribidi0 libgif7 libglib2.0-0 libgomp1 libgraphite2-3
+#12 18.85   libharfbuzz0b libicu72 libjbig0 libjpeg62-turbo liblcms2-2 libldap-2.5-0
+#12 18.85   liblept5 liblerc4 libnghttp2-14 libnspr4 libnss3 libopenjp2-7 libpango-1.0-0
+#12 18.85   libpangocairo-1.0-0 libpangoft2-1.0-0 libpixman-1-0 libpng16-16
+#12 18.85   libpoppler126 libpsl5 librtmp1 libsasl2-2 libsasl2-modules-db libssh2-1
+#12 18.85   libtesseract5 libthai-data libthai0 libtiff6 libwebp7 libwebpmux3 libx11-6
+#12 18.85   libx11-data libxau6 libxcb-render0 libxcb-shm0 libxcb1 libxdmcp6 libxext6
+#12 18.85   libxml2 libxrender1 poppler-utils tesseract-ocr tesseract-ocr-eng
+#12 18.85   tesseract-ocr-ind tesseract-ocr-osd
+#12 18.85 The following packages will be upgraded:
+#12 18.85   libssl3 openssl
+#12 18.94 2 upgraded, 62 newly installed, 0 to remove and 3 not upgraded.
+#12 18.94 Need to get 38.0 MB of archives.
+#12 18.94 After this operation, 104 MB of additional disk space will be used.
+#12 18.94 Get:1 http://deb.debian.org/debian-security bookworm-security/main amd64 libexpat1 amd64 2.5.0-1+deb12u4 [106 kB]
+#12 19.08 Get:2 http://deb.debian.org/debian bookworm/main amd64 libbrotli1 amd64 1.0.9-2+b6 [275 kB]
+#12 19.53 Get:3 http://deb.debian.org/debian-security bookworm-security/main amd64 libpng16-16 amd64 1.6.39-2+deb12u6 [277 kB]
+#12 20.26 Get:4 http://deb.debian.org/debian bookworm/main amd64 libfreetype6 amd64 2.12.1+dfsg-5+deb12u4 [398 kB]
+#12 20.88 Get:5 http://deb.debian.org/debian bookworm/main amd64 fonts-dejavu-core all 2.37-6 [1068 kB]
+#12 22.64 Get:6 http://deb.debian.org/debian bookworm/main amd64 fontconfig-config amd64 2.14.1-4 [315 kB]
+#12 23.28 Get:7 http://deb.debian.org/debian bookworm/main amd64 libfontconfig1 amd64 2.14.1-4 [386 kB]
+#12 23.92 Get:8 http://deb.debian.org/debian bookworm/main amd64 fontconfig amd64 2.14.1-4 [449 kB]
+#12 24.66 Get:9 http://deb.debian.org/debian bookworm/main amd64 libicu72 amd64 72.1-3+deb12u1 [9376 kB]
+#12 42.67 Get:10 http://deb.debian.org/debian bookworm/main amd64 libxml2 amd64 2.9.14+dfsg-1.3~deb12u6 [689 kB]
+#12 43.77 Get:11 http://deb.debian.org/debian-security bookworm-security/main amd64 libarchive13 amd64 3.6.2-1+deb12u5 [345 kB]
+#12 44.38 Get:12 http://deb.debian.org/debian bookworm/main amd64 libbsd0 amd64 0.11.7-2 [117 kB]
+#12 44.60 Get:13 http://deb.debian.org/debian bookworm/main amd64 libpixman-1-0 amd64 0.42.2-1 [546 kB]
+#12 45.52 Get:14 http://deb.debian.org/debian bookworm/main amd64 libxau6 amd64 1:1.0.9-1 [19.7 kB]
+#12 45.55 Get:15 http://deb.debian.org/debian bookworm/main amd64 libxdmcp6 amd64 1:1.1.2-3 [26.3 kB]
+#12 45.61 Get:16 http://deb.debian.org/debian bookworm/main amd64 libxcb1 amd64 1.15-1 [144 kB]
+#12 45.83 Get:17 http://deb.debian.org/debian bookworm/main amd64 libx11-data all 2:1.8.4-2+deb12u2 [292 kB]
+#12 46.34 Get:18 http://deb.debian.org/debian bookworm/main amd64 libx11-6 amd64 2:1.8.4-2+deb12u2 [760 kB]
+#12 47.58 Get:19 http://deb.debian.org/debian bookworm/main amd64 libxcb-render0 amd64 1.15-1 [115 kB]
+#12 47.77 Get:20 http://deb.debian.org/debian bookworm/main amd64 libxcb-shm0 amd64 1.15-1 [105 kB]
+#12 47.95 Get:21 http://deb.debian.org/debian bookworm/main amd64 libxext6 amd64 2:1.3.4-1+b1 [52.9 kB]
+#12 48.04 Get:22 http://deb.debian.org/debian bookworm/main amd64 libxrender1 amd64 1:0.9.10-1.1 [33.2 kB]
+#12 48.11 Get:23 http://deb.debian.org/debian bookworm/main amd64 libcairo2 amd64 1.16.0-7 [575 kB]
+#12 49.04 Get:24 http://deb.debian.org/debian bookworm/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg-10 [20.3 kB]
+#12 49.07 Get:25 http://deb.debian.org/debian bookworm/main amd64 libsasl2-2 amd64 2.1.28+dfsg-10 [59.7 kB]
+#12 49.17 Get:26 http://deb.debian.org/debian bookworm/main amd64 libldap-2.5-0 amd64 2.5.13+dfsg-5 [183 kB]
+#12 49.48 Get:27 http://deb.debian.org/debian bookworm/main amd64 libnghttp2-14 amd64 1.52.0-1+deb12u3 [72.4 kB]
+#12 49.61 Get:28 http://deb.debian.org/debian bookworm/main amd64 libpsl5 amd64 0.21.2-1 [58.7 kB]
+#12 49.69 Get:29 http://deb.debian.org/debian bookworm/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2+b2 [60.8 kB]
+#12 49.80 Get:30 http://deb.debian.org/debian-security bookworm-security/main amd64 libssl3 amd64 3.0.22-1~deb12u1 [2039 kB]
+#12 53.17 Get:31 http://deb.debian.org/debian-security bookworm-security/main amd64 libssh2-1 amd64 1.10.0-3+deb12u1 [176 kB]
+#12 53.48 Get:32 http://deb.debian.org/debian bookworm/main amd64 libcurl4 amd64 7.88.1-10+deb12u15 [392 kB]
+#12 54.19 Get:33 http://deb.debian.org/debian bookworm/main amd64 libdatrie1 amd64 0.2.13-2+b1 [43.3 kB]
+#12 54.24 Get:34 http://deb.debian.org/debian bookworm/main amd64 libdeflate0 amd64 1.14-1 [61.4 kB]
+#12 54.33 Get:35 http://deb.debian.org/debian bookworm/main amd64 libfribidi0 amd64 1.0.8-2.1 [65.0 kB]
+#12 54.44 Get:36 http://deb.debian.org/debian bookworm/main amd64 libgif7 amd64 5.2.1-2.5+deb12u1 [43.0 kB]
+#12 54.51 Get:37 http://deb.debian.org/debian bookworm/main amd64 libglib2.0-0 amd64 2.74.6-2+deb12u9 [1403 kB]
+#12 58.30 Get:38 http://deb.debian.org/debian bookworm/main amd64 libgomp1 amd64 12.2.0-14+deb12u1 [116 kB]
+#12 58.46 Get:39 http://deb.debian.org/debian bookworm/main amd64 libgraphite2-3 amd64 1.3.14-1+deb12u1 [74.6 kB]
+#12 58.55 Get:40 http://deb.debian.org/debian bookworm/main amd64 libharfbuzz0b amd64 6.0.0+dfsg-3 [1945 kB]
+#12 62.83 Get:41 http://deb.debian.org/debian bookworm/main amd64 libjbig0 amd64 2.1-6.1 [31.7 kB]
+#12 62.91 Get:42 http://deb.debian.org/debian bookworm/main amd64 libjpeg62-turbo amd64 1:2.1.5-2 [166 kB]
+#12 63.20 Get:43 http://deb.debian.org/debian bookworm/main amd64 liblcms2-2 amd64 2.14-2+deb12u1 [154 kB]
+#12 64.34 Get:44 http://deb.debian.org/debian bookworm/main amd64 libopenjp2-7 amd64 2.5.0-2+deb12u3 [189 kB]
+#12 64.88 Get:45 http://deb.debian.org/debian bookworm/main amd64 liblerc4 amd64 4.0.0+ds-2 [170 kB]
+#12 65.11 Get:46 http://deb.debian.org/debian bookworm/main amd64 libwebp7 amd64 1.2.4-0.2+deb12u1 [286 kB]
+#12 70.00 Get:47 http://deb.debian.org/debian bookworm/main amd64 libtiff6 amd64 4.5.0-6+deb12u4 [316 kB]
+#12 72.94 Get:48 http://deb.debian.org/debian bookworm/main amd64 libwebpmux3 amd64 1.2.4-0.2+deb12u1 [109 kB]
+#12 74.53 Get:49 http://deb.debian.org/debian bookworm/main amd64 liblept5 amd64 1.82.0-3+b3 [1050 kB]
+#12 76.22 Get:50 http://deb.debian.org/debian bookworm/main amd64 libnspr4 amd64 2:4.35-1 [113 kB]
+#12 76.38 Get:51 http://deb.debian.org/debian-security bookworm-security/main amd64 libnss3 amd64 2:3.87.1-1+deb12u4 [1331 kB]
+#12 79.44 Get:52 http://deb.debian.org/debian bookworm/main amd64 libthai-data all 0.1.29-1 [176 kB]
+#12 79.70 Get:53 http://deb.debian.org/debian bookworm/main amd64 libthai0 amd64 0.1.29-1 [57.5 kB]
+#12 79.81 Get:54 http://deb.debian.org/debian bookworm/main amd64 libpango-1.0-0 amd64 1.50.12+ds-1 [212 kB]
+#12 80.15 Get:55 http://deb.debian.org/debian bookworm/main amd64 libpangoft2-1.0-0 amd64 1.50.12+ds-1 [47.4 kB]
+#12 80.25 Get:56 http://deb.debian.org/debian bookworm/main amd64 libpangocairo-1.0-0 amd64 1.50.12+ds-1 [34.2 kB]
+#12 80.28 Get:57 http://deb.debian.org/debian-security bookworm-security/main amd64 libpoppler126 amd64 22.12.0-2+deb12u3 [1856 kB]
+#12 84.94 Get:58 http://deb.debian.org/debian bookworm/main amd64 libtesseract5 amd64 5.3.0-2 [1279 kB]
+#12 88.16 Get:59 http://deb.debian.org/debian-security bookworm-security/main amd64 openssl amd64 3.0.22-1~deb12u1 [1442 kB]
+#12 91.63 Get:60 http://deb.debian.org/debian-security bookworm-security/main amd64 poppler-utils amd64 22.12.0-2+deb12u3 [192 kB]
+#12 91.90 Get:61 http://deb.debian.org/debian bookworm/main amd64 tesseract-ocr-eng all 1:4.1.0-2 [1594 kB]
+#12 94.51 Get:62 http://deb.debian.org/debian bookworm/main amd64 tesseract-ocr-osd all 1:4.1.0-2 [2992 kB]
+#12 99.46 Get:63 http://deb.debian.org/debian bookworm/main amd64 tesseract-ocr amd64 5.3.0-2 [402 kB]
+#12 100.1 Get:64 http://deb.debian.org/debian bookworm/main amd64 tesseract-ocr-ind all 1:4.1.0-2 [538 kB]
+#12 101.2 debconf: delaying package configuration, since apt-utils is not installed
+#12 101.2 Fetched 38.0 MB in 1min 22s (463 kB/s)
+#12 101.2 Selecting previously unselected package libexpat1:amd64.
+#12 101.2 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6703 files and directories currently installed.)
+#12 101.3 Preparing to unpack .../00-libexpat1_2.5.0-1+deb12u4_amd64.deb ...
+#12 101.3 Unpacking libexpat1:amd64 (2.5.0-1+deb12u4) ...
+#12 101.3 Selecting previously unselected package libbrotli1:amd64.
+#12 101.3 Preparing to unpack .../01-libbrotli1_1.0.9-2+b6_amd64.deb ...
+#12 101.3 Unpacking libbrotli1:amd64 (1.0.9-2+b6) ...
+#12 101.4 Selecting previously unselected package libpng16-16:amd64.
+#12 101.4 Preparing to unpack .../02-libpng16-16_1.6.39-2+deb12u6_amd64.deb ...
+#12 101.4 Unpacking libpng16-16:amd64 (1.6.39-2+deb12u6) ...
+#12 101.4 Selecting previously unselected package libfreetype6:amd64.
+#12 101.4 Preparing to unpack .../03-libfreetype6_2.12.1+dfsg-5+deb12u4_amd64.deb ...
+#12 101.4 Unpacking libfreetype6:amd64 (2.12.1+dfsg-5+deb12u4) ...
+#12 101.5 Selecting previously unselected package fonts-dejavu-core.
+#12 101.5 Preparing to unpack .../04-fonts-dejavu-core_2.37-6_all.deb ...
+#12 101.5 Unpacking fonts-dejavu-core (2.37-6) ...
+#12 101.6 Selecting previously unselected package fontconfig-config.
+#12 101.6 Preparing to unpack .../05-fontconfig-config_2.14.1-4_amd64.deb ...
+#12 101.8 Unpacking fontconfig-config (2.14.1-4) ...
+#12 101.8 Selecting previously unselected package libfontconfig1:amd64.
+#12 101.8 Preparing to unpack .../06-libfontconfig1_2.14.1-4_amd64.deb ...
+#12 101.8 Unpacking libfontconfig1:amd64 (2.14.1-4) ...
+#12 101.9 Selecting previously unselected package fontconfig.
+#12 101.9 Preparing to unpack .../07-fontconfig_2.14.1-4_amd64.deb ...
+#12 101.9 Unpacking fontconfig (2.14.1-4) ...
+#12 101.9 Selecting previously unselected package libicu72:amd64.
+#12 101.9 Preparing to unpack .../08-libicu72_72.1-3+deb12u1_amd64.deb ...
+#12 101.9 Unpacking libicu72:amd64 (72.1-3+deb12u1) ...
+#12 102.7 Selecting previously unselected package libxml2:amd64.
+#12 102.7 Preparing to unpack .../09-libxml2_2.9.14+dfsg-1.3~deb12u6_amd64.deb ...
+#12 102.7 Unpacking libxml2:amd64 (2.9.14+dfsg-1.3~deb12u6) ...
+#12 102.8 Selecting previously unselected package libarchive13:amd64.
+#12 102.8 Preparing to unpack .../10-libarchive13_3.6.2-1+deb12u5_amd64.deb ...
+#12 102.8 Unpacking libarchive13:amd64 (3.6.2-1+deb12u5) ...
+#12 102.8 Selecting previously unselected package libbsd0:amd64.
+#12 102.8 Preparing to unpack .../11-libbsd0_0.11.7-2_amd64.deb ...
+#12 102.8 Unpacking libbsd0:amd64 (0.11.7-2) ...
+#12 102.9 Selecting previously unselected package libpixman-1-0:amd64.
+#12 102.9 Preparing to unpack .../12-libpixman-1-0_0.42.2-1_amd64.deb ...
+#12 102.9 Unpacking libpixman-1-0:amd64 (0.42.2-1) ...
+#12 102.9 Selecting previously unselected package libxau6:amd64.
+#12 102.9 Preparing to unpack .../13-libxau6_1%3a1.0.9-1_amd64.deb ...
+#12 102.9 Unpacking libxau6:amd64 (1:1.0.9-1) ...
+#12 103.0 Selecting previously unselected package libxdmcp6:amd64.
+#12 103.0 Preparing to unpack .../14-libxdmcp6_1%3a1.1.2-3_amd64.deb ...
+#12 103.0 Unpacking libxdmcp6:amd64 (1:1.1.2-3) ...
+#12 103.0 Selecting previously unselected package libxcb1:amd64.
+#12 103.0 Preparing to unpack .../15-libxcb1_1.15-1_amd64.deb ...
+#12 103.0 Unpacking libxcb1:amd64 (1.15-1) ...
+#12 103.0 Selecting previously unselected package libx11-data.
+#12 103.0 Preparing to unpack .../16-libx11-data_2%3a1.8.4-2+deb12u2_all.deb ...
+#12 103.0 Unpacking libx11-data (2:1.8.4-2+deb12u2) ...
+#12 103.2 Selecting previously unselected package libx11-6:amd64.
+#12 103.2 Preparing to unpack .../17-libx11-6_2%3a1.8.4-2+deb12u2_amd64.deb ...
+#12 103.2 Unpacking libx11-6:amd64 (2:1.8.4-2+deb12u2) ...
+#12 103.2 Selecting previously unselected package libxcb-render0:amd64.
+#12 103.2 Preparing to unpack .../18-libxcb-render0_1.15-1_amd64.deb ...
+#12 103.3 Unpacking libxcb-render0:amd64 (1.15-1) ...
+#12 103.3 Selecting previously unselected package libxcb-shm0:amd64.
+#12 103.3 Preparing to unpack .../19-libxcb-shm0_1.15-1_amd64.deb ...
+#12 103.3 Unpacking libxcb-shm0:amd64 (1.15-1) ...
+#12 103.3 Selecting previously unselected package libxext6:amd64.
+#12 103.3 Preparing to unpack .../20-libxext6_2%3a1.3.4-1+b1_amd64.deb ...
+#12 103.3 Unpacking libxext6:amd64 (2:1.3.4-1+b1) ...
+#12 103.4 Selecting previously unselected package libxrender1:amd64.
+#12 103.4 Preparing to unpack .../21-libxrender1_1%3a0.9.10-1.1_amd64.deb ...
+#12 103.4 Unpacking libxrender1:amd64 (1:0.9.10-1.1) ...
+#12 103.4 Selecting previously unselected package libcairo2:amd64.
+#12 103.4 Preparing to unpack .../22-libcairo2_1.16.0-7_amd64.deb ...
+#12 103.4 Unpacking libcairo2:amd64 (1.16.0-7) ...
+#12 103.5 Selecting previously unselected package libsasl2-modules-db:amd64.
+#12 103.5 Preparing to unpack .../23-libsasl2-modules-db_2.1.28+dfsg-10_amd64.deb ...
+#12 103.5 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg-10) ...
+#12 103.5 Selecting previously unselected package libsasl2-2:amd64.
+#12 103.5 Preparing to unpack .../24-libsasl2-2_2.1.28+dfsg-10_amd64.deb ...
+#12 103.5 Unpacking libsasl2-2:amd64 (2.1.28+dfsg-10) ...
+#12 103.6 Selecting previously unselected package libldap-2.5-0:amd64.
+#12 103.6 Preparing to unpack .../25-libldap-2.5-0_2.5.13+dfsg-5_amd64.deb ...
+#12 103.6 Unpacking libldap-2.5-0:amd64 (2.5.13+dfsg-5) ...
+#12 103.6 Selecting previously unselected package libnghttp2-14:amd64.
+#12 103.6 Preparing to unpack .../26-libnghttp2-14_1.52.0-1+deb12u3_amd64.deb ...
+#12 103.6 Unpacking libnghttp2-14:amd64 (1.52.0-1+deb12u3) ...
+#12 103.7 Selecting previously unselected package libpsl5:amd64.
+#12 103.7 Preparing to unpack .../27-libpsl5_0.21.2-1_amd64.deb ...
+#12 103.7 Unpacking libpsl5:amd64 (0.21.2-1) ...
+#12 103.7 Selecting previously unselected package librtmp1:amd64.
+#12 103.7 Preparing to unpack .../28-librtmp1_2.4+20151223.gitfa8646d.1-2+b2_amd64.deb ...
+#12 103.7 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+#12 103.8 Preparing to unpack .../29-libssl3_3.0.22-1~deb12u1_amd64.deb ...
+#12 103.8 Unpacking libssl3:amd64 (3.0.22-1~deb12u1) over (3.0.20-1~deb12u2) ...
+#12 103.9 Selecting previously unselected package libssh2-1:amd64.
+#12 103.9 Preparing to unpack .../30-libssh2-1_1.10.0-3+deb12u1_amd64.deb ...
+#12 103.9 Unpacking libssh2-1:amd64 (1.10.0-3+deb12u1) ...
+#12 104.0 Selecting previously unselected package libcurl4:amd64.
+#12 104.0 Preparing to unpack .../31-libcurl4_7.88.1-10+deb12u15_amd64.deb ...
+#12 104.0 Unpacking libcurl4:amd64 (7.88.1-10+deb12u15) ...
+#12 104.1 Selecting previously unselected package libdatrie1:amd64.
+#12 104.1 Preparing to unpack .../32-libdatrie1_0.2.13-2+b1_amd64.deb ...
+#12 104.1 Unpacking libdatrie1:amd64 (0.2.13-2+b1) ...
+#12 104.1 Selecting previously unselected package libdeflate0:amd64.
+#12 104.1 Preparing to unpack .../33-libdeflate0_1.14-1_amd64.deb ...
+#12 104.1 Unpacking libdeflate0:amd64 (1.14-1) ...
+#12 104.1 Selecting previously unselected package libfribidi0:amd64.
+#12 104.1 Preparing to unpack .../34-libfribidi0_1.0.8-2.1_amd64.deb ...
+#12 104.1 Unpacking libfribidi0:amd64 (1.0.8-2.1) ...
+#12 104.2 Selecting previously unselected package libgif7:amd64.
+#12 104.2 Preparing to unpack .../35-libgif7_5.2.1-2.5+deb12u1_amd64.deb ...
+#12 104.2 Unpacking libgif7:amd64 (5.2.1-2.5+deb12u1) ...
+#12 104.2 Selecting previously unselected package libglib2.0-0:amd64.
+#12 104.2 Preparing to unpack .../36-libglib2.0-0_2.74.6-2+deb12u9_amd64.deb ...
+#12 104.2 Unpacking libglib2.0-0:amd64 (2.74.6-2+deb12u9) ...
+#12 104.4 Selecting previously unselected package libgomp1:amd64.
+#12 104.4 Preparing to unpack .../37-libgomp1_12.2.0-14+deb12u1_amd64.deb ...
+#12 104.4 Unpacking libgomp1:amd64 (12.2.0-14+deb12u1) ...
+#12 104.4 Selecting previously unselected package libgraphite2-3:amd64.
+#12 104.4 Preparing to unpack .../38-libgraphite2-3_1.3.14-1+deb12u1_amd64.deb ...
+#12 104.4 Unpacking libgraphite2-3:amd64 (1.3.14-1+deb12u1) ...
+#12 104.5 Selecting previously unselected package libharfbuzz0b:amd64.
+#12 104.5 Preparing to unpack .../39-libharfbuzz0b_6.0.0+dfsg-3_amd64.deb ...
+#12 104.5 Unpacking libharfbuzz0b:amd64 (6.0.0+dfsg-3) ...
+#12 104.5 Selecting previously unselected package libjbig0:amd64.
+#12 104.5 Preparing to unpack .../40-libjbig0_2.1-6.1_amd64.deb ...
+#12 104.5 Unpacking libjbig0:amd64 (2.1-6.1) ...
+#12 104.6 Selecting previously unselected package libjpeg62-turbo:amd64.
+#12 104.6 Preparing to unpack .../41-libjpeg62-turbo_1%3a2.1.5-2_amd64.deb ...
+#12 104.6 Unpacking libjpeg62-turbo:amd64 (1:2.1.5-2) ...
+#12 104.6 Selecting previously unselected package liblcms2-2:amd64.
+#12 104.6 Preparing to unpack .../42-liblcms2-2_2.14-2+deb12u1_amd64.deb ...
+#12 104.6 Unpacking liblcms2-2:amd64 (2.14-2+deb12u1) ...
+#12 104.7 Selecting previously unselected package libopenjp2-7:amd64.
+#12 104.7 Preparing to unpack .../43-libopenjp2-7_2.5.0-2+deb12u3_amd64.deb ...
+#12 104.7 Unpacking libopenjp2-7:amd64 (2.5.0-2+deb12u3) ...
+#12 104.7 Selecting previously unselected package liblerc4:amd64.
+#12 104.7 Preparing to unpack .../44-liblerc4_4.0.0+ds-2_amd64.deb ...
+#12 104.7 Unpacking liblerc4:amd64 (4.0.0+ds-2) ...
+#12 104.8 Selecting previously unselected package libwebp7:amd64.
+#12 104.8 Preparing to unpack .../45-libwebp7_1.2.4-0.2+deb12u1_amd64.deb ...
+#12 104.8 Unpacking libwebp7:amd64 (1.2.4-0.2+deb12u1) ...
+#12 104.8 Selecting previously unselected package libtiff6:amd64.
+#12 104.9 Preparing to unpack .../46-libtiff6_4.5.0-6+deb12u4_amd64.deb ...
+#12 104.9 Unpacking libtiff6:amd64 (4.5.0-6+deb12u4) ...
+#12 104.9 Selecting previously unselected package libwebpmux3:amd64.
+#12 104.9 Preparing to unpack .../47-libwebpmux3_1.2.4-0.2+deb12u1_amd64.deb ...
+#12 104.9 Unpacking libwebpmux3:amd64 (1.2.4-0.2+deb12u1) ...
+#12 105.0 Selecting previously unselected package liblept5:amd64.
+#12 105.0 Preparing to unpack .../48-liblept5_1.82.0-3+b3_amd64.deb ...
+#12 105.0 Unpacking liblept5:amd64 (1.82.0-3+b3) ...
+#12 105.1 Selecting previously unselected package libnspr4:amd64.
+#12 105.1 Preparing to unpack .../49-libnspr4_2%3a4.35-1_amd64.deb ...
+#12 105.1 Unpacking libnspr4:amd64 (2:4.35-1) ...
+#12 105.1 Selecting previously unselected package libnss3:amd64.
+#12 105.1 Preparing to unpack .../50-libnss3_2%3a3.87.1-1+deb12u4_amd64.deb ...
+#12 105.1 Unpacking libnss3:amd64 (2:3.87.1-1+deb12u4) ...
+#12 105.2 Selecting previously unselected package libthai-data.
+#12 105.2 Preparing to unpack .../51-libthai-data_0.1.29-1_all.deb ...
+#12 105.3 Unpacking libthai-data (0.1.29-1) ...
+#12 105.3 Selecting previously unselected package libthai0:amd64.
+#12 105.3 Preparing to unpack .../52-libthai0_0.1.29-1_amd64.deb ...
+#12 105.3 Unpacking libthai0:amd64 (0.1.29-1) ...
+#12 105.3 Selecting previously unselected package libpango-1.0-0:amd64.
+#12 105.3 Preparing to unpack .../53-libpango-1.0-0_1.50.12+ds-1_amd64.deb ...
+#12 105.4 Unpacking libpango-1.0-0:amd64 (1.50.12+ds-1) ...
+#12 105.4 Selecting previously unselected package libpangoft2-1.0-0:amd64.
+#12 105.4 Preparing to unpack .../54-libpangoft2-1.0-0_1.50.12+ds-1_amd64.deb ...
+#12 105.4 Unpacking libpangoft2-1.0-0:amd64 (1.50.12+ds-1) ...
+#12 105.4 Selecting previously unselected package libpangocairo-1.0-0:amd64.
+#12 105.4 Preparing to unpack .../55-libpangocairo-1.0-0_1.50.12+ds-1_amd64.deb ...
+#12 105.5 Unpacking libpangocairo-1.0-0:amd64 (1.50.12+ds-1) ...
+#12 105.5 Selecting previously unselected package libpoppler126:amd64.
+#12 105.5 Preparing to unpack .../56-libpoppler126_22.12.0-2+deb12u3_amd64.deb ...
+#12 105.5 Unpacking libpoppler126:amd64 (22.12.0-2+deb12u3) ...
+#12 105.6 Selecting previously unselected package libtesseract5:amd64.
+#12 105.6 Preparing to unpack .../57-libtesseract5_5.3.0-2_amd64.deb ...
+#12 105.6 Unpacking libtesseract5:amd64 (5.3.0-2) ...
+#12 105.7 Preparing to unpack .../58-openssl_3.0.22-1~deb12u1_amd64.deb ...
+#12 105.7 Unpacking openssl (3.0.22-1~deb12u1) over (3.0.20-1~deb12u2) ...
+#12 105.9 Selecting previously unselected package poppler-utils.
+#12 105.9 Preparing to unpack .../59-poppler-utils_22.12.0-2+deb12u3_amd64.deb ...
+#12 105.9 Unpacking poppler-utils (22.12.0-2+deb12u3) ...
+#12 105.9 Selecting previously unselected package tesseract-ocr-eng.
+#12 105.9 Preparing to unpack .../60-tesseract-ocr-eng_1%3a4.1.0-2_all.deb ...
+#12 105.9 Unpacking tesseract-ocr-eng (1:4.1.0-2) ...
+#12 106.1 Selecting previously unselected package tesseract-ocr-osd.
+#12 106.1 Preparing to unpack .../61-tesseract-ocr-osd_1%3a4.1.0-2_all.deb ...
+#12 106.1 Unpacking tesseract-ocr-osd (1:4.1.0-2) ...
+#12 106.4 Selecting previously unselected package tesseract-ocr.
+#12 106.4 Preparing to unpack .../62-tesseract-ocr_5.3.0-2_amd64.deb ...
+#12 106.4 Unpacking tesseract-ocr (5.3.0-2) ...
+#12 106.4 Selecting previously unselected package tesseract-ocr-ind.
+#12 106.4 Preparing to unpack .../63-tesseract-ocr-ind_1%3a4.1.0-2_all.deb ...
+#12 106.4 Unpacking tesseract-ocr-ind (1:4.1.0-2) ...
+#12 106.5 Setting up libexpat1:amd64 (2.5.0-1+deb12u4) ...
+#12 106.5 Setting up libgraphite2-3:amd64 (1.3.14-1+deb12u1) ...
+#12 106.5 Setting up liblcms2-2:amd64 (2.14-2+deb12u1) ...
+#12 106.5 Setting up libpixman-1-0:amd64 (0.42.2-1) ...
+#12 106.5 Setting up libxau6:amd64 (1:1.0.9-1) ...
+#12 106.6 Setting up libpsl5:amd64 (0.21.2-1) ...
+#12 106.6 Setting up libicu72:amd64 (72.1-3+deb12u1) ...
+#12 106.6 Setting up liblerc4:amd64 (4.0.0+ds-2) ...
+#12 106.6 Setting up libdatrie1:amd64 (0.2.13-2+b1) ...
+#12 106.6 Setting up libglib2.0-0:amd64 (2.74.6-2+deb12u9) ...
+#12 106.6 No schema files found: doing nothing.
+#12 106.6 Setting up libbrotli1:amd64 (1.0.9-2+b6) ...
+#12 106.6 Setting up libssl3:amd64 (3.0.22-1~deb12u1) ...
+#12 106.6 Setting up libnghttp2-14:amd64 (1.52.0-1+deb12u3) ...
+#12 106.7 Setting up libdeflate0:amd64 (1.14-1) ...
+#12 106.7 Setting up tesseract-ocr-eng (1:4.1.0-2) ...
+#12 106.7 Setting up libgomp1:amd64 (12.2.0-14+deb12u1) ...
+#12 106.7 Setting up libjbig0:amd64 (2.1-6.1) ...
+#12 106.7 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg-10) ...
+#12 106.7 Setting up libjpeg62-turbo:amd64 (1:2.1.5-2) ...
+#12 106.7 Setting up libx11-data (2:1.8.4-2+deb12u2) ...
+#12 106.7 Setting up libnspr4:amd64 (2:4.35-1) ...
+#12 106.7 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+#12 106.7 Setting up tesseract-ocr-ind (1:4.1.0-2) ...
+#12 106.8 Setting up libfribidi0:amd64 (1.0.8-2.1) ...
+#12 106.8 Setting up libpng16-16:amd64 (1.6.39-2+deb12u6) ...
+#12 106.8 Setting up fonts-dejavu-core (2.37-6) ...
+#12 106.8 Setting up libsasl2-2:amd64 (2.1.28+dfsg-10) ...
+#12 106.8 Setting up libwebp7:amd64 (1.2.4-0.2+deb12u1) ...
+#12 106.9 Setting up libgif7:amd64 (5.2.1-2.5+deb12u1) ...
+#12 106.9 Setting up libtiff6:amd64 (4.5.0-6+deb12u4) ...
+#12 106.9 Setting up libopenjp2-7:amd64 (2.5.0-2+deb12u3) ...
+#12 106.9 Setting up libthai-data (0.1.29-1) ...
+#12 106.9 Setting up libssh2-1:amd64 (1.10.0-3+deb12u1) ...
+#12 106.9 Setting up tesseract-ocr-osd (1:4.1.0-2) ...
+#12 106.9 Setting up openssl (3.0.22-1~deb12u1) ...
+#12 106.9 Setting up libwebpmux3:amd64 (1.2.4-0.2+deb12u1) ...
+#12 106.9 Setting up libbsd0:amd64 (0.11.7-2) ...
+#12 107.0 Setting up libxml2:amd64 (2.9.14+dfsg-1.3~deb12u6) ...
+#12 107.0 Setting up libxdmcp6:amd64 (1:1.1.2-3) ...
+#12 107.0 Setting up libxcb1:amd64 (1.15-1) ...
+#12 107.0 Setting up libarchive13:amd64 (3.6.2-1+deb12u5) ...
+#12 107.0 Setting up libxcb-render0:amd64 (1.15-1) ...
+#12 107.0 Setting up fontconfig-config (2.14.1-4) ...
+#12 107.1 debconf: unable to initialize frontend: Dialog
+#12 107.1 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#12 107.1 debconf: falling back to frontend: Readline
+#12 107.1 debconf: unable to initialize frontend: Readline
+#12 107.1 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.36.0 /usr/local/share/perl/5.36.0 /usr/lib/x86_64-linux-gnu/perl5/5.36 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.36 /usr/share/perl/5.36 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+#12 107.1 debconf: falling back to frontend: Teletype
+#12 107.4 Setting up libnss3:amd64 (2:3.87.1-1+deb12u4) ...
+#12 107.4 Setting up libxcb-shm0:amd64 (1.15-1) ...
+#12 107.4 Setting up libldap-2.5-0:amd64 (2.5.13+dfsg-5) ...
+#12 107.4 Setting up liblept5:amd64 (1.82.0-3+b3) ...
+#12 107.4 Setting up libthai0:amd64 (0.1.29-1) ...
+#12 107.4 Setting up libfreetype6:amd64 (2.12.1+dfsg-5+deb12u4) ...
+#12 107.4 Setting up libcurl4:amd64 (7.88.1-10+deb12u15) ...
+#12 107.4 Setting up libx11-6:amd64 (2:1.8.4-2+deb12u2) ...
+#12 107.4 Setting up libharfbuzz0b:amd64 (6.0.0+dfsg-3) ...
+#12 107.4 Setting up libfontconfig1:amd64 (2.14.1-4) ...
+#12 107.5 Setting up fontconfig (2.14.1-4) ...
+#12 107.5 Regenerating fonts cache... done.
+#12 109.5 Setting up libxrender1:amd64 (1:0.9.10-1.1) ...
+#12 109.5 Setting up libpango-1.0-0:amd64 (1.50.12+ds-1) ...
+#12 109.5 Setting up libxext6:amd64 (2:1.3.4-1+b1) ...
+#12 109.5 Setting up libcairo2:amd64 (1.16.0-7) ...
+#12 109.5 Setting up libpoppler126:amd64 (22.12.0-2+deb12u3) ...
+#12 109.5 Setting up libtesseract5:amd64 (5.3.0-2) ...
+#12 109.6 Setting up poppler-utils (22.12.0-2+deb12u3) ...
+#12 109.6 Setting up libpangoft2-1.0-0:amd64 (1.50.12+ds-1) ...
+#12 109.6 Setting up libpangocairo-1.0-0:amd64 (1.50.12+ds-1) ...
+#12 109.6 Setting up tesseract-ocr (5.3.0-2) ...
+#12 109.6 Processing triggers for libc-bin (2.36-9+deb12u14) ...
+#12 DONE 109.8s
+
+#13 [tests  2/10] RUN python -c "import shutil, subprocess; assert all(shutil.which(x) for x in ('pdfinfo', 'pdftotext', 'pdfimages', 'pdftoppm', 'tesseract')); assert {'eng', 'ind'} <= set(subprocess.check_output(['tesseract', '--list-langs'], text=True).split())"
+#13 DONE 0.5s
+
+#14 [tests  3/10] RUN uv sync --frozen --no-editable
+#14 0.861 Downloading pip (1.7MiB)
+#14 0.864 Downloading pygments (1.2MiB)
+#14 0.872 Downloading ruff (9.9MiB)
+#14 12.02  Downloaded pygments
+#14 13.99  Downloaded pip
+#14 31.84  Downloaded ruff
+#14 31.84 Prepared 26 packages in 31.29s
+#14 31.94 Installed 27 packages in 106ms
+#14 31.94  + boolean-py==5.0
+#14 31.94  + cachecontrol==0.14.4
+#14 31.94  + coverage==7.16.2
+#14 31.94  + cyclonedx-python-lib==11.12.0
+#14 31.94  + iniconfig==2.3.0
+#14 31.94  + license-expression==30.4.4
+#14 31.94  + markdown-it-py==4.2.0
+#14 31.94  + mdurl==0.1.2
+#14 31.94  + msgpack==1.2.2
+#14 31.94  + packageurl-python==0.17.6
+#14 31.94  + pip==26.2.1
+#14 31.94  + pip-api==0.0.35
+#14 31.94  + pip-audit==2.10.1
+#14 31.94  + pip-requirements-parser==32.0.1
+#14 31.94  + platformdirs==4.12.0
+#14 31.94  + pluggy==1.6.0
+#14 31.94  + py-serializable==2.1.0
+#14 31.94  + pygments==2.21.0
+#14 31.94  + pyparsing==3.3.3
+#14 31.94  + pytest==9.1.1
+#14 31.94  + pytest-asyncio==1.4.0
+#14 31.94  + pytest-cov==7.1.0
+#14 31.94  + rich==15.0.0
+#14 31.94  + ruff==0.16.9
+#14 31.94  + sortedcontainers==2.4.0
+#14 31.94  + tomli==2.4.1
+#14 31.94  + tomli-w==1.2.0
+#14 DONE 32.0s
+
+#15 [tests  4/10] COPY migrations ./migrations
+#15 DONE 0.0s
+
+#16 [tests  5/10] COPY alembic.ini ./
+#16 DONE 0.0s
+
+#17 [tests  6/10] COPY tests ./tests
+#17 DONE 0.1s
+
+#18 [tests  7/10] COPY compose*.yaml ./
+#18 DONE 0.0s
+
+#19 [tests  8/10] COPY Dockerfile ./Dockerfile
+#19 DONE 0.0s
+
+#20 [tests  9/10] COPY scripts ./scripts
+#20 DONE 0.0s
+
+#21 [tests 10/10] COPY infra/postgres/bootstrap.sh ./infra/postgres/bootstrap.sh
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 2.3s done
+#22 writing image sha256:e79e875683682a7ed7255afdfd2babc2a95fe2cc60b0af8335358a3ac9b14541 done
+#22 naming to docker.io/library/personal-jarvis-tests-tests done
+#22 DONE 2.3s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image personal-jarvis-tests-tests Built 
+ Network personal-jarvis-tests_default Creating 
+ Network personal-jarvis-tests_default Creating 
+ Network personal-jarvis-tests_default Created 
+ Network personal-jarvis-tests_default Created 
+ Container personal-jarvis-tests-postgres-test-1 Creating 
+ Container personal-jarvis-tests-qdrant-1 Creating 
+ Container personal-jarvis-tests-qdrant-1 Created 
+ Container personal-jarvis-tests-postgres-test-1 Created 
+ Container personal-jarvis-tests-tests-1 Creating 
+ Container personal-jarvis-tests-tests-1 Created 
+Attaching to postgres-test-1, qdrant-1, tests-1
+ Container personal-jarvis-tests-postgres-test-1 Starting 
+ Container personal-jarvis-tests-qdrant-1 Starting 
+ Container personal-jarvis-tests-postgres-test-1 Started 
+postgres-test-1  | The files belonging to this database system will be owned by user "postgres".
+postgres-test-1  | This user must also own the server process.
+postgres-test-1  | 
+postgres-test-1  | The database cluster will be initialized with locale "en_US.utf8".
+postgres-test-1  | The default database encoding has accordingly been set to "UTF8".
+postgres-test-1  | The default text search configuration will be set to "english".
+postgres-test-1  | 
+postgres-test-1  | Data page checksums are disabled.
+postgres-test-1  | 
+postgres-test-1  | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+postgres-test-1  | creating subdirectories ... ok
+postgres-test-1  | selecting dynamic shared memory implementation ... posix
+postgres-test-1  | selecting default max_connections ... 100
+postgres-test-1  | selecting default shared_buffers ... 128MB
+postgres-test-1  | selecting default time zone ... Etc/UTC
+postgres-test-1  | creating configuration files ... ok
+ Container personal-jarvis-tests-qdrant-1 Started 
+ Container personal-jarvis-tests-postgres-test-1 Waiting 
+qdrant-1         |            _                 _    
+qdrant-1         |   __ _  __| |_ __ __ _ _ __ | |_  
+qdrant-1         |  / _` |/ _` | '__/ _` | '_ \| __| 
+qdrant-1         | | (_| | (_| | | | (_| | | | | |_  
+qdrant-1         |  \__, |\__,_|_|  \__,_|_| |_|\__| 
+qdrant-1         |     |_|                           
+qdrant-1         | 
+qdrant-1         | Version: 1.19.1, build: 6ab21cac
+qdrant-1         | Access web UI at http://localhost:6333/dashboard
+qdrant-1         | Agentic Skills: https://skills.qdrant.tech/
+qdrant-1         | 
+qdrant-1         | 2026-10-10T10:49:11.443379Z  WARN qdrant: There is a potential issue with the filesystem for storage path ./storage. Details: Data will be lost on system restart - tmpfs is memory-based
+qdrant-1         | 2026-10-10T10:49:11.443504Z  INFO storage::content_manager::consensus::persistent: Initializing new raft state at ./storage/raft_state.json
+qdrant-1         | 2026-10-10T10:49:11.449566Z  INFO qdrant: Distributed mode disabled
+qdrant-1         | 2026-10-10T10:49:11.449624Z  INFO qdrant: Telemetry reporting disabled
+qdrant-1         | 2026-10-10T10:49:11.469180Z  WARN qdrant::startup: Failed to create init file indicator: failed to create file `.qdrant-initialized`: Read-only file system (os error 30)
+qdrant-1         | 2026-10-10T10:49:11.469776Z  INFO qdrant::actix: REST transport settings: keep_alive=5s, client_request_timeout=5s, client_disconnect_timeout=5s
+qdrant-1         | 2026-10-10T10:49:11.469810Z  INFO qdrant::actix: TLS disabled for REST API
+qdrant-1         | 2026-10-10T10:49:11.469909Z  INFO qdrant::actix: Qdrant HTTP listening on 6333
+qdrant-1         | 2026-10-10T10:49:11.469952Z  INFO actix_server::builder: starting 11 workers
+qdrant-1         | 2026-10-10T10:49:11.470094Z  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+qdrant-1         | 2026-10-10T10:49:11.470126Z  INFO actix_server::server: starting service: "actix-web-service-0.0.0.0:6333", workers: 11, listening on: 0.0.0.0:6333
+qdrant-1         | 2026-10-10T10:49:11.487768Z  INFO qdrant::tonic: Qdrant gRPC listening on 6334
+qdrant-1         | 2026-10-10T10:49:11.487810Z  INFO qdrant::tonic: TLS disabled for gRPC API
+postgres-test-1  | running bootstrap script ... ok
+postgres-test-1  | performing post-bootstrap initialization ... ok
+postgres-test-1  | initdb: warning: enabling "trust" authentication for local connections
+postgres-test-1  | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+postgres-test-1  | syncing data to disk ... ok
+postgres-test-1  | 
+postgres-test-1  | 
+postgres-test-1  | Success. You can now start the database server using:
+postgres-test-1  | 
+postgres-test-1  |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+postgres-test-1  | 
+postgres-test-1  | waiting for server to start....2026-10-10 10:49:12.626 UTC [49] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-test-1  | 2026-10-10 10:49:12.628 UTC [49] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-test-1  | 2026-10-10 10:49:12.631 UTC [52] LOG:  database system was shut down at 2026-10-10 10:49:12 UTC
+postgres-test-1  | 2026-10-10 10:49:12.637 UTC [49] LOG:  database system is ready to accept connections
+postgres-test-1  |  done
+postgres-test-1  | server started
+postgres-test-1  | CREATE DATABASE
+postgres-test-1  | 
+postgres-test-1  | 
+postgres-test-1  | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+postgres-test-1  | 
+postgres-test-1  | waiting for server to shut down...2026-10-10 10:49:12.889 UTC [49] LOG:  received fast shutdown request
+postgres-test-1  | .2026-10-10 10:49:12.889 UTC [49] LOG:  aborting any active transactions
+postgres-test-1  | 2026-10-10 10:49:12.893 UTC [49] LOG:  background worker "logical replication launcher" (PID 55) exited with exit code 1
+postgres-test-1  | 2026-10-10 10:49:12.897 UTC [50] LOG:  shutting down
+postgres-test-1  | 2026-10-10 10:49:12.897 UTC [50] LOG:  checkpoint starting: shutdown immediate
+postgres-test-1  | 2026-10-10 10:49:12.917 UTC [50] LOG:  checkpoint complete: wrote 922 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.018 s, sync=0.002 s, total=0.021 s; sync files=301, longest=0.001 s, average=0.001 s; distance=4255 kB, estimate=4255 kB; lsn=0/1912118, redo lsn=0/1912118
+postgres-test-1  | 2026-10-10 10:49:12.938 UTC [49] LOG:  database system is shut down
+postgres-test-1  |  done
+postgres-test-1  | server stopped
+postgres-test-1  | 
+postgres-test-1  | PostgreSQL init process complete; ready for start up.
+postgres-test-1  | 
+postgres-test-1  | 2026-10-10 10:49:13.044 UTC [1] LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+postgres-test-1  | 2026-10-10 10:49:13.045 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-test-1  | 2026-10-10 10:49:13.045 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-test-1  | 2026-10-10 10:49:13.047 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-test-1  | 2026-10-10 10:49:13.050 UTC [65] LOG:  database system was shut down at 2026-10-10 10:49:12 UTC
+postgres-test-1  | 2026-10-10 10:49:13.055 UTC [1] LOG:  database system is ready to accept connections
+ Container personal-jarvis-tests-postgres-test-1 Healthy 
+ Container personal-jarvis-tests-tests-1 Starting 
+ Container personal-jarvis-tests-tests-1 Started 
+tests-1          | 1/7 exit=0 log=01-command.log
+tests-1          | 2/7 exit=0 log=02-command.log
+tests-1          | 3/7 exit=0 log=03-command.log
+tests-1          | 4/7 exit=0 log=04-command.log
+tests-1          | 5/7 exit=0 log=05-command.log
+tests-1          | 6/7 exit=0 log=06-command.log
+postgres-test-1  | 2026-10-10 10:49:37.228 UTC [197] ERROR:  new row violates row-level security policy for table "profile_memory"
+postgres-test-1  | 2026-10-10 10:49:37.228 UTC [197] STATEMENT:  INSERT INTO app.profile_memory (owner_id, key, value, data_class, kind, provenance, expires_at, status, importance) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR, $7::TIMESTAMP WITH TIME ZONE, $8::VARCHAR, $9) RETURNING app.profile_memory.created_at, app.profile_memory.updated_at
+postgres-test-1  | 2026-10-10 10:49:48.796 UTC [282] ERROR:  tool action payload is immutable
+postgres-test-1  | 2026-10-10 10:49:48.796 UTC [282] CONTEXT:  PL/pgSQL function app.reject_tool_action_payload_update() line 19 at RAISE
+postgres-test-1  | 2026-10-10 10:49:48.796 UTC [282] STATEMENT:  UPDATE app.tool_actions SET due_at=due_at+interval '1 hour' WHERE id=$1
+postgres-test-1  | 2026-10-10 10:49:53.669 UTC [326] ERROR:  new row violates row-level security policy for table "users"
+postgres-test-1  | 2026-10-10 10:49:53.669 UTC [326] STATEMENT:  INSERT INTO app.users (id, display_name, timezone, status) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR) RETURNING app.users.created_at
+postgres-test-1  | 2026-10-10 10:49:53.722 UTC [327] ERROR:  permission denied for schema app at character 14
+postgres-test-1  | 2026-10-10 10:49:53.722 UTC [327] STATEMENT:  CREATE TABLE app.forbidden (id integer)
+postgres-test-1  | 2026-10-10 10:49:53.726 UTC [327] ERROR:  permission denied to set role "jarvis_migrator"
+postgres-test-1  | 2026-10-10 10:49:53.726 UTC [327] STATEMENT:  SET ROLE jarvis_migrator
+postgres-test-1  | 2026-10-10 10:49:53.768 UTC [328] ERROR:  permission denied for table audit_events
+postgres-test-1  | 2026-10-10 10:49:53.768 UTC [328] STATEMENT:  UPDATE app.audit_events SET action='forged'
+postgres-test-1  | 2026-10-10 10:49:53.813 UTC [329] ERROR:  permission denied for table audit_events
+postgres-test-1  | 2026-10-10 10:49:53.813 UTC [329] STATEMENT:  DELETE FROM app.audit_events
+postgres-test-1  | 2026-10-10 10:49:54.618 UTC [336] ERROR:  duplicate key value violates unique constraint "identity_channel_user"
+postgres-test-1  | 2026-10-10 10:49:54.618 UTC [336] STATEMENT:  INSERT INTO app.external_identities (id, owner_id, channel, external_user_id, chat_id, enabled) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::BIGINT, $5::BIGINT, $6) RETURNING app.external_identities.created_at
+postgres-test-1  | 2026-10-10 10:49:58.127 UTC [384] ERROR:  new row violates row-level security policy for table "telegram_receipts"
+postgres-test-1  | 2026-10-10 10:49:58.127 UTC [384] STATEMENT:  INSERT INTO app.telegram_receipts (owner_id, bot_id, update_id, chat_id, reply_kind, reply_text, requires_pairing, delivery_status, attempts, next_attempt_at, telegram_message_id) VALUES ($1::UUID, $2::BIGINT, $3::BIGINT, $4::BIGINT, $5::VARCHAR, $6::VARCHAR, $7, $8::VARCHAR, $9::INTEGER, $10::TIMESTAMP WITH TIME ZONE, $11::BIGINT) RETURNING app.telegram_receipts.created_at
+postgres-test-1  | 2026-10-10 10:49:59.131 UTC [391] ERROR:  tool action payload is immutable
+postgres-test-1  | 2026-10-10 10:49:59.131 UTC [391] CONTEXT:  PL/pgSQL function app.reject_tool_action_payload_update() line 19 at RAISE
+postgres-test-1  | 2026-10-10 10:49:59.131 UTC [391] STATEMENT:  UPDATE app.tool_actions SET arguments=$1::JSONB WHERE app.tool_actions.id = $2::UUID
+qdrant-1         | 2026-10-10T10:49:59.328512Z  INFO actix_web::middleware::logger: 172.25.0.4 "GET /collections/jarvis_knowledge_v1 HTTP/1.1" 404 102 "-" "python-httpx/0.28.1" 0.001006
+qdrant-1         | 2026-10-10T10:49:59.332515Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection jarvis_knowledge_v1
+qdrant-1         | 2026-10-10T10:49:59.346645Z  INFO actix_web::middleware::logger: 172.25.0.4 "PUT /collections/jarvis_knowledge_v1 HTTP/1.1" 200 57 "-" "python-httpx/0.28.1" 0.014560
+qdrant-1         | 2026-10-10T10:49:59.349221Z  INFO actix_web::middleware::logger: 172.25.0.4 "GET /collections/jarvis_knowledge_v1 HTTP/1.1" 200 450 "-" "python-httpx/0.28.1" 0.000625
+qdrant-1         | 2026-10-10T10:49:59.355636Z  INFO actix_web::middleware::logger: 172.25.0.4 "PUT /collections/jarvis_knowledge_v1/points?wait=true HTTP/1.1" 200 84 "-" "python-httpx/0.28.1" 0.004381
+qdrant-1         | 2026-10-10T10:49:59.359156Z  INFO actix_web::middleware::logger: 172.25.0.4 "PUT /collections/jarvis_knowledge_v1/points?wait=true HTTP/1.1" 200 83 "-" "python-httpx/0.28.1" 0.001178
+qdrant-1         | 2026-10-10T10:49:59.361860Z  INFO actix_web::middleware::logger: 172.25.0.4 "PUT /collections/jarvis_knowledge_v1/points?wait=true HTTP/1.1" 200 82 "-" "python-httpx/0.28.1" 0.000850
+qdrant-1         | 2026-10-10T10:49:59.366152Z  INFO actix_web::middleware::logger: 172.25.0.4 "POST /collections/jarvis_knowledge_v1/points/search HTTP/1.1" 200 110 "-" "python-httpx/0.28.1" 0.002211
+qdrant-1         | 2026-10-10T10:49:59.369433Z  INFO actix_web::middleware::logger: 172.25.0.4 "POST /collections/jarvis_knowledge_v1/points/delete?wait=true HTTP/1.1" 200 83 "-" "python-httpx/0.28.1" 0.001337
+qdrant-1         | 2026-10-10T10:49:59.372505Z  INFO actix_web::middleware::logger: 172.25.0.4 "POST /collections/jarvis_knowledge_v1/points/search HTTP/1.1" 200 55 "-" "python-httpx/0.28.1" 0.000612
+qdrant-1         | 2026-10-10T10:49:59.374866Z  INFO actix_web::middleware::logger: 172.25.0.4 "POST /collections/jarvis_knowledge_v1/points/search HTTP/1.1" 200 108 "-" "python-httpx/0.28.1" 0.000551
+qdrant-1         | 2026-10-10T10:49:59.378102Z  INFO actix_web::middleware::logger: 172.25.0.4 "POST /collections/jarvis_knowledge_v1/points/delete?wait=true HTTP/1.1" 200 81 "-" "python-httpx/0.28.1" 0.000773
+qdrant-1         | 2026-10-10T10:49:59.380169Z  INFO actix_web::middleware::logger: 172.25.0.4 "POST /collections/jarvis_knowledge_v1/points/delete?wait=true HTTP/1.1" 200 83 "-" "python-httpx/0.28.1" 0.000581
+qdrant-1         | 2026-10-10T10:49:59.383141Z  INFO actix_web::middleware::logger: 172.25.0.4 "POST /collections/jarvis_knowledge_v1/points/delete?wait=true HTTP/1.1" 200 80 "-" "python-httpx/0.28.1" 0.001077
+tests-1          | 7/7 exit=0 log=07-command.log
+[Ktests-1 exited with code 0
+ Compose Stopping Aborting on container exit...
+ Container personal-jarvis-tests-tests-1 Stopping 
+ Container personal-jarvis-tests-tests-1 Stopped 
+ Container personal-jarvis-tests-qdrant-1 Stopping 
+ Container personal-jarvis-tests-postgres-test-1 Stopping 
+qdrant-1         | 2026-10-10T10:50:07.760618Z  INFO actix_server::server: SIGTERM received; starting graceful shutdown
+qdrant-1         | 2026-10-10T10:50:07.760731Z  INFO actix_server::worker: shutting down idle worker
+qdrant-1         | 2026-10-10T10:50:07.760730Z  INFO actix_server::worker: shutting down idle worker
+qdrant-1         | 2026-10-10T10:50:07.760805Z  INFO actix_server::worker: shutting down idle worker
+qdrant-1         | 2026-10-10T10:50:07.760757Z  INFO actix_server::accept: accept thread stopped
+qdrant-1         | 2026-10-10T10:50:07.760836Z  INFO actix_server::worker: shutting down idle worker
+qdrant-1         | 2026-10-10T10:50:07.760848Z  INFO actix_server::worker: shutting down idle worker
+postgres-test-1  | 2026-10-10 10:50:07.763 UTC [1] LOG:  received fast shutdown request
+postgres-test-1  | 2026-10-10 10:50:07.763 UTC [1] LOG:  aborting any active transactions
+postgres-test-1  | 2026-10-10 10:50:07.767 UTC [1] LOG:  background worker "logical replication launcher" (PID 68) exited with exit code 1
+postgres-test-1  | 2026-10-10 10:50:07.768 UTC [63] LOG:  shutting down
+postgres-test-1  | 2026-10-10 10:50:07.768 UTC [63] LOG:  checkpoint starting: shutdown immediate
+postgres-test-1  | 2026-10-10 10:50:07.774 UTC [63] LOG:  checkpoint complete: wrote 492 buffers (3.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.006 s, sync=0.001 s, total=0.006 s; sync files=226, longest=0.001 s, average=0.000 s; distance=2970 kB, estimate=2970 kB; lsn=0/1BF89C8, redo lsn=0/1BF89C8
+postgres-test-1  | 2026-10-10 10:50:07.784 UTC [1] LOG:  database system is shut down
+ Container personal-jarvis-tests-qdrant-1 Stopped 
+[Kqdrant-1 exited with code 143
+ Container personal-jarvis-tests-postgres-test-1 Stopped 
+[Kpostgres-test-1 exited with code 0

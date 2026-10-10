@@ -1,0 +1,27 @@
+{
+  "verified_utc": "2026-10-05T13:56:58.823644+00:00",
+  "source_hash": "fe425fe6d3fcc7365cdaf20a8b6e90d4f564dc02ee7ba6825ad2eee1b90dc058",
+  "previous_candidate_archive_sha256": "2c0e80902230726dc30d7136275c1134d563c247a4b0e8902dfebadbaaed8498",
+  "payload_files_before_evidence": 94,
+  "deletions": [],
+  "apply_results": [
+    {
+      "start": "original_baseline",
+      "checks": 95,
+      "apply": "passed",
+      "manifest_copied": true,
+      "full_source_hash_match": true,
+      "repeat": "idempotent"
+    },
+    {
+      "start": "candidate_v1",
+      "checks": 95,
+      "apply": "passed",
+      "manifest_copied": true,
+      "full_source_hash_match": true,
+      "repeat": "idempotent"
+    }
+  ],
+  "runtime_calendar_schema_dependencies": "unchanged by runner fix",
+  "corrected_windows_docker": "NOT_RUN"
+}

@@ -1,0 +1,22 @@
+# Cold backup helper only; never starts writers or mounts secrets.
+services:
+  backup-files:
+    image: personal-jarvis:0.4.0
+    profiles: [operations]
+    user: 10001:10001
+    read_only: true
+    network_mode: none
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 16
+    mem_limit: 256m
+    entrypoint: [python, /opt/kuro_volume_archive.py, pack]
+    volumes:
+      - ./scripts/volume_archive.py:/opt/kuro_volume_archive.py:ro
+      - document-data:/volumes/documents:ro
+      - qdrant-data:/volumes/qdrant:ro
+      - embedding-models:/volumes/models:ro
+volumes:
+  document-data:
+  qdrant-data:
+  embedding-models:

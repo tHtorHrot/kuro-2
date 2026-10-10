@@ -1,0 +1,22 @@
+{
+  "recorded_utc": "2026-10-05T13:52:11.218618+00:00",
+  "user_reported": {
+    "source_overwrite_only": true,
+    "manifest_files": 64,
+    "all_match": "already_current",
+    "initial_windows_gate": "INTERRUPTED_BEFORE_TEST_RESULT",
+    "removed_network": "personal-jarvis-tests_default",
+    "native_error": "NativeCommandError on Image personal-jarvis-tests-tests Building",
+    "exit_code": null
+  },
+  "corrected_runner_sha256": "ed4ef57979ed468d78de4840143e220f87a8ebf8db240d80053a0b079a025720",
+  "source_hash": "46cdff99e181e528424ac3da5db76ca38263bbc4e2a130070f82c51899bc65dd",
+  "offline_evidence": "docs/evidence/stage-4h/release-runner-fix-final/verification.json",
+  "corrected_windows_runner": "NOT_RUN",
+  "native_release_gate": "NOT_RUN",
+  "production_migration": "NOT_RUN per user",
+  "references": [
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables",
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file"
+  ]
+}

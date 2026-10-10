@@ -17,16 +17,16 @@ REPLIES = {
     "pair_failed": "Pairing tidak berhasil. Periksa kode dan masa berlakunya di komputer.",
     "already_paired": "Akun ini sudah dipasangkan. Gunakan /status atau /help.",
     "help": (
-        "KURO\nKirim pesan biasa untuk bertanya ke AI cloud. /ask TEKS tetap tersedia.\n"
-        "/docs — daftar dokumen\n/doc UUID — status dokumen\n"
-        "/askdoc UUID PERTANYAAN — jawaban bersumber\n/deldoc UUID — hapus dokumen lokal\n"
-        "/remember kunci nilai — simpan fakta profil untuk AI\n/memory — lihat profil\n"
-        "/forget kunci — hapus fakta\n/new — percakapan baru\n/clear — hapus isi percakapan lokal\n"
-        "/approve KODE — setujui satu panggilan premium\n/cancel — batalkan permintaan\n"
-        "/toolapprove ID FINGERPRINT — setujui proposal Calendar\n"
-        "/toolstatus ID — lihat status tindakan Calendar\n"
-        "Calendar: coba 'apa jadwalku besok?' setelah diaktifkan pemilik.\n"
-        "/ai — status AI\n/status — koneksi Telegram\n/privacy — batas privasi"
+        "KURO — cukup kirim pesan biasa, contoh:\n"
+        "• Tanya: apa jadwalku besok?\n"
+        '• Buat: buat rapat "Review" besok jam 10 durasi 60 menit\n'
+        "• Koreksi: draft 1234abcd: durasi 20 menit\n"
+        "• Setuju: ketuk tombol, /toolapprove ID FINGERPRINT, atau balas ya / setujui nomor 1\n"
+        "• Cek/batal: /toolstatus 1234abcd — /cancel 1234abcd\n\n"
+        "Dokumen: /docs — /doc — /askdoc UUID pertanyaan — /deldoc UUID\n"
+        "Task: kirim goal langsung, atau /tasks — /task 1234abcd\n"
+        "Profil: /remember kunci nilai — /memory — /forget kunci\n"
+        "Lain: /new — /clear — /ai — /status — /privacy"
     ),
     "status": (
         "KURO terhubung dan akunmu sudah dipasangkan.\n"
@@ -62,6 +62,55 @@ class IncomingCommand:
     command: str
     pair_code: str | None = field(default=None, repr=False)
     argument: str | None = field(default=None, repr=False)
+    callback_id: str | None = field(default=None, repr=False)
+    callback_message_id: int | None = field(default=None, repr=False)
+    callback_message_text: str | None = field(default=None, repr=False)
+
+
+def parse_callback(
+    update_id: int, query: dict, config: "TelegramConfig", now: datetime
+) -> IncomingCommand | None:
+    """Tap on the bot's own inline button. Same sender/private checks as messages."""
+    if not isinstance(query, dict):
+        return None
+    sender, message = query.get("from"), query.get("message")
+    if not isinstance(sender, dict) or not isinstance(message, dict):
+        return None
+    chat = message.get("chat")
+    if not isinstance(chat, dict):
+        return None
+    if (
+        type(sender.get("id")) is not int
+        or sender["id"] != config.sender_id
+        or sender.get("is_bot") is not False
+        or type(chat.get("id")) is not int
+        or chat["id"] != config.sender_id
+        or chat.get("type") != "private"
+        or type(message.get("message_id")) is not int
+        or not 0 < message["message_id"] < 2**52
+        or type(message.get("date")) is not int
+        or not -60 <= now.timestamp() - message["date"] <= 86400
+    ):
+        return None
+    query_id, data = query.get("id"), query.get("data")
+    if (
+        not isinstance(query_id, str)
+        or not 1 <= len(query_id) <= 256
+        or not isinstance(data, str)
+        or not 1 <= len(data) <= 64
+    ):
+        return None
+    text = message.get("text")
+    return IncomingCommand(
+        update_id,
+        config.sender_id,
+        "callback",
+        None,
+        data,
+        query_id,
+        message["message_id"],
+        text if isinstance(text, str) and 1 <= len(text) <= 4096 else None,
+    )
 
 
 def parse_update(
@@ -125,7 +174,6 @@ def parse_update(
                 "ai",
                 "new",
                 "clear",
-                "cancel",
             }:
                 argument = pieces[1].strip()
         if command == "pair" and len(pieces) == 2 and len(pieces[1]) <= 200:

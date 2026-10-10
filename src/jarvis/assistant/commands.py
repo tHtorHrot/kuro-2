@@ -18,6 +18,9 @@ SLASH_COMMANDS = frozenset(
         "doc",
         "askdoc",
         "deldoc",
+        "goal",
+        "tasks",
+        "task",
     }
 )
 

@@ -67,7 +67,19 @@ class ExecutionBroker:
             return ExecutionResult(claimed.id, "failed", "tool_definition_changed")
 
         proposal = ToolProposal(claimed.tool_name, claimed.arguments)
-        if action_fingerprint(self.journal.owner, proposal) != claimed.action_fingerprint:
+        fingerprint = (
+            action_fingerprint(self.journal.owner, proposal)
+            if claimed.fingerprint_version == 1
+            else action_fingerprint(
+                self.journal.owner,
+                proposal,
+                version=claimed.fingerprint_version,
+                due_at=claimed.due_at,
+                due_timezone=claimed.due_timezone,
+                latest_dispatch_at=claimed.latest_dispatch_at,
+            )
+        )
+        if fingerprint != claimed.action_fingerprint:
             await self.journal.reject_claim(claimed, "action_changed")
             return ExecutionResult(claimed.id, "failed", "action_changed")
 

@@ -12,10 +12,13 @@ from alembic import command
 from alembic.config import Config
 from sqlalchemy.exc import SQLAlchemyError
 
+from jarvis.automation.service import AutomationError
 from jarvis.core.config import ConfigurationError, load_settings
 from jarvis.core.errors import UnsafeDatabaseRole
 from jarvis.core.logging import configure_logging
 from jarvis.identity.service import ALL_SCOPES, audit, create_pairing_code, issue_api_token
+from jarvis.orchestration.contracts import TaskError
+from jarvis.orchestration.llm_planner import PlanProposalError
 from jarvis.storage.database import Database
 from jarvis.storage.models import ApiToken, User
 
@@ -51,6 +54,20 @@ def parser() -> argparse.ArgumentParser:
     for name in ("run", "once", "health"):
         q = sub.add_parser("scheduler-" + name)
         q.add_argument("--owner-id", type=UUID, required=True)
+    once = sub.add_parser(
+        "tasks-run-once",
+        help="Intake queued read-only tasks: claim, write intake record artifact, finish",
+    )
+    once.add_argument("--owner-id", type=UUID, required=True)
+    once.add_argument("--max", type=int, default=3)
+    once.add_argument("--worker", default="cli-once")
+    loop = sub.add_parser(
+        "tasks-loop", help="Run intake batches forever until stopped (task worker)"
+    )
+    loop.add_argument("--owner-id", type=UUID, required=True)
+    loop.add_argument("--interval", type=int, default=30)
+    loop.add_argument("--max", type=int, default=3)
+    loop.add_argument("--worker", default="task-loop")
     sub.add_parser("documents-list")
     for name in ("info", "delete", "retry"):
         sub.add_parser("documents-" + name).add_argument("document_id", type=UUID)
@@ -76,6 +93,35 @@ def parser() -> argparse.ArgumentParser:
             command_parser.add_argument("--telegram-user-id", type=int, required=True)
         else:
             command_parser.add_argument("--status", choices=["active", "suspended"], required=True)
+    monitor = sub.add_parser("ops-monitor", help="Read-only owner-scoped operational snapshot")
+    monitor.add_argument("--owner-id", type=UUID, required=True)
+    prune = sub.add_parser("tasks-prune", help="Dry-run (default) or batch-prune old task events")
+    prune.add_argument("--owner-id", type=UUID, required=True)
+    prune.add_argument("--days", type=int, default=90)
+    prune.add_argument("--limit", type=int, default=500)
+    prune.add_argument("--apply", action="store_true")
+    create = sub.add_parser("automation-create", help="Create a recurring goal definition")
+    create.add_argument("--owner-id", type=UUID, required=True)
+    create.add_argument("--title", required=True)
+    create.add_argument("--timezone", default="Asia/Jakarta")
+    create.add_argument("--rrule", required=True)
+    create.add_argument("--goal", required=True)
+    sub.add_parser("automation-tick").add_argument("--owner-id", type=UUID, required=True)
+    ticker = sub.add_parser("automation-loop", help="Run automation tick forever until stopped")
+    ticker.add_argument("--owner-id", type=UUID, required=True)
+    ticker.add_argument("--interval", type=int, default=300)
+    preview = sub.add_parser(
+        "tasks-plan-preview",
+        help="Print planner prompt for a goal; optionally validate a proposal file",
+    )
+    preview.add_argument("--goal", required=True)
+    preview.add_argument("--proposal-file", default=None)
+    auto = sub.add_parser(
+        "tasks-plan-auto", help="Propose a validated plan for a queued root task (free route)"
+    )
+    auto.add_argument("--owner-id", type=UUID, required=True)
+    auto.add_argument("--task-id", type=UUID, required=True)
+    auto.add_argument("--worker", default="planner-auto")
     return p
 
 
@@ -85,12 +131,152 @@ async def operate(args: argparse.Namespace) -> dict:
     db = Database(settings)
     try:
         await db.verify_runtime_role()
+        if args.command == "ops-monitor":
+            from jarvis.operations.monitor import snapshot
+
+            return await snapshot(db, args.owner_id)
+        if args.command == "tasks-prune":
+            from jarvis.operations.task_retention import prune_events
+
+            return await prune_events(
+                db,
+                args.owner_id,
+                older_than_days=args.days,
+                limit=args.limit,
+                apply=args.apply,
+            )
+        if args.command == "automation-create":
+            from jarvis.automation.service import create_definition
+
+            row = await create_definition(
+                db,
+                args.owner_id,
+                title=args.title,
+                timezone=args.timezone,
+                rrule=args.rrule,
+                goal_template=args.goal,
+            )
+            return {"definition_id": str(row.id), "rrule": row.rrule}
+        if args.command == "automation-tick":
+            from jarvis.automation.service import tick
+
+            items = await tick(db, args.owner_id)
+            return {"launched": len(items), "items": items}
+        if args.command == "tasks-plan-preview":
+            from pathlib import Path
+
+            from jarvis.orchestration.llm_planner import build_plan_prompt, parse_plan_response
+            from jarvis.orchestration.planner import validate_plan
+
+            prompt = build_plan_prompt(goal=args.goal)
+            if not args.proposal_file:
+                return {"prompt": prompt, "validated": False}
+            if args.proposal_file == "-":
+                text = await asyncio.to_thread(sys.stdin.read)
+            else:
+                text = await asyncio.to_thread(Path(args.proposal_file).read_text, encoding="utf-8")
+            nodes = parse_plan_response(text)
+            plan = validate_plan(nodes)
+            return {
+                "prompt_chars": len(prompt),
+                "validated": True,
+                "tasks": len(plan.nodes),
+                "revision": plan.revision,
+            }
+        if args.command == "tasks-plan-auto":
+            from jarvis.assistant.config import load_assistant_config, load_router_key
+            from jarvis.assistant.router import OpenRouter
+            from jarvis.orchestration.llm_planner import propose_plan
+
+            config = load_assistant_config()
+            router = OpenRouter(load_router_key())
+            try:
+                endpoint = await router.plan(config, "free")
+                return await propose_plan(
+                    db,
+                    args.owner_id,
+                    args.task_id,
+                    router=router,
+                    endpoint_plan=endpoint,
+                    worker=args.worker,
+                )
+            finally:
+                await router.close()
+        if args.command == "automation-loop":
+            import signal
+
+            from jarvis.automation.service import tick
+
+            if not 60 <= args.interval <= 3600:
+                raise ValueError("interval must be 60..3600 seconds")
+            stop = asyncio.Event()
+            loop = asyncio.get_running_loop()
+            for signum in (signal.SIGTERM, signal.SIGINT):
+                try:
+                    loop.add_signal_handler(signum, stop.set)
+                except NotImplementedError:
+                    pass
+            rounds, total = 0, 0
+            while not stop.is_set():
+                items = await tick(db, args.owner_id)
+                rounds += 1
+                total += len(items)
+                print(
+                    json.dumps({"automation_loop": "tick", "round": rounds, "launched": total}),
+                    flush=True,
+                )
+                try:
+                    await asyncio.wait_for(stop.wait(), timeout=args.interval)
+                except TimeoutError:
+                    pass
+            return {"automation_loop": "stopped", "rounds": rounds, "launched": total}
         if args.command == "doctor":
             if not await db.ready():
                 raise ConfigurationError(
                     "Schema or RLS not ready; run migrations and check role grants"
                 )
             return {"database": "ready", "rls": "enabled_and_forced", "stage": "4"}
+        if args.command == "tasks-run-once":
+            from jarvis.orchestration.intake import process_intake_batch
+
+            if not 1 <= args.max <= 10:
+                raise ValueError("max must be 1..10")
+            if not args.worker or len(args.worker) > 80:
+                raise ValueError("worker name must be 1..80 characters")
+            items = await process_intake_batch(db, args.owner_id, args.worker, args.max)
+            return {"processed": len(items), "items": items}
+        if args.command == "tasks-loop":
+            import signal
+
+            from jarvis.orchestration.intake import process_intake_batch
+
+            if not 10 <= args.interval <= 300:
+                raise ValueError("interval must be 10..300 seconds")
+            if not 1 <= args.max <= 10:
+                raise ValueError("max must be 1..10")
+            if not args.worker or len(args.worker) > 80:
+                raise ValueError("worker name must be 1..80 characters")
+            stop = asyncio.Event()
+            loop = asyncio.get_running_loop()
+            for signum in (signal.SIGTERM, signal.SIGINT):
+                try:
+                    loop.add_signal_handler(signum, stop.set)
+                except NotImplementedError:
+                    pass
+            batches, total = 0, 0
+            while not stop.is_set():
+                items = await process_intake_batch(db, args.owner_id, args.worker, args.max)
+                batches += 1
+                total += len(items)
+                print(
+                    json.dumps({"tasks_loop": "batch", "batch": batches, "processed": total}),
+                    flush=True,
+                )
+                try:
+                    await asyncio.wait_for(stop.wait(), timeout=args.interval)
+                except TimeoutError:
+                    pass
+            return {"tasks_loop": "stopped", "batches": batches, "processed": total}
         if args.command == "owner-create":
             if not 1 <= len(args.name) <= 100:
                 raise ValueError("Name must be 1..100 characters")
@@ -217,6 +403,9 @@ def main() -> None:
             print(json.dumps(asyncio.run(operate(args)), ensure_ascii=False))
     except (ConfigurationError, UnsafeDatabaseRole, ValueError) as exc:
         print(f"Configuration/command error: {exc}", file=sys.stderr)
+        raise SystemExit(2) from None
+    except (AutomationError, TaskError, PlanProposalError) as exc:
+        print(f"Task error: {exc.code}", file=sys.stderr)
         raise SystemExit(2) from None
     except SQLAlchemyError:
         print("Database operation failed. Check readiness, grants and migrations.", file=sys.stderr)

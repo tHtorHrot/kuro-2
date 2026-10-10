@@ -13,7 +13,16 @@ from jarvis.storage.database import Database
 from jarvis.storage.models import ApiToken, AuditEvent, ExternalIdentity, PairingCode, User
 
 ALL_SCOPES = frozenset(
-    {"profile:read", "tokens:read", "tokens:revoke", "policy:read", "audit:read", "ops:metrics"}
+    {
+        "profile:read",
+        "tokens:read",
+        "tokens:revoke",
+        "policy:read",
+        "audit:read",
+        "ops:metrics",
+        "tasks:read",
+        "tasks:write",
+    }
 )
 
 

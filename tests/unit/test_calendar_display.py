@@ -105,3 +105,29 @@ def test_busy_agenda_is_bounded_on_whole_events_and_reports_hidden_count():
 def test_invalid_legacy_timezone_is_explicitly_displayed_as_utc():
     text = agenda([event()], timezone="invalid/zone")
     assert "(UTC)" in text and "5 Oktober 2026 02.00" in text
+
+
+def test_short_id_is_stable_prefix_and_human_range_is_readable():
+    from jarvis.orchestration.calendar_chat import human_range, short_id
+
+    assert short_id("d79f0872-7e31-4d0f-9d60-e04396b5456e") == "d79f0872"
+    assert (
+        human_range("2026-10-10T10:00:00+07:00", "2026-10-10T10:15:00+07:00", "Asia/Jakarta")
+        == "Sabtu, 10 Oktober 2026 10.00–10.15 (WIB)"
+    )
+    assert human_range("bad", "also-bad", "Asia/Jakarta") is None
+    assert human_range("2026-10-10T10:00:00", "2026-10-10T10:15:00", "Asia/Jakarta") is None
+
+
+def test_read_tolerates_trailing_filler_and_bikin_starts_help():
+    from datetime import UTC, datetime
+
+    from jarvis.orchestration.calendar_chat import propose
+    from jarvis.orchestration.trusted_intent import IntentKind
+
+    now = datetime.now(UTC)
+    intent = propose("jadwal besok apa aja", timezone="Asia/Jakarta", received_at=now)
+    assert intent.kind == IntentKind.CALENDAR_LIST
+    assert (
+        propose("bikin meeting besok jam 10", timezone="Asia/Jakarta", received_at=now) is not None
+    )

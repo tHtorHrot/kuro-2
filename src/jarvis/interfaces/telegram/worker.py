@@ -59,12 +59,20 @@ async def poller_lock(db: Database, bot_id: int):
 
 
 async def send_one(repo: TelegramRepository, client: TelegramClient) -> bool:
+    from jarvis.interfaces.telegram.callbacks import proposal_markup
+
     delivery = await repo.claim()
     if delivery is None:
         return False
     try:
+        markup = proposal_markup(delivery.text or REPLIES[delivery.reply_kind])
+        if markup is not None and not await _proposal_still_awaiting(repo, delivery.text):
+            markup = None
         message_id = await client.send(
-            delivery.chat_id, delivery.text or REPLIES[delivery.reply_kind]
+            delivery.chat_id,
+            delivery.text or REPLIES[delivery.reply_kind],
+            protect_content=repo.config.protect_content,
+            reply_markup=markup,
         )
     except TelegramError as exc:
         await repo.finish(delivery, error=exc)
@@ -74,6 +82,42 @@ async def send_one(repo: TelegramRepository, client: TelegramClient) -> bool:
     else:
         await repo.finish(delivery, message_id=message_id)
     return True
+
+
+async def _proposal_still_awaiting(repo: TelegramRepository, text: str | None) -> bool:
+    """Only fresh proposals get buttons; stale re-sends stay plain text."""
+    from jarvis.interfaces.telegram.callbacks import _TOOLAPPROVE_LINE
+    from jarvis.storage.models import ToolAction
+
+    if not isinstance(text, str):
+        return False
+    match = _TOOLAPPROVE_LINE.search(text)
+    if not match:
+        return False
+    try:
+        async with repo.db.tenant(repo.config.owner_id) as session:
+            action = await session.get(ToolAction, match[1])
+            return (
+                action is not None
+                and action.owner_id == repo.config.owner_id
+                and action.status == "awaiting_approval"
+            )
+    except Exception:
+        return False
+
+
+async def answer_taps(repo: TelegramRepository, client: TelegramClient) -> None:
+    """Best-effort tap feedback; a failed popup never blocks polling or delivery."""
+    for tap in repo.take_callback_outbox():
+        try:
+            await client.answer_callback(tap["callback_id"], tap["answer"])
+        except (TelegramError, ValueError):
+            continue
+        if tap.get("message_text"):
+            try:
+                await client.strip_buttons(tap["chat_id"], tap["message_id"], tap["message_text"])
+            except (TelegramError, ValueError):
+                continue
 
 
 async def pause(stop: asyncio.Event, seconds: float):
@@ -112,6 +156,7 @@ async def run_worker(db: Database, config: TelegramConfig, client: TelegramClien
                     break
                 await check_lock()
                 await repo.ingest(updates, username)
+                await answer_taps(repo, client)
                 failures = 0
                 turns += 1
                 if turns == 1 or turns % 100 == 0:

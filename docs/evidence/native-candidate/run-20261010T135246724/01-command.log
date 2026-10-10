@@ -1,0 +1,12 @@
+E501 Line too long (104 > 100)
+   --> src/jarvis/orchestration/calendar_chat.py:242:101
+    |
+240 |     read = re.fullmatch(
+241 |         r"(?:KURO[, :]\s*)?(?:apa\s+)?jadwal(?:ku)?\s+"
+242 |         r"(hari ini|besok|\d{4}-\d{2}-\d{2})(?:\s+apa)?(?:\s+(?:aja|saja|dong|kok|ya|kah|nih|deh))?\??",
+    |                                                                                                     ^^^^
+243 |         text.strip(),
+244 |         re.I,
+    |
+
+Found 1 error.

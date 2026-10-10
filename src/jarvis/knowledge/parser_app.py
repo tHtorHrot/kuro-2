@@ -77,15 +77,18 @@ async def extract_request(request: Request, kind: str, ocr: str = "auto"):
 
 
 def child_main():
-    import resource
+    try:
+        import resource  # POSIX only; Windows has no resource module
 
+        resource.setrlimit(resource.RLIMIT_AS, (768 * 1024**2, 768 * 1024**2))
+        resource.setrlimit(resource.RLIMIT_CPU, (PARSER_SECONDS, PARSER_SECONDS))
+        resource.setrlimit(resource.RLIMIT_FSIZE, (32 * 1024**2, 32 * 1024**2))
+        resource.setrlimit(resource.RLIMIT_NOFILE, (64, 64))
+    except ImportError:
+        pass
     from jarvis.knowledge.config import KnowledgeError
     from jarvis.knowledge.extraction import extract
 
-    resource.setrlimit(resource.RLIMIT_AS, (768 * 1024**2, 768 * 1024**2))
-    resource.setrlimit(resource.RLIMIT_CPU, (PARSER_SECONDS, PARSER_SECONDS))
-    resource.setrlimit(resource.RLIMIT_FSIZE, (32 * 1024**2, 32 * 1024**2))
-    resource.setrlimit(resource.RLIMIT_NOFILE, (64, 64))
     try:
         rows = extract(Path(sys.argv[1]), sys.argv[2], sys.argv[3])
         print(json.dumps({"segments": [asdict(s) for s in rows]}, ensure_ascii=False))

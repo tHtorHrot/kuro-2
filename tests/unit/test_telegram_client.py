@@ -133,11 +133,13 @@ async def test_outbound_replies_are_private_fixed_host_and_no_paid_broadcast(mon
         assert sent["protect_content"] is True and sent["allow_paid_broadcast"] is False
         assert sent["link_preview_options"]["is_disabled"] is True
         assert "parse_mode" not in sent
+        assert await client.send(123, "Copyable", protect_content=False) == 14
+        assert json.loads(seen[1].content)["protect_content"] is False
         with pytest.raises(ValueError):
             await client.send(-123, "group")
         with pytest.raises(ValueError):
             await client.call("deleteWebhook", {})
-        assert len(seen) == 1
+        assert len(seen) == 2
     finally:
         await client.close()
 
@@ -187,7 +189,7 @@ async def test_poll_sorts_validates_and_acknowledges_only_supplied_offset():
         assert [r["update_id"] for r in await client.updates(None, limit=2, wait=1)] == [2, 4]
         await client.updates(5, limit=2, wait=1)
         assert "offset" not in requests[0] and requests[1]["offset"] == 5
-        assert requests[0]["allowed_updates"] == ["message"]
+        assert requests[0]["allowed_updates"] == ["message", "callback_query"]
     finally:
         await client.close()
 
@@ -240,3 +242,51 @@ async def test_send_lifecycle_records_failure_once_and_propagates_fatal():
     client.send.side_effect = TelegramError("unauthorized", fatal=True)
     with pytest.raises(TelegramError):
         await send_one(repo, client)
+
+
+async def test_callback_methods_validate_and_use_bounded_endpoints():
+    seen = []
+
+    def handler(request):
+        seen.append(request)
+        return httpx.Response(200, json={"ok": True, "result": True})
+
+    client = TelegramClient(SecretStr(TOKEN), transport=httpx.MockTransport(handler))
+    try:
+        await client.answer_callback("cb123", "Disetujui ✓")
+        await client.strip_buttons(123, 7, "proposal text")
+        assert [r.url.path.split("/")[-1] for r in seen] == [
+            "answerCallbackQuery",
+            "editMessageText",
+        ]
+        answered = json.loads(seen[0].content)
+        assert answered == {"callback_query_id": "cb123", "text": "Disetujui ✓"}
+        edited = json.loads(seen[1].content)
+        assert edited["reply_markup"] == {} and edited["text"] == "proposal text"
+        with pytest.raises(ValueError):
+            await client.answer_callback("", "x" * 201)
+        with pytest.raises(ValueError):
+            await client.strip_buttons(-1, 0, "")
+    finally:
+        await client.close()
+
+
+async def test_send_attaches_markup_only_when_present():
+    seen = []
+
+    def handler(request):
+        seen.append(request)
+        return httpx.Response(
+            200,
+            json={"ok": True, "result": {"message_id": 9, "chat": {"id": 123, "type": "private"}}},
+        )
+
+    client = TelegramClient(SecretStr(TOKEN), transport=httpx.MockTransport(handler))
+    try:
+        markup = {"inline_keyboard": [[{"text": "Setuju ✓", "callback_data": "approve:x"}]]}
+        await client.send(123, "proposal", reply_markup=markup)
+        await client.send(123, "plain")
+        assert json.loads(seen[0].content)["reply_markup"] == markup
+        assert "reply_markup" not in json.loads(seen[1].content)
+    finally:
+        await client.close()

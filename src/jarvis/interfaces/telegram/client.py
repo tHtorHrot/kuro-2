@@ -8,7 +8,16 @@ import httpx
 from pydantic import SecretStr
 
 MAX_RESPONSE_BYTES = 1024 * 1024
-METHODS = frozenset({"getMe", "getWebhookInfo", "getUpdates", "sendMessage"})
+METHODS = frozenset(
+    {
+        "getMe",
+        "getWebhookInfo",
+        "getUpdates",
+        "sendMessage",
+        "answerCallbackQuery",
+        "editMessageText",
+    }
+)
 
 
 class TelegramError(RuntimeError):
@@ -111,7 +120,11 @@ class TelegramClient:
         return me["username"]
 
     async def updates(self, offset: int | None, *, limit: int, wait: int) -> list[dict]:
-        payload: dict[str, Any] = {"limit": limit, "timeout": wait, "allowed_updates": ["message"]}
+        payload: dict[str, Any] = {
+            "limit": limit,
+            "timeout": wait,
+            "allowed_updates": ["message", "callback_query"],
+        }
         if offset is not None:
             payload["offset"] = offset
         updates = await self.call("getUpdates", payload, wait=wait)
@@ -126,19 +139,28 @@ class TelegramClient:
                 raise TelegramError("invalid_update_id")
         return sorted(updates, key=lambda update: update["update_id"])
 
-    async def send(self, chat_id: int, text: str) -> int:
+    async def send(
+        self,
+        chat_id: int,
+        text: str,
+        *,
+        protect_content: bool = True,
+        reply_markup: dict | None = None,
+    ) -> int:
         if not positive_id(chat_id) or not 1 <= len(text) <= 4096:
             raise ValueError("Invalid private reply")
-        result = await self.call(
-            "sendMessage",
-            {
-                "chat_id": chat_id,
-                "text": text,
-                "protect_content": True,
-                "allow_paid_broadcast": False,
-                "link_preview_options": {"is_disabled": True},
-            },
-        )
+        payload: dict[str, Any] = {
+            "chat_id": chat_id,
+            "text": text,
+            "protect_content": protect_content,
+            "allow_paid_broadcast": False,
+            "link_preview_options": {"is_disabled": True},
+        }
+        if reply_markup is not None:
+            if not isinstance(reply_markup, dict):
+                raise ValueError("Invalid reply markup")
+            payload["reply_markup"] = reply_markup
+        result = await self.call("sendMessage", payload)
         chat = result.get("chat") if isinstance(result, dict) else None
         if (
             not isinstance(chat, dict)
@@ -148,3 +170,22 @@ class TelegramClient:
         ):
             raise TelegramError("invalid_send_result", ambiguous=True)
         return result["message_id"]
+
+    async def answer_callback(self, callback_id: str, text: str) -> None:
+        """Ephemeral tap feedback; never carries authority or secret content."""
+        if not isinstance(callback_id, str) or not 1 <= len(callback_id) <= 256:
+            raise ValueError("Invalid callback identifier")
+        if not isinstance(text, str) or not 1 <= len(text) <= 200:
+            raise ValueError("Invalid callback answer")
+        await self.call("answerCallbackQuery", {"callback_query_id": callback_id, "text": text})
+
+    async def strip_buttons(self, chat_id: int, message_id: int, text: str) -> None:
+        """Best-effort removal of inline buttons after a tap decision; text is re-sent unchanged."""
+        if not positive_id(chat_id) or not positive_id(message_id):
+            raise ValueError("Invalid message reference")
+        if not 1 <= len(text) <= 4096:
+            raise ValueError("Invalid message text")
+        await self.call(
+            "editMessageText",
+            {"chat_id": chat_id, "message_id": message_id, "text": text, "reply_markup": {}},
+        )

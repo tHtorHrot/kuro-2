@@ -17,6 +17,10 @@ class TelegramConfig(BaseModel):
     bot_id: int = Field(strict=True, gt=0, lt=2**52)
     poll_seconds: int = Field(default=20, strict=True, ge=1, le=30)
     updates_per_poll: int = Field(default=20, strict=True, ge=1, le=100)
+    # Kebijakan eksplisit operator: True melarang forward/salin/screenshot
+    # balasan bot (privasi), False mengizinkan demi kenyamanan dengan risiko
+    # bocor bila perangkat dilihat orang lain. Default tetap terlindungi.
+    protect_content: bool = True
 
 
 def load_telegram_config() -> TelegramConfig:

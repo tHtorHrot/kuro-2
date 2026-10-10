@@ -10,14 +10,14 @@ COPY src ./src
 RUN uv sync --frozen --no-dev --no-editable
 
 FROM builder AS tests
-RUN apt-get update && apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends openssl poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
 RUN python -c "import shutil, subprocess; assert all(shutil.which(x) for x in ('pdfinfo', 'pdftotext', 'pdfimages', 'pdftoppm', 'tesseract')); assert {'eng', 'ind'} <= set(subprocess.check_output(['tesseract', '--list-langs'], text=True).split())"
 RUN uv sync --frozen --no-editable
 COPY migrations ./migrations
 COPY alembic.ini ./
 COPY tests ./tests
-COPY compose.knowledge.yaml ./compose.knowledge.yaml
-COPY compose.calendar.yaml ./compose.calendar.yaml
+COPY compose*.yaml ./
+COPY Dockerfile ./Dockerfile
 COPY scripts ./scripts
 COPY infra/postgres/bootstrap.sh ./infra/postgres/bootstrap.sh
 ENV PATH="/app/.venv/bin:$PATH"
@@ -39,3 +39,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends poppler-utils t
 RUN python -c "import shutil, subprocess; assert all(shutil.which(x) for x in ('pdfinfo', 'pdftotext', 'pdfimages', 'pdftoppm', 'tesseract')); assert {'eng', 'ind'} <= set(subprocess.check_output(['tesseract', '--list-langs'], text=True).split())"
 USER 10001:10001
 CMD ["uvicorn", "jarvis.knowledge.parser_app:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1", "--no-access-log", "--no-proxy-headers", "--limit-concurrency", "4"]
+
+# Untrusted code runner. No application code, no secrets, no credentials.
+# Confinement comes from the launcher flags in jarvis/execution/sandbox.py
+# (nonroot, read-only rootfs, writable /work only, no network, quotas).
+FROM base AS sandbox
+RUN groupadd --gid 65532 sandbox && useradd --uid 65532 --gid 65532 --no-create-home --shell /usr/sbin/nologin sandbox
+USER 65532:65532
+WORKDIR /work
+CMD ["python", "-c", "print('kuro sandbox ready')"]

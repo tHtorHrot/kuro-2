@@ -1,0 +1,19 @@
+{
+  "evidence_type": "user_reported",
+  "reported_date": "2026-10-05",
+  "source": "PROMPT_AGENT_KURO_LANJUTAN.md supplied in this session",
+  "accepted_scenarios": [
+    "calendar read/agenda (earlier acceptance)",
+    "OAuth write registration and candidate activation",
+    "create",
+    "queue survives scheduler stop before dispatch and restart",
+    "cancel deletion proposal retains test event",
+    "approved deletion"
+  ],
+  "test_timestamp": null,
+  "source_hash": null,
+  "image_digest": null,
+  "action_ids": null,
+  "grant_revision": null,
+  "limitations": "Acceptance of prior scenarios, not evidence for new source, clarification, chat due time or post-provider crash. Not executed by this assistant."
+}

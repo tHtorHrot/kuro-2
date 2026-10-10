@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KURO Tasks</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; font-size: 0.9rem; }
+  code { font-size: 0.8rem; }
+  #events { white-space: pre-wrap; font-size: 0.8rem; background: #f6f6f6; padding: 0.6rem; }
+</style>
+</head>
+<body>
+<h1>KURO Tasks (read-only)</h1>
+<p>
+  Token: <input id="token" type="password" size="60" placeholder="tempel API token tasks:read">
+  <button id="load">Muat</button>
+</p>
+<p id="health"></p>
+<h2>Antrean</h2>
+<table><thead><tr><th>ID</th><th>Judul</th><th>Status</th><th>Role</th></tr></thead>
+<tbody id="rows"></tbody></table>
+<h2>Detail task</h2>
+<p>Klik baris di atas.</p>
+<div id="detail"></div>
+<h2>Event terbaru</h2>
+<div id="events"></div>
+<script>
+const api = "";
+let auth = "";
+async function detail(id) {
+  const t = await (await fetch(api + "/api/v1/tasks/" + id, { headers: headers() })).json();
+  const box = document.getElementById("detail");
+  const prog = t.progress ? ("selesai " + t.progress.succeeded + "/" + t.progress.total) : "-";
+  box.innerHTML = "";
+  const pre = document.createElement("pre");
+  pre.textContent = JSON.stringify(
+    { id: t.id, title: t.title, status: t.status, role: t.role, progress: prog,
+      ceiling: t.cost_ceiling_usd, spent: t.cost_spent_usd, error: t.error_code }, null, 1);
+  box.appendChild(pre);
+  const ev = await (await fetch(api + "/api/v1/task-events?task_id=" + id + "&limit=20",
+    { headers: headers() })).json().catch(() => null);
+  const pre2 = document.createElement("pre");
+  pre2.textContent = JSON.stringify((ev && ev.events) || ev, null, 1).slice(0, 2000);
+  box.appendChild(pre2);
+}
+function headers() {
+  return { "Authorization": "Bearer " + auth };
+}
+async function load() {
+  auth = document.getElementById("token").value.trim();
+  const h = await (await fetch(api + "/health/ready")).json().catch(() => null);
+  document.getElementById("health").textContent = "API: " + (h ? h.status : "tidak terjangkau");
+  const tasks = await (await fetch(api + "/api/v1/tasks?limit=50",
+    { headers: headers() })).json().catch(() => null);
+  const rows = document.getElementById("rows");
+  rows.innerHTML = "";
+  if (!Array.isArray(tasks)) {
+    rows.innerHTML = "<tr><td colspan=4>Gagal memuat (cek token/scope tasks:read).</td></tr>";
+    return;
+  }
+  for (const t of tasks) {
+    const tr = document.createElement("tr");
+    const short = (t.id || "").slice(0, 8);
+    tr.innerHTML = "<td><code>" + short + "</code></td><td></td><td></td><td></td>";
+    tr.children[1].textContent = t.title || "";
+    tr.children[2].textContent = t.status || "";
+    tr.children[3].textContent = t.role || "";
+    tr.style.cursor = "pointer";
+    tr.addEventListener("click", () => detail(t.id));
+    rows.appendChild(tr);
+  }
+  const ev = await (await fetch(api + "/api/v1/task-events?limit=20",
+    { headers: headers() })).json().catch(() => null);
+  document.getElementById("events").textContent =
+    JSON.stringify((ev && ev.events) || ev, null, 1).slice(0, 4000);
+}
+document.getElementById("load").addEventListener("click", load);
+setInterval(() => { if (auth) load(); }, 30000);
+</script>
+</body>
+</html>

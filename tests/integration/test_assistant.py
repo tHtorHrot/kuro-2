@@ -375,3 +375,20 @@ async def test_daily_free_quota_stops_second_request(test_db):
     row2 = await ask(tg, repo, 101)
     with pytest.raises(PolicyError, match="daily_free_limit"):
         await repo.dispatch(row2.id, plan(repo))
+
+
+async def test_daily_free_limit_message_shows_quota_and_reset(test_db):
+    tg, old = await fixture(test_db)
+    repo = AssistantRepository(test_db, old.config.model_copy(update={"daily_free_calls": 1}))
+    await repo.initialize()
+    async with test_db.tenant(repo.owner) as session:
+        (await owner_state(session, repo.owner)).enabled = True
+    row = await ask(tg, repo)
+    call = await repo.dispatch(row.id, plan(repo))
+    await repo.finish(row.id, call, Completion("Selesai", Decimal(0), 100, 2), None)
+    row2 = await ask(tg, repo, 101)
+    await repo.fail(row2.id, "daily_free_limit")
+    text = (await receipt(tg, 101)).reply_text
+    assert "Jatah gratis harian habis (1/1)" in text
+    assert "Reset 00:00 UTC" in text
+    assert "daily_free_limit" in text

@@ -1,139 +1,39 @@
-# KURO — checkpoint pengembangan 4 Oktober 2026
+# KURO — status 10 Oktober 2026 (menggantikan snapshot 5 Okt di bawah)
 
-## Pembaruan setelah pengujian pada komputer pengguna
+Release: **PILOT / operasi lokal**. Schema `0015_memory_kinds`, package
+`personal-jarvis` 0.4.0. Gate native **648 passed / 0 failed** (XML 734),
+ruff clean, bukti `docs/evidence/native-candidate/run/verification.json`.
+Sejak 5 Okt: Stage 4 delta live hijau, Stage 5 pilot-lengkap (backup
+terenkripsi + offsite microsd + restore drill03/04 + retrieval dingin hijau),
+UX kalender Fase A–C + tombol inline + kata waktu Indonesia + salvage +
+kontrak konfirmasi (`docs/UX_CONFIRMATION_CONTRACT.md`), Stage 6 slice 1–2
+(memory bertipe/presedence/tombstone + konteks selektif + evaluasi).
+Sisa: hosting (ditunda), scoping proyek, specialist/voice, RPO/RTO penuh.
 
-Pengguna telah melaporkan **444 tes Docker lulus dalam 28,50 detik**, exit code 0,
-kemudian backup PostgreSQL, migrasi dan doctor berhasil pada instalasi lama yang
-dilanjutkan dari `A:\Kuro2\kuro-main`. Assistant sekarang enabled, tidak frozen,
-config cocok dan heartbeat terbaru. Pada 4 Oktober 2026 pengguna berhasil melakukan
-OAuth baca, mengaktifkan grant `calendar:read` revisi 2, dan menjalankan scheduler
-healthy. Balasan bot untuk `apa jadwalku besok?` dilaporkan sesuai Google Calendar.
-Bukti ini berupa keluaran terminal dan laporan pengguna; full test log belum diunggah.
+# KURO — kandidat Stage 4h / fondasi Stage 5 (5 Oktober 2026)
 
-Hambatan native yang dijelaskan di bagian historis di bawah telah diselesaikan
-melalui komputer pengguna untuk kandidat runtime yang sama. Tidak perlu mengulang
-444 tes atau migrasi tersebut. Helper OAuth lokal sebelumnya lulus 35 tes. Pengguna
-menemukan dan memperbaiki pemisahan `tmpfs` oleh koma pada YAML flow list: bentuk scalar
-`/tmp:size=16m,mode=1777` sudah berhasil digunakan dan sekarang disamakan pada source.
+Status release: **CANDIDATE / acceptance pending**. Stage 4 belum FROZEN; Stage 5–8 belum selesai. Schema baru `0009_calendar_tasks`; package tetap `personal-jarvis` 0.4.0, namespace jarvis. Source/delivery akhir berada di root proyek; status yang dipakai sesi berikutnya adalah `CHECKPOINT.json`, matriks `docs/WORK_MATRIX.md`, dan bukti `docs/evidence/stage-4h/`.
 
-Patch terbaru merapikan hasil baca menjadi tanggal/zona sekali, jam mulai–selesai dan
-judul setiap acara. ID tetap pada journal; data provider tidak diubah. Acara sepanjang
-hari, lintas tanggal, perbedaan zona/DST, data waktu tidak lengkap dan batas Telegram
-ditangani. 16 tes terarah lulus; lint/format bersih. Assertion integrasi read diperbarui
-untuk memeriksa judul/zona dan ID yang tetap tersimpan; PostgreSQL/Docker tidak dijalankan
-ulang oleh asisten untuk patch tampilan ini. Pada 4 Oktober 2026 21:01 WIB pengguna
-melaporkan build berhasil, assistant healthy, dan format bot sesuai. Tampilan diterima.
+Pengguna menyatakan seluruh write acceptance sebelumnya berhasil: OAuth write/aktivasi, create, restart scheduler sebelum dispatch, cancel deletion menjaga event, dan approved delete. Read/agenda juga diterima sebelumnya. Bukti dicatat **user_reported**, bukan dijalankan ulang oleh asisten. Tidak ada action ID/grant/image digest/timestamp pengujian yang ditebak. Log `calendar-test.log` pada baseline memang memuat 444 passed / 28.50s; pemetaan hash revisi pengujian itu tidak tersedia dan tidak dialihkan ke source baru. Hasil helper 43 tes adalah bukti historis terpisah.
 
-Read Calendar E2E dan UI diterima berdasarkan laporan pengguna. Kandidat berikut
-menambahkan `setup_calendar.py --access write`, yang menyimpan credential terpisah di
-`.secrets/calendar_write`, serta overlay `compose.calendar.write.yaml`. Scope hanya
-owned events; Google consent baru tetap diperlukan. Helper kini lulus 43 tes. Patch
-ini tidak mengubah modul runtime atau schema, sehingga tidak memerlukan build image.
-Aktivasi memeriksa antrean, mengganti binding/grant secara eksplisit, dan recreate
-scheduler. Panduan lengkap `docs/STAGE4_WRITE_ACCEPTANCE.md` menggabungkan satu create
-uji dengan restart pre-dispatch, cancel dan delete approval. Aktivasi/tes write belum
-dilakukan pengguna atau asisten; calendar:send tetap tidak diberikan oleh panduan.
+## Perubahan nyata
 
-Audit sisa gate ada di `docs/STAGE4_REMAINING.md`. Klarifikasi bertahap dan penjadwalan
-eksekusi tertunda dari chat masih terbatas; satu regresi konsolidasi juga masih menjadi
-gate akhir. Natural chat LLM belum dilaporkan. Stage 4 masih OPEN, Stage 5–8 belum selesai.
-Stage 3 pada assistant-status adalah label lama, bukan schema aktual.
+- Draft Calendar owner/conversation/identity/bot scoped, anchor/timezone tetap, provenance per field, TTL/size/turn/job limits; follow-up/correction/expiry/target cancel. Teks unrelated tetap chat. Gabungan turn memerlukan approval proposal konkret; tidak memasukkan slot sintetis sebagai instruksi asli.
+- Event time dan execution time terpisah; offset + zona IANA, UTC, DST gap/fold fail-closed, lintas tengah malam eksplisit, jadwal lampau ditolak dan late window 15 menit. Fingerprint v2 mengikat payload/due/zona/window; v1 action existing tetap kompatibel dan immutable.
+- Job/task terpisah dari active turn; request `handed_off` bukan provider success. Unique active LLM index dipertahankan. Acknowledgement dan completion memiliki identitas delivery berbeda; recovery uncertain→succeeded menghasilkan event baru, bukan mengaktifkan ulang receipt.
+- Migrasi 0009 menambah dua tabel tenant FORCE RLS/composite FK dan binding schedule immutable; 0001–0008/lock tidak diubah. Upgrade fixture mencakup owner/pairing/memory/dokumen dan status action pending/claimed/dispatching/uncertain.
+- Backup cold lengkap dengan restart writer finally, OpenSSL CMS terenkripsi/pinned public certificate, safe volume archive, standalone quarantine restore, local dedup alarm, retention preview, rollback guard, preflight patch dan evidence-producing release runner. Offsite/key custody/external alarm belum dipilih/diaktifkan; retrieval/restore/kapasitas operasi belum diterima.
 
-## Catatan historis saat paket kandidat runtime dibuat
+## Bukti dan batas
 
-**Stage 4 masih OPEN. Stage 5–8 belum selesai. Paket ini belum diterima untuk produksi.**
-Schema kandidat: `0008_executor_binding`. Target akhir tetap Stage 8; tidak ada stage
-atau penerimaan produksi yang ditandai selesai hanya karena dokumentasinya tersedia.
-Tidak ada akun Telegram/Google/LLM nyata yang dipanggil atau server pengguna yang diubah.
+Lint/format, offline pytest, real OCR, enkripsi/dekripsi/tamper detection dan archive/monitor/rollback/patch preflight diuji lokal; hasil mesin final ada di `docs/evidence/stage-4h/release-dacl-fix/verification.json`. Hasil targeted development tidak dijumlahkan dengan suite final. 13 tes native baru telah dikoleksi, belum dijalankan. Native PG/Docker terblokir karena tidak tersedia dan UID hanya root; guard tidak di-bypass. Percobaan supplementary WASM terblokir pada GRANT database di engine sebelum migrasi; bukan native pass.
 
-## Pemulihan sesi
+Belum: build Docker final, native regression 0009/RLS/Qdrant/concurrency/crash provider mock, Windows execution, live delta klarifikasi/scheduled/outbox, natural-chat LLM smoke jika belum ada bukti, encrypted Docker DB/volume restore + retrieval, measured RPO/RTO/capacity, deployment/offsite/external alert. Sesi ini tidak memanggil Google/Telegram/LLM nyata atau mengubah instalasi pengguna.
 
-Baseline berasal dari `kuro-main (2).zip` dan catatan proyek pengguna. Ekstraksi, audit
-kode, perbaikan natural chat, serta batas otorisasi tidak diulang dari awal. Regresi
-native sempat berhasil pada revisi sebelum sambungan Calendar baru: **389 tes dan
-81 subtes lulus**, termasuk PostgreSQL 16.15, RLS, Qdrant 1.19.1, OCR, upgrade data
-lama, dan migrasi dua kali. Log serta XML-nya disimpan di `docs/evidence/stage-4g/`.
+Instruksi install/rollback: `docs/KURO_CANDIDATE_UPGRADE.md`. Acceptance delta: `docs/KURO_DELTA_ACCEPTANCE.md`. Operasi: `docs/KURO_OPERATIONS.md`. Jangan setup awal/OAuth/pairing/grant ulang atau mengambil nested ZIP lama sebagai baseline. Stage 6 memory/privacy → Stage 7 enam specialist → Stage 8 durable multi-step tetap pekerjaan berikutnya setelah gate Stage 4/5 relevan terpenuhi.
 
-Iterasi awal migrasi 0007 juga selesai dengan exit code 0 menurut catatan runner,
-tetapi log rinci di `/tmp` tidak bertahan saat sesi berganti. Hasil itu tidak dipakai
-sebagai bukti penerimaan kandidat akhir. Yang terputus kemudian adalah regresi unit
-terakhir, penyimpanan bukti dan paket akhir; semuanya dilanjutkan dari file yang ada.
+Update runner 5 Oktober: pengguna melaporkan 64 payload file `already_current` setelah penimpaan manual, tanpa build/migrate/recreate. Run Windows awal berhenti pada `NativeCommandError` untuk progres `Image ... Building`; ini bukan native pass. Runner kini memakai `run_test_compose.py` untuk menangkap stdout/stderr dan menjaga exit code. Tes subprocess nyata (Linux), preflight kandidat sebelumnya, dan penyalinan metadata manifest lulus. Regresi final: 470 pytest items + 83 subtes, 0 failed/skipped, 91 native deselected. Runner revisi Windows/Docker masih NOT_RUN. Bukti lama dipertahankan; instruksi khusus: `docs/KURO_RUNNER_FIX.md`.
 
-## Implementasi yang sekarang tersedia
+Pemeriksaan paket mengoreksi pengecualian operations agar hanya folder artefak di root yang dikecualikan. Dua file source monitoring yang terlewat pada ZIP awal kini disertakan. Gate akhir 470 items + 83 subtes; native/Windows corrected runner belum dijalankan.
 
-- Natural chat tetap melalui pairing, privacy filter, queue dan premium consent
-  yang sama dengan `/ask`; pesan yang diawali email atau `@handle` tidak hilang.
-- Worker memanggil routing Calendar sebelum inference: read hari ini/besok/tanggal,
-  solo create lengkap, proposal undangan dan penghapusan berdasarkan ID. Perintah
-  yang belum lengkap meminta detail. Calendar yang dikenali tidak dikirim ke LLM.
-- Read dan write Calendar masuk journal. Hanya scheduler memiliki secret Google.
-  Eksekusi write melalui `ToolRuntime` langsung ditolak.
-- Grant specialist tersimpan, owner/scope/revision/source diperiksa pada dispatch.
-  Perubahan scope membatalkan authority lama; perubahan akun/refresh token/calendar
-  membuat executor binding tidak cocok sampai operator mengatur grant baru.
-- Source-step key unik mencegah antrean ganda. ID Google create berasal dari ID
-  action yang stabil. Respons create harus merujuk ID yang sama.
-- Result provider disimpan. Heartbeat assistant menerbitkan hasil ke outbox dari
-  journal, tanpa mengulang eksekusi provider atau membuat klaim melalui LLM.
-- `/toolapprove ID FINGERPRINT` terpisah dari `/approve` premium. Approval terikat
-  action immutable, TTL, dan sekali pakai. Flag approval mentah ditolak journal.
-- `/cancel` membatalkan action pre-dispatch; aksi in-flight tidak diklaim ditarik
-  kembali. `/toolstatus ID` membaca status milik owner.
-- Lease dispatch mencakup timeout; scheduler berhenti mengambil action baru saat
-  shutdown. Dispatch ambigu menjadi uncertain dan tidak diulang otomatis.
-- `tools-reconcile` memeriksa solo create uncertain lewat GET ID stabil, judul,
-  serta instant mulai/selesai; tidak mengirim POST ulang. Invite/update/delete
-  uncertain tetap memerlukan pemeriksaan manual.
-- Validasi tipe, timestamp ber-offset, zona, durasi, ID dan attendee; pembatasan
-  pagination/ukuran respons; HTTP client menolak redirect dan proxy environment.
-- `tools-status` memuat hitungan status, umur antrean dan heartbeat; overlay
-  Calendar memiliki healthcheck. Ini baru sebagian fondasi monitoring Stage 5.
-
-## Hasil verifikasi kandidat akhir
-
-| Pemeriksaan | Hasil dan batas |
-|---|---|
-| Unit + offline | 366 tes, 83 subtes lulus; tidak ada tes dilewati |
-| Ruff lint + format | Lulus |
-| Sintaks Python | Diperiksa ulang pada file final |
-| Alembic SQL offline sampai head 0008 | Berhasil dihasilkan; bukan pengganti eksekusi native |
-| Tes integrasi ditemukan | 78; termasuk 12 kasus Calendar chat baru |
-| Regresi native lama | 389 tes/81 subtes lulus; bukti historis sebelum perubahan runtime terbaru |
-| Regresi native kandidat akhir | BLOCKED oleh lingkungan; belum diterima |
-| Google/Telegram nyata, Docker build final, restore, deploy | Belum dijalankan |
-
-Lingkungan terbaru hanya memetakan UID 0. PostgreSQL menolak dijalankan sebagai root;
-UID non-root tidak tersedia dan Docker tidak terpasang. Percobaan eskalasi ditolak
-oleh kebijakan izin otomatis (`sandbox_approval: false`). Pemeriksaan PostgreSQL
-non-root tidak dinonaktifkan dan database palsu tidak dipakai untuk mengklaim native
-pass. Gate baru harus dijalankan pada lingkungan Docker/CI atau PostgreSQL uji yang
-memang diizinkan sebelum penerimaan Stage 4.
-
-## Yang masih harus diselesaikan
-
-Stage 4: jalankan dan perbaiki gate native kandidat akhir; production smoke Calendar
-pada kalender uji; clarification/follow-up yang lebih bebas; penjadwalan tertunda
-melalui percakapan; verifikasi penerimaan seluruh skenario pada versi yang sama.
-Bahasa yang didukung masih berupa vertical slice terbatas, bukan planner umum.
-
-Stage 5: deploy target nyata, alert eksternal, backup lengkap terenkripsi, restore
-terukur, rollback, secret rotation dan disaster recovery. Backup lokal legacy masih
-hanya pg_dump tanpa enkripsi; jangan menganggapnya backup produksi lengkap.
-
-Stage 6: memory proyek/preference/relevance/retention belum ditambahkan penuh. Profil
-serta riwayat baseline tetap ada. Catatan tindakan Calendar tersimpan terpisah dari
-`/clear`; kebijakan redaksi/retensinya masih merupakan gate terbuka.
-
-Stage 7: keenam specialist belum selesai. Stage 8: DAG planner, durable multi-step,
-natural follow-up lintas agent dan routing local/cloud belum selesai. Registry dan
-checklist tidak dihitung sebagai implementasi specialist.
-
-## Mulai sesi berikutnya dari sini
-
-1. Baca `docs/RESUME_CHECKPOINT.md` dan `docs/STAGE_4G_CALENDAR_CHAT.md`.
-2. Jalankan gate native kandidat ini pada lingkungan yang mendukung; jangan
-   mengulang ekstraksi/audit baseline atau memakai nested ZIP lama sebagai baseline.
-3. Simpan XML/log dan perbaiki kegagalan yang ditemukan. Bekukan Stage 4 hanya setelah
-   acceptance nyata, kemudian lanjutkan operasi Stage 5 dan Stage 6–8.
-4. Target hosting/provider specialist belum ditentukan. Secret dipasang melalui
-   file privat pada lingkungan target, tidak ditempelkan ke percakapan.
+Update Windows berikutnya: pengguna melaporkan 96 preflight checks berhasil, apply dan diagnosis gagal pada Set-Acl SeSecurityPrivilege sebelum penyalinan. Helper sekarang membaca/persist Access/DACL saja dan memverifikasi rule current-user; owner/group/audit tidak diubah. CLI menampilkan jenis/pesan error aktual. Regresi akhir 470 items + 83 subtes, 0 failed/skipped, 91 native deselected. Bridge Windows diuji mock, bukan native ACL pass. Native Windows dan Docker masih terbuka. Lanjut `KURO_WINDOWS_DACL_FIX.md`.

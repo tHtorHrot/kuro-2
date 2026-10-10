@@ -1,94 +1,20 @@
-# Titik lanjut yang dapat diverifikasi
+# Resume KURO — lanjut dari delta, jangan audit ulang baseline
 
-Tanggal pembaruan: 4 Oktober 2026. Sumber aktif berada pada root paket `kuro-main/`.
-`CHECKPOINT.json` pada root ZIP memuat SHA-256 setiap file paket.
+Baca `CHECKPOINT.json`, `DEVELOPMENT_STATUS.md`, `docs/WORK_MATRIX.md` dan `docs/evidence/stage-4h/release-dacl-fix/verification.json`. Baseline ZIP hash sesuai prompt; tidak ada Git/AGENTS atau source lebih baru dalam workspace. File `.env/.secrets` instalasi tidak ada dan tidak dibuat. Package manifest lama tetap historis; manifest byte baru `KURO_PATCH_MANIFEST.json`.
 
-## Titik lanjut terbaru — Calendar read sudah berhasil
+Laporan pengguna 5 Oktober bahwa write acceptance seluruhnya berhasil sudah disimpan sebagai `user_reported`. Read/agenda sebelumnya diterima. Log 444 tes / 28.50s memang tersedia pada `calendar-test.log`; klaim lama “log belum diunggah” superseded. Hash release/ID/timestamp/grant pengujian historis tidak diketahui. Jangan mengulang OAuth, pairing, grant, migrasi 0008 atau baseline smoke.
 
-444 tes Docker telah dilaporkan lulus (exit 0). Backup PostgreSQL dan migrasi produksi
-lokal selesai; doctor menunjukkan ready/RLS forced/stage 4. Assistant sudah sehat
-dan enabled. OAuth Desktop read-only telah berhasil pada Windows pengguna. Grant
-`calendar:read` aktif revisi 2 dan scheduler healthy/worker_recent true. Hasil nyata bot
-untuk `apa jadwalku besok?` dilaporkan cocok dengan Google Calendar. Jangan ulangi
-ekstraksi baseline, 444 tes, backup upgrade, migrasi, setup OAuth atau tools-grant.
-Log lengkap belum diunggah; hasil ini dilaporkan pengguna melalui terminal/chat.
+Batch kode terbaru: draft/job Calendar durable, parser bounded, snapshot provenance/anchor, event/due terpisah, immutable fingerprint v2 dengan v1 kompatibel, detached turns, completion outbox, target cancel, migrasi 0009 + upgrade/native tests, backup CMS/restore quarantine/monitor/retention/rollback/release helpers. Source menentukan implemented; bukti final menentukan tested. Tidak ada label frozen atau production-ready.
 
-Kegagalan aktivasi pertama terjadi sebelum container CLI dibuat: YAML tmpfs flow list
-memisahkan `mode=1777` menjadi lokasi mount. Pengguna telah memperbaikinya menjadi satu
-scalar dan membuktikan scheduler berjalan. Source sekarang mengikuti perbaikan tersebut.
+Gate berikut:
 
-Formatter agenda sudah dibuat dan lulus 16 tes terarah. Pada 4 Oktober 2026 21:01 WIB,
-pengguna melaporkan build berhasil, assistant healthy, config_matches/worker_recent true
-dan hasil bot sesuai format baru. Tahap tampilan selesai; jangan ulangi build/recreate
-assistant untuk patch helper berikutnya.
+1. Terapkan patch melalui preflight dengan target `A:\Kuro2\kuro-main`; conflict perubahan pengguna ditolak. Jalankan `scripts/run_release_gate.ps1` pada project test terisolasi. Perbaiki hanya failure/delta yang ditemukan, lalu simpan JSON/XML/log untuk kandidat baru yang benar. Native mock khusus crash setelah provider accept mengukur satu POST + GET recovery.
+2. Sesudah native gate lulus: backup upgrade, build runtime, migrate 0009, doctor dan recreate services dengan write overlay sesudah Calendar read, sesuai panduan. Source live memakai image, bukan bind mount; restart saja tidak cukup. Jangan grant ulang.
+3. Jalankan `docs/KURO_DELTA_ACCEPTANCE.md` untuk klarifikasi restart + scheduled acknowledgement/read + completion + correction/cancel. Natural chat live cukup satu smoke jika belum ada bukti; setup/model/privacy/budget existing tetap.
+4. Stage 5: jalankan encrypted backup + **disposable** DB/volume restore/retrieval, ukur waktu dan pending jobs/quarantine. Pilih key custody/offsite/alert/hosting hanya ketika hasil siap ditinjau. Hindari produksi/fault injection akun nyata untuk tes crash.
 
-Scope aktif pengguna masih baca saja. Helper sekarang mendukung `--access write` ke
-folder kandidat `.secrets/calendar_write` dan overlay `compose.calendar.write.yaml`.
-43 tes helper lulus, Ruff bersih; tidak ada modul runtime/schema yang berubah pada
-patch ini. OAuth kandidat, aktivasi grant dan smoke write belum dilakukan pengguna.
-Lanjutkan dari `docs/STAGE4_WRITE_ACCEPTANCE.md`; jangan timpa credential baca, jangan
-berikan calendar:send, dan jangan pindah binding saat ada tindakan pending/uncertain.
+Blocker terukur lingkungan asisten: Docker/PostgreSQL tidak tersedia, UID map hanya `0 0 1`; Windows/live/restore/hosting NOT_RUN. GPG socket dilarang, backend CMS berhasil diuji. PGlite supplementary GRANT catalog error, tidak dipakai sebagai native evidence. Jangan mengulang perintah blocker tanpa perubahan kondisi.
 
-Audit gate lengkap ada di `docs/STAGE4_REMAINING.md`. Setelah smoke write, selesaikan
-batas klarifikasi/penjadwalan percakapan dan regresi konsolidasi sebelum freeze.
-Stage 5–8 tetap target selanjutnya. Panduan OAuth awal ada di `GOOGLE_CALENDAR_WINDOWS.md`.
-Bagian historis di bawah bukan alasan mengulang gate native yang telah diterima.
+Delta terbaru hanya runner host/capture, preflight update kandidat, tes dan bukti/dokumentasi. Source runtime Calendar/schema/dependency sama dengan kandidat awal. Pengguna sudah menimpa source dan semua 64 payload sesuai; percobaan gate native awal terhenti pada progres stderr sebelum suite selesai. Terapkan ZIP revisi dari staging memakai helper terbaru, lalu ulangi gate; jangan klaim Windows runner revisi telah lulus. Source hash/count final ada di checkpoint dan release-runner-fix-package-final.
 
-## Sudah selesai; jangan diulang
-
-- Ekstraksi aman ZIP input dan pembacaan catatan kondisi proyek.
-- Audit perbedaan klaim dokumentasi dengan jalur runtime nyata.
-- Perbaikan parser email/@handle, shared commands, trusted intent grounding,
-  owner/scope checks dan pengujian regresi ingress.
-- Instalasi dependency frozen sesuai `uv.lock` dan pemulihan gate native awal.
-- Regresi native awal 389/81, dengan PostgreSQL 16.15/Qdrant 1.19.1 nyata.
-- Perbaikan lint lama. Formatting tambahan terpisah dari perubahan perilaku pada
-  daftar perubahan; migrasi 0001–0006 tidak mendapat perubahan skema.
-- Implementasi kandidat Calendar chat, grants, result, approval, recovery,
-  executor binding, health dan tes baru yang dijelaskan di DEVELOPMENT_STATUS.md.
-
-## Langkah terakhir yang benar-benar berhasil
-
-366 unit/offline dan 83 subtes lulus pada source akhir sebelum pengemasan; Ruff
-lint/format bersih. SQL Alembic offline sampai `0008_executor_binding` dibuat.
-78 tes integrasi dapat dikoleksi. Hasil native 389/81 sebelumnya disimpan sebagai
-bukti revisi lama, tidak dijumlahkan dengan unit kandidat terbaru.
-
-`docs/evidence/stage-4g/verification-final.json` memuat hasil dan hash source yang
-diverifikasi. `source-changes.json` membandingkan kandidat dengan ZIP input;
-perbedaan AST dibedakan dari perubahan yang hanya memengaruhi komentar/format.
-XML unit memuat 449 hasil karena 83 subtes tercatat terpisah dari 366 tes.
-
-## Langkah yang terputus atau terblokir
-
-Regresi unit sebelumnya terputus tanpa hasil final; sesi ini menyelesaikannya.
-Penerimaan native untuk sambungan Calendar baru dan migrasi 0008 belum selesai.
-Lingkungan terbaru hanya menyediakan UID root dan tidak menyediakan Docker.
-Eskalasi ditolak konfigurasi approval otomatis. Jangan menghapus guard non-root
-PostgreSQL atau mengganti test DB dengan mock untuk memberi label native pass.
-
-## Urutan pekerjaan berikutnya
-
-1. Jalankan `compose.test.yaml` pada lingkungan disposable yang mendukung Docker.
-   Gate akan bootstrap role nonprivileged, menguji upgrade data lama, migrate dua
-   kali, dan menjalankan seluruh pytest, termasuk 12 kasus Calendar chat baru.
-2. Tinjau kegagalan native secara khusus: transaksi source/action, scope revocation,
-   dedup concurrency, approval replay, fencing, durable result/outbox, recovery.
-3. Build runtime final dan smoke pada kalender Google uji. Jangan mengirim undangan
-   ke pihak lain tanpa persetujuan terpisah untuk penerima dan isi konkretnya.
-4. Selesaikan slot clarification/follow-up dan UI scheduled execution; uji gate S4.
-5. Stage 5 backup/restore/rollback dan deployment privat. Baru lakukan freeze ketika
-   hasil operasional benar-benar terukur, kemudian lanjut Stage 6–8 sesuai acceptance.
-
-## Migrasi dan kompatibilitas
-
-0007 menambah grants, source-step dedup dan result. Antrean legacy tanpa grant
-terverifikasi dibatalkan; dispatch legacy menjadi uncertain. 0008 menambah executor
-binding dan heartbeat. Ini memungkinkan checkpoint 0007 diteruskan tanpa mengedit
-migrasi yang sudah diterapkan. Grants lama tanpa binding tidak mengizinkan Calendar
-production worker sampai operator mengatur ulang grant. Rekam dan rekonsiliasi
-aksi pending sebelum upgrade; tidak ada downgrade destruktif otomatis.
-
-Paket ini tidak berisi secret produksi, runtime dependency cache, binary test server,
-atau tiga nested ZIP historis. Tidak ada Git remote, hosting target atau credential
-provider baru yang ditambahkan.
+Blocker pengguna terbaru diketahui: SeSecurityPrivilege pada pembuatan private backup directory, sebelum apply copy. Perbaikan helper DACL tersedia; target main masih kandidat awal menurut posisi kegagalan di kode. Terapkan revisi ACL dari staging baru lalu native gate; jangan menaikkan privilege atau mengulang setup. Evidence final release-dacl-fix; Windows DACL enforcement revisi belum diuji di sini.

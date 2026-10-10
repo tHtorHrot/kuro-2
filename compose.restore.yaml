@@ -1,0 +1,42 @@
+# Standalone disposable restore. Do not merge with production Compose or .secrets.
+name: kuro-restore-drill
+services:
+  postgres:
+    image: postgres:16.15-bookworm@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: restore-only-not-a-production-secret
+      POSTGRES_DB: jarvis_restore_test
+    volumes: [restore-db:/var/lib/postgresql/data]
+    networks: [restore-internal]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U postgres -d jarvis_restore_test]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: 'no'
+  restore-files:
+    image: personal-jarvis:0.4.0
+    profiles: [restore-helper]
+    user: 0:0
+    read_only: true
+    network_mode: none
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 16
+    mem_limit: 256m
+    entrypoint: [python, /opt/kuro_volume_archive.py, unpack]
+    volumes:
+      - ./scripts/volume_archive.py:/opt/kuro_volume_archive.py:ro
+      - restore-documents:/volumes/documents
+      - restore-qdrant:/volumes/qdrant
+      - restore-models:/volumes/models
+networks:
+  restore-internal:
+    internal: true
+volumes:
+  restore-db:
+  restore-documents:
+  restore-qdrant:
+  restore-models:

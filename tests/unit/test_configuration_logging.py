@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import logging
+import os
 import stat
 from pathlib import Path
 
@@ -96,7 +97,12 @@ def test_secret_generator_refuses_overwrite_and_prints_nothing(tmp_path, capsys)
     folder = tmp_path / ".secrets"
     initial = (folder / "token_pepper").read_bytes()
     assert len(initial.strip()) >= 43
-    assert stat.S_IMODE(folder.stat().st_mode) == 0o700
+    if os.name == "nt":
+        # Windows has no POSIX mode bits; host DACL is enforced via
+        # ops_common.windows_private_dacl, tested separately with mocks.
+        assert folder.is_dir() and not folder.is_symlink()
+    else:
+        assert stat.S_IMODE(folder.stat().st_mode) == 0o700
     with pytest.raises(FileExistsError):
         module.create_secrets(tmp_path)
     assert (folder / "token_pepper").read_bytes() == initial

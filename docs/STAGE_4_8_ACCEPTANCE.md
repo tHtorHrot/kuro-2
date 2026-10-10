@@ -1,20 +1,6 @@
 # Acceptance Stage 4–8
 
-Status awal seluruh stage: **OPEN**. Dokumen ini menetapkan output dan bukti yang diperlukan; ia tidak menyatakan fitur sudah diimplementasikan. Bukti sesi sekarang hanya tercatat pada `../DEVELOPMENT_STATUS.md`.
-
-## Pembaruan 4 Oktober 2026
-
-Pengguna telah melaporkan 444 tes Docker lulus, upgrade/RLS berhasil, OAuth baca dan
-scheduler sehat. S4-03 memiliki read E2E nyata yang cocok dengan Google Calendar; patch
-agenda juga sudah dibuild dan diterima di bot. Implementasi S4-04 sampai S4-11 memiliki
-tes journal/authority/approval/recovery; smoke tulis masih terbuka. Helper kandidat
-OAuth tulis terpisah lulus 43 tes lokal, tanpa menimpa credential baca.
-
-S4-12 masih memerlukan satu regresi konsolidasi release terakhir dan bounded write
-smoke, bukan pengulangan instalasi baseline. Audit rinci ada di `STAGE4_REMAINING.md`.
-Klarifikasi durable dan percakapan untuk waktu eksekusi tertunda masih terbatas.
-S5 baru mendapat heartbeat/ringkasan queue; backup lengkap, restore/deploy dan lifecycle
-secret tetap terbuka. S6–S8 belum selesai. Tidak ada freeze baru dari laporan read ini.
+Update kandidat 5 Oktober 2026: source Stage 4h/schema 0009 sudah mengimplementasikan klarifikasi durable, scheduled execution dan detached delivery. Stage 4 tetap OPEN sampai native gate dan live delta pada kandidat diterima. Write acceptance sebelumnya diterima menurut USER_REPORTED; bukan bukti untuk source baru. Stage 5 fondasi operasi tersedia, seluruh S5 gate belum ditutup. Status/bukti saat ini: CHECKPOINT.json, WORK_MATRIX.md dan evidence/stage-4h/.
 
 ## Aturan penutupan
 
@@ -110,6 +96,12 @@ Satu specialist dibangun dan diuji sampai tuntas sebelum berikutnya mendapat aks
 Contoh awal batas planner yang dapat dievaluasi: maksimal 8 langkah dan budget per task yang dikonfigurasi pemilik. Itu rancangan awal, bukan konfigurasi baru yang sudah diaktifkan. Keputusan akhir bergantung latensi/biaya benchmark. Cross-agent orchestration tidak berarti agent boleh berbagi semua memory atau credential.
 
 **Gate freeze:** seluruh perjalanan pengguna yang disepakati lulus; policy/data provenance tidak hilang saat handoff; restart/recovery terbukti; biaya dan respons dapat diukur.
+
+## Kontrak UX lintas-domain
+
+Prinsip tebak → konfirmasi → eksekusi di `docs/UX_CONFIRMATION_CONTRACT.md`
+mengikat semua domain dan antarmuka (termasuk voice). Stage 6–8 wajib
+memenuhinya; error format generik dan approve massal buta tidak lulus gate.
 
 ## Jalur rilis
 

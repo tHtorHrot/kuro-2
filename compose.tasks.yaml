@@ -1,0 +1,49 @@
+# Optional overlay: automatic intake worker for queued read-only tasks.
+# Base-only Compose never requires it. Enable with profile `tasks`.
+x-tasks-app: &tasks-app
+  image: personal-jarvis:0.4.0
+  build:
+    context: .
+    target: runtime
+  init: true
+  read_only: true
+  tmpfs:
+    - /tmp:size=16m,mode=1777
+  security_opt:
+    - no-new-privileges:true
+  cap_drop: [ALL]
+  pids_limit: 100
+  mem_limit: 256m
+  cpus: 0.5
+  environment:
+    JARVIS_ENVIRONMENT: production
+    JARVIS_DATABASE_URL_FILE: /run/secrets/database_url
+    JARVIS_TOKEN_PEPPER_FILE: /run/secrets/token_pepper
+  networks: [database]
+  secrets: [database_url, token_pepper]
+  entrypoint: ["jarvis"]
+  logging:
+    driver: json-file
+    options:
+      max-size: "5m"
+      max-file: "3"
+
+services:
+  task-worker:
+    <<: *tasks-app
+    profiles: [tasks]
+    restart: "on-failure:5"
+    stop_grace_period: 30s
+    command: ["tasks-loop", "--owner-id", "${JARVIS_OWNER_ID:?set JARVIS_OWNER_ID}"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+  automation-ticker:
+    <<: *tasks-app
+    profiles: [tasks]
+    restart: "on-failure:5"
+    stop_grace_period: 30s
+    command: ["automation-loop", "--owner-id", "${JARVIS_OWNER_ID:?set JARVIS_OWNER_ID}"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully

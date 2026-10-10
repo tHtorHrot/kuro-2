@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 _CREATE = re.compile(
-    r"(?:KURO[, :]\s*)?(?:tolong\s+)?(?:buat(?:kan)?|tambahkan|jadwalkan)\s+"
+    r"(?:KURO[, :]\s*)?(?:tolong\s+)?(?:buat(?:kan)?|bikin|tambahkan|jadwalkan)\s+"
     r'(?:acara|rapat|meeting|event)\s+"(?P<title>[^"\r\n]{1,200})"\s+'
     r"pada\s+(?P<date>\d{4}-\d{2}-\d{2})\s+jam\s+"
     r"(?P<start>\d{2}:\d{2})\s+(?:sampai|hingga)\s+(?P<end>\d{2}:\d{2})\s+"

@@ -1,0 +1,26 @@
+{
+  "native_postgresql": "BLOCKED",
+  "docker": "NOT_AVAILABLE",
+  "postgres_binary": "NOT_AVAILABLE",
+  "uid_map_observed": "0 0 1",
+  "native_tests": "NOT_RUN",
+  "docker_build": "NOT_RUN",
+  "powershell_execution": "NOT_RUN",
+  "google_telegram_live": "NOT_RUN",
+  "restore_volume_database_drill": "NOT_RUN",
+  "offsite": "NOT_ACTIVATED",
+  "external_alert": "NOT_ACTIVATED",
+  "capacity_failure_load": "NOT_RUN",
+  "supplementary_wasm": {
+    "status": "BLOCKED",
+    "engine_package": "@electric-sql/pglite@0.3.14",
+    "error": "XX000 tuple concurrently deleted while GRANT CREATE ON DATABASE template1 during fixture bootstrap; migrations not exercised by this engine",
+    "native_equivalent": false,
+    "next_step": "Use native compose.test.yaml gate; do not loosen runtime role checks"
+  },
+  "gpg_attempt": {
+    "status": "BLOCKED",
+    "error": "gpg-agent cannot create socket: Operation not permitted",
+    "resolution": "Use tested OpenSSL CMS backend; no custom cryptography or production keys generated"
+  }
+}

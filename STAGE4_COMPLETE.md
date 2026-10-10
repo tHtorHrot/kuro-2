@@ -1,3 +1,5 @@
+> Update kandidat 0009: Stage 4 OPEN. Klarifikasi/jadwal/outbox sudah di source; native/live gate masih terbuka. CHECKPOINT.json merupakan snapshot terbaru; rincian di bawah historis, bukan sertifikat freeze.
+
 # Stage 4 remains open
 
 The filename is retained for compatibility. It does not certify completion.

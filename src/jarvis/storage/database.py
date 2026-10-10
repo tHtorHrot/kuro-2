@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from jarvis.core.config import Settings
 from jarvis.core.errors import UnsafeDatabaseRole
 
-SCHEMA_REVISION = "0008_executor_binding"
+SCHEMA_REVISION = "0015_memory_kinds"
 TENANT_TABLES = (
     "users",
     "api_tokens",
@@ -27,6 +27,15 @@ TENANT_TABLES = (
     "document_chunks",
     "tool_actions",
     "tool_grants",
+    "calendar_tasks",
+    "calendar_notifications",
+    "tasks",
+    "task_dependencies",
+    "task_runs",
+    "artifacts",
+    "task_events",
+    "automation_definitions",
+    "automation_runs",
 )
 
 

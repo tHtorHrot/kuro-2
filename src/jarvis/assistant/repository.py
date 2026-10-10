@@ -98,6 +98,26 @@ async def deliver(session, request: AssistantRequest, text: str):
 
 
 async def cancel_pending(session, state, *, erase=False):
+    from jarvis.orchestration.calendar_tasks import revoke_tasks
+
+    # Detached jobs are outside ACTIVE; cancel them before revoking the revision.
+    await session.get(User, state.owner_id, with_for_update=True)
+    actions = (
+        await session.scalars(
+            select(ToolAction)
+            .where(
+                ToolAction.owner_id == state.owner_id,
+                ToolAction.request_id.is_not(None),
+                ToolAction.status.in_({"queued", "claimed", "awaiting_approval"}),
+            )
+            .with_for_update()
+        )
+    ).all()
+    for action in actions:
+        action.status, action.finished_at = "cancelled", now_utc()
+        action.lease_token = action.lease_until = None
+        audit(session, state.owner_id, "tool_action.cancelled", action.id)
+    await revoke_tasks(session, state.owner_id, erase=erase)
     rows = (
         await session.scalars(
             select(AssistantRequest).where(
@@ -178,6 +198,12 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
             AssistantRequest.owner_id == owner_id, AssistantRequest.status.in_(ACTIVE)
         )
     )
+    if cmd == "cancel" and arg:
+        from jarvis.orchestration.calendar_tasks import cancel_target
+
+        await session.get(User, owner_id, with_for_update=True)
+        set_reply(receipt, await cancel_target(session, owner_id, arg))
+        return
     if cmd in {"new", "clear", "cancel"}:
         await cancel_pending(session, state, erase=cmd == "clear")
         if cmd in {"new", "clear"}:
@@ -198,18 +224,22 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
         )
         return
     if cmd == "memory":
+        from jarvis.memory.service import live_condition
+
         rows = (
             await session.scalars(
                 select(ProfileMemory)
                 .where(ProfileMemory.owner_id == owner_id)
-                .order_by(ProfileMemory.key)
+                .where(live_condition())
+                .order_by(ProfileMemory.kind, ProfileMemory.key)
             )
         ).all()
         set_reply(
             receipt,
             "Profil tersimpan:\n"
             + "\n".join(
-                f"{r.key}: {r.value if r.data_class == 'private' else '[restricted]'}" for r in rows
+                f"{r.key} [{r.kind}]: {r.value if r.data_class == 'private' else '[restricted]'}"
+                for r in rows
             )
             if rows
             else "Profil belum berisi fakta. /remember kunci nilai untuk menyimpan.",
@@ -223,10 +253,10 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
                 receipt, "Kunci harus huruf kecil/angka/underscore, diawali huruf (maks. 40)."
             )
             return
-        row = await session.get(ProfileMemory, (owner_id, key))
         if cmd == "forget":
-            if row:
-                await session.delete(row)
+            from jarvis.memory.service import apply_forget
+
+            await apply_forget(session, owner_id, key)
             await cancel_pending(session, state)
             set_reply(
                 receipt,
@@ -242,18 +272,24 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
                 receipt, "Nilai profil harus 1–500 karakter tanpa kredensial atau data restricted."
             )
             return
+        from jarvis.memory.repository import MemoryFact
+        from jarvis.memory.service import apply_fact, live_condition
+
         count = await session.scalar(
             select(func.count())
             .select_from(ProfileMemory)
             .where(ProfileMemory.owner_id == owner_id)
+            .where(live_condition())
         )
+        row = await session.get(ProfileMemory, (owner_id, key))
         if row is None and count >= 20:
             set_reply(receipt, "Batas 20 fakta profil tercapai. Hapus dengan /forget kunci.")
             return
-        if row:
-            row.value, row.data_class, row.updated_at = value, "private", now_utc()
-        else:
-            session.add(ProfileMemory(owner_id=owner_id, key=key, value=value))
+        await apply_fact(
+            session,
+            owner_id,
+            MemoryFact(key=key, value=value, provenance="user:telegram", source="user"),
+        )
         await cancel_pending(session, state)
         set_reply(
             receipt, "Fakta disimpan. Nilainya akan disertakan dalam percakapan AI berikutnya."
@@ -302,23 +338,26 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
         await approve_from_chat(session, owner_id, incoming, receipt)
         return
     if cmd == "toolstatus":
-        from uuid import UUID
+        from jarvis.orchestration.calendar_chat import resolve_action, short_id
 
-        try:
-            action_id = UUID(arg)
-        except ValueError:
-            set_reply(receipt, "Gunakan /toolstatus ID tindakan Calendar.")
-            return
-        action = await session.get(ToolAction, action_id)
+        action = await resolve_action(session, owner_id, arg)
         if not action or action.agent != "calendar":
-            set_reply(receipt, "Tindakan Calendar tidak ditemukan.")
+            set_reply(
+                receipt,
+                "Tindakan tidak ditemukan. Cek Ref 8 char di proposal, atau /toolstatus ID penuh.",
+            )
         else:
             event_id = (action.result or {}).get("id") if isinstance(action.result, dict) else None
             set_reply(
                 receipt,
-                f"Calendar {action.id}: {action.status}."
-                + (f" ID event: {event_id}" if event_id else ""),
+                f"{short_id(action.id)}: {action.status}."
+                + (f" Event: {short_id(event_id)}." if event_id else ""),
             )
+        return
+    if cmd in {"tasks", "task", "goal"}:
+        from jarvis.interfaces.telegram.task_commands import handle_task_command
+
+        await handle_task_command(session, owner_id, incoming, receipt)
         return
     if cmd in INFERENCE_COMMANDS:
         if active:
@@ -426,6 +465,11 @@ class AssistantRepository:
             from jarvis.orchestration.calendar_chat import deliver_completed
 
             await deliver_completed(session, self.owner, state)
+            from jarvis.orchestration.calendar_tasks import expire_drafts
+            from jarvis.storage.models import ToolGrant
+
+            grant = await session.get(ToolGrant, (self.owner, "calendar"))
+            await expire_drafts(session, self.owner, state, grant)
             expired = (
                 await session.scalars(
                     select(AssistantRequest).where(
@@ -481,16 +525,34 @@ class AssistantRepository:
                     messages = sourced_messages(row.prompt, row.document_sources)
                     row.messages, row.context_hash = messages, digest(messages)
             if row.messages is None:
+                from jarvis.memory.repository import MAX_CONTEXT_CHARS, rank_facts
+                from jarvis.memory.service import live_condition
+
                 profile = (
                     await session.scalars(
                         select(ProfileMemory)
                         .where(ProfileMemory.owner_id == self.owner)
+                        .where(live_condition())
                         .order_by(ProfileMemory.key)
                     )
                 ).all()
                 if any(p.data_class != "private" for p in profile):
                     # Fail closed rather than silently downgrading a restricted fact.
                     raise PolicyError("restricted_profile")
+                selected = rank_facts(
+                    [
+                        {
+                            "key": p.key,
+                            "value": p.value,
+                            "kind": p.kind,
+                            "importance": p.importance,
+                            "updated_at": p.updated_at,
+                            "data_class": p.data_class,
+                        }
+                        for p in profile
+                    ],
+                    budget_chars=MAX_CONTEXT_CHARS,
+                )
                 history = (
                     await session.scalars(
                         select(ConversationMessage)
@@ -506,12 +568,14 @@ class AssistantRepository:
                     )
                 ).all()
                 messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-                if profile:
+                if selected:
                     messages.append(
                         {
                             "role": "user",
                             "content": "Fakta profil yang saya simpan: "
-                            + json.dumps({p.key: p.value for p in profile}, ensure_ascii=False),
+                            + json.dumps(
+                                {f["key"]: f["value"] for f in selected}, ensure_ascii=False
+                            ),
                         }
                     )
                 messages.extend({"role": r.role, "content": r.content} for r in reversed(history))
@@ -749,12 +813,33 @@ class AssistantRepository:
             row = await session.get(AssistantRequest, request_id)
             if row and row.status in {"queued", "preparing", "approved", "awaiting_approval"}:
                 row.status, row.finished_at, row.approval_digest = "failed", now_utc(), None
-                await deliver(
-                    session,
-                    row,
-                    "AI belum dapat memproses permintaan dengan aturan privasi/biaya saat ini. "
-                    f"Kode: {reason}. Tidak ada panggilan premium otomatis.",
-                )
+                if reason == "daily_free_limit":
+                    day = now_utc().replace(hour=0, minute=0, second=0, microsecond=0)
+                    used = (
+                        await session.scalar(
+                            select(func.count())
+                            .select_from(LLMCall)
+                            .where(
+                                LLMCall.owner_id == self.owner,
+                                LLMCall.kind == "free",
+                                LLMCall.created_at >= day,
+                            )
+                        )
+                        or 0
+                    )
+                    limit = self.config.daily_free_calls
+                    reset = (day + timedelta(days=1)).strftime("%H:%M UTC")
+                    text = (
+                        "Jatah gratis harian habis "
+                        f"({used}/{limit}). Reset {reset} (~07:00 WIB). "
+                        f"Kode: {reason}. Tidak ada panggilan premium otomatis."
+                    )
+                else:
+                    text = (
+                        "AI belum dapat memproses permintaan dengan aturan privasi/biaya "
+                        f"saat ini. Kode: {reason}. Tidak ada panggilan premium otomatis."
+                    )
+                await deliver(session, row, text)
 
     async def prune(self):
         async with self.db.tenant(self.owner) as session:

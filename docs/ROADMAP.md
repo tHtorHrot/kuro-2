@@ -1,3 +1,7 @@
+# Snapshot kandidat 5 Oktober 2026
+
+Stage 4h/schema 0009: IMPLEMENTED + offline verification, native/live acceptance pending. Stage 5 backup/restore/monitor/release foundation tersedia; restore/deploy/offsite/alert/capacity belum diterima. Lanjut gate pada docs/RESUME_CHECKPOINT.md. Urutan Stage 6–8 di bawah tetap berlaku.
+
 # Roadmap KURO — Stage 4 sampai 8
 
 Roadmap ini mengikuti arahan pengguna tanggal 2 Oktober 2026. Status source dan hasil pemeriksaan terbaru ada di `../DEVELOPMENT_STATUS.md`; acceptance lengkap di `STAGE_4_8_ACCEPTANCE.md`.
@@ -12,10 +16,7 @@ Roadmap ini mengikuti arahan pengguna tanggal 2 Oktober 2026. Status source dan 
 
 ## Posisi sekarang
 
-Stage 4 masih terbuka. Full regression baseline, upgrade dan Calendar read telah
-diterima dari laporan pengguna. Agenda yang lebih terbaca juga sudah berjalan di bot.
-Create/approval/recovery memiliki implementasi dan tes, tetapi smoke tulis serta
-beberapa alur percakapan belum diterima. Audit sisa gate: `STAGE4_REMAINING.md`.
+Baseline read/agenda dan write acceptance diterima menurut laporan pengguna; log baseline 444 pass tersedia. Kandidat 0009 menambah clarification/scheduling/delivery dan fondasi Stage 5; native regression/live delta/restore/deployment acceptance masih terbuka. Matriks: WORK_MATRIX.md; bukti release: evidence/stage-4h/. Tidak ada freeze atau pergeseran ke seluruh specialist.
 
 ## Prinsip yang tetap
 

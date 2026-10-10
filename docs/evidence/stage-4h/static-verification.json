@@ -1,0 +1,25 @@
+{
+  "source_hash": "2b3f2a8884a96f88a0f5c0f4bff820e55b975d0031e7061923418726937254d7",
+  "schema": "0009_calendar_tasks",
+  "ast_parse": {
+    "status": "passed",
+    "files": 159,
+    "scope": "src/migrations/scripts/tests *.py excluding __pycache__"
+  },
+  "sql_offline": {
+    "command": [
+      "/workspace/scratch/e1f7287edd87/work/.venv/bin/python",
+      "-m",
+      "alembic",
+      "upgrade",
+      "head",
+      "--sql"
+    ],
+    "exit_code": 0,
+    "seconds": 0.484,
+    "artifact": "migration-0009.sql",
+    "sha256": "918aac782a78c0140163771ce2e285f5f42f6092b7ee8a142959557860a63445",
+    "native_equivalent": false
+  },
+  "python": "3.12.14"
+}

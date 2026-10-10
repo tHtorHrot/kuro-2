@@ -9,8 +9,11 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import JSONResponse
 
 from jarvis import __version__
+from jarvis.api.dashboard import router as dashboard_router
 from jarvis.api.middleware import BoundaryMiddleware
 from jarvis.api.routes import router
+from jarvis.api.task_events import router as task_events_router
+from jarvis.api.tasks import router as tasks_router
 from jarvis.core.config import Settings, load_settings
 from jarvis.core.errors import ApplicationError, UnsafeDatabaseRole
 from jarvis.core.logging import configure_logging
@@ -76,6 +79,9 @@ def create_app(settings: Settings | None = None, database: Database | None = Non
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
     app.add_middleware(BoundaryMiddleware, settings=settings)
     app.include_router(router)
+    app.include_router(tasks_router)
+    app.include_router(task_events_router)
+    app.include_router(dashboard_router)
 
     @app.exception_handler(ApplicationError)
     async def application_error(request: Request, exc: ApplicationError):

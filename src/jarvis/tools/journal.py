@@ -32,7 +32,15 @@ def now_utc() -> datetime:
     return datetime.now(UTC)
 
 
-def action_fingerprint(owner_id: UUID, proposal: ToolProposal) -> str:
+def action_fingerprint(
+    owner_id: UUID,
+    proposal: ToolProposal,
+    *,
+    version=1,
+    due_at=None,
+    due_timezone=None,
+    latest_dispatch_at=None,
+) -> str:
     """Bind authorization to owner + exact tool + canonical JSON arguments."""
     if not isinstance(owner_id, UUID):
         raise TypeError("owner_id must be a UUID")
@@ -46,7 +54,22 @@ def action_fingerprint(owner_id: UUID, proposal: ToolProposal) -> str:
         )
     except (TypeError, ValueError):
         raise ActionJournalError("arguments_not_json") from None
-    payload = f"v1\n{owner_id}\n{proposal.tool_name}\n{arguments}".encode()
+    if version == 1:
+        payload = f"v1\n{owner_id}\n{proposal.tool_name}\n{arguments}".encode()
+    elif version == 2 and due_at is not None and latest_dispatch_at is not None:
+        if due_at.tzinfo is None or latest_dispatch_at.tzinfo is None:
+            raise ActionJournalError("schedule_requires_timezone")
+        schedule = json.dumps(
+            [
+                due_at.astimezone(UTC).isoformat(),
+                due_timezone,
+                latest_dispatch_at.astimezone(UTC).isoformat(),
+            ],
+            separators=(",", ":"),
+        )
+        payload = f"v2\n{owner_id}\n{proposal.tool_name}\n{arguments}\n{schedule}".encode()
+    else:
+        raise ActionJournalError("invalid_fingerprint_version")
     return hashlib.sha256(payload).hexdigest()
 
 
@@ -73,6 +96,10 @@ class ClaimedAction:
     action_fingerprint: str
     lease_token: UUID
     attempt: int
+    fingerprint_version: int = 1
+    due_at: datetime | None = None
+    due_timezone: str | None = None
+    latest_dispatch_at: datetime | None = None
 
 
 class ActionJournal:
@@ -109,6 +136,8 @@ class ActionJournal:
         request_id: UUID | None = None,
         due_timezone: str = "UTC",
         source_key: str | None = None,
+        fingerprint_version: int = 1,
+        latest_dispatch_at: datetime | None = None,
         session=None,
     ) -> ToolAction:
         try:
@@ -138,7 +167,18 @@ class ActionJournal:
             ZoneInfo(due_timezone)
         except (ZoneInfoNotFoundError, ValueError):
             raise ActionJournalError("invalid_due_timezone") from None
-        fingerprint = action_fingerprint(self.owner, proposal)
+        if latest_dispatch_at is not None and (
+            latest_dispatch_at.tzinfo is None or latest_dispatch_at <= due
+        ):
+            raise ActionJournalError("invalid_dispatch_window")
+        fingerprint = action_fingerprint(
+            self.owner,
+            proposal,
+            version=fingerprint_version,
+            due_at=due,
+            due_timezone=due_timezone,
+            latest_dispatch_at=latest_dispatch_at,
+        )
         if source_key is not None and (
             not isinstance(source_key, str) or not 1 <= len(source_key) <= 200
         ):
@@ -162,6 +202,8 @@ class ActionJournal:
             due_timezone=due_timezone,
             source_key=source_key,
             spec_fingerprint=spec_fingerprint(spec),
+            fingerprint_version=fingerprint_version,
+            latest_dispatch_at=latest_dispatch_at,
         )
         async with self.transaction(session) as session:
             grant, reason = await self._authority(session, spec, request_id=request_id)
@@ -263,6 +305,26 @@ class ActionJournal:
                 row.lease_token = row.lease_until = None
                 audit(session, self.owner, f"tool_action.{row.status}", row.id)
                 changed += 1
+            overdue = (
+                await session.scalars(
+                    select(ToolAction)
+                    .where(
+                        ToolAction.owner_id == self.owner,
+                        ToolAction.status.in_({"queued", "claimed", "awaiting_approval"}),
+                        ToolAction.latest_dispatch_at <= now_utc(),
+                    )
+                    .with_for_update(skip_locked=True)
+                )
+            ).all()
+            for row in overdue:
+                row.status, row.finished_at, row.error_code = (
+                    "cancelled",
+                    now_utc(),
+                    "execution_window_expired",
+                )
+                row.lease_token = row.lease_until = None
+                audit(session, self.owner, "tool_action.cancelled", row.id)
+                changed += 1
             expired = (
                 await session.scalars(
                     select(ToolAction)
@@ -311,6 +373,10 @@ class ActionJournal:
                 row.action_fingerprint,
                 row.lease_token,
                 row.attempts,
+                row.fingerprint_version,
+                row.due_at,
+                row.due_timezone,
+                row.latest_dispatch_at,
             )
 
     async def reject_claim(self, claimed: ClaimedAction, reason: str) -> None:
@@ -356,6 +422,21 @@ class ActionJournal:
 
             request = await session.get(AssistantRequest, request_id)
             state = await session.get(AssistantState, self.owner)
+            from jarvis.orchestration.calendar_tasks import task_valid
+            from jarvis.storage.models import CalendarTask
+
+            task = (
+                await session.scalar(
+                    select(CalendarTask).where(
+                        CalendarTask.owner_id == self.owner,
+                        CalendarTask.current_action_id == row.id,
+                    )
+                )
+                if row
+                else None
+            )
+            if task and not await task_valid(session, task, state, grant):
+                return grant, "source_authorization_changed"
             if (
                 not request
                 or not state
@@ -383,6 +464,10 @@ class ActionJournal:
                 raise ActionJournalError("action_changed")
             spec = self.registry.get(row.tool_name)
             _, reason = await self._authority(session, spec, row=row)
+            if row.due_at > now_utc():
+                reason = "execution_not_due"
+            if row.latest_dispatch_at is not None and row.latest_dispatch_at <= now_utc():
+                reason = "execution_window_expired"
             if reason:
                 row.status, row.finished_at, row.error_code = "failed", now_utc(), reason
                 row.lease_token = row.lease_until = None

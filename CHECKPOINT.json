@@ -1,0 +1,102 @@
+{
+  "format": "kuro-resume-checkpoint-v1",
+  "updated_utc": "2026-10-05T14:27:29.302832+00:00",
+  "release_status": "CANDIDATE_ACCEPTANCE_PENDING",
+  "schema": "0009_calendar_tasks",
+  "package_version": "0.4.0",
+  "namespace": "jarvis",
+  "baseline_zip_sha256": "67535ace1926135986170771f20b9f7fdf91d9a5d3593be90df8edc608cef4bb",
+  "source_fingerprint": {
+    "hash": "3bd113d5a1b43da56b2f17b841060d6ff443a73bfcd5a77db5573d4c830ef97a",
+    "scope": "src/migrations/tests/scripts *.py,*.sql,*.mjs; Dockerfile/pyproject.toml/uv.lock/alembic.ini/compose*.yaml; exclude __pycache__"
+  },
+  "image_digest": null,
+  "implemented": [
+    "owner/conversation/identity-scoped durable Calendar drafts",
+    "explicit due time separate from event time",
+    "versioned immutable schedule fingerprint with v1 compatibility",
+    "detached Calendar jobs and independent terminal notification events",
+    "target cancellation and expiry/revocation",
+    "additive schema 0009",
+    "cold CMS backup + empty-target quarantine restore tooling",
+    "local alarm dedup/retention/rollback guard",
+    "baseline-safe cumulative patch and evidence runner"
+  ],
+  "tested_local": {
+    "pytest_items": {
+      "passed": 470,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 91,
+      "errors": 0
+    },
+    "subtests_passed": 83,
+    "xml_testcases": {
+      "tests": 553,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 553
+    },
+    "lint": "passed",
+    "format": "passed",
+    "ast_python_files": 161,
+    "sql_offline_exit_code": 0,
+    "cms_encryption_decryption_tamper_archive": "passed",
+    "evidence": "docs/evidence/stage-4h/release-dacl-fix/verification.json"
+  },
+  "tested_integration_new_source": "NOT_RUN",
+  "user_reported": "docs/evidence/stage-4h/user-acceptance.json",
+  "stage4": "OPEN: native + live delta + natural LLM smoke if missing",
+  "stage5": "FOUNDATION_IMPLEMENTED: all full operations gates remain open",
+  "stage6_8": "NOT_IMPLEMENTED in this session",
+  "blockers": [
+    "Docker/native PostgreSQL unavailable and only UID 0 mapped",
+    "Windows/Compose build not run here",
+    "Calendar/Telegram/LLM live credentials/target not available",
+    "full encrypted restore/retrieval/capacity/failure drills not run"
+  ],
+  "decisions": {
+    "multi_turn_authority": "final exact-action approval",
+    "scheduled_create_authority": "approval binds due/timezone/late window",
+    "draft_ttl_minutes": 30,
+    "approval_ttl_minutes": 10,
+    "late_window_minutes": 15,
+    "max_schedule_days": 30,
+    "max_open_drafts": 3,
+    "max_turns": 20,
+    "max_pending_jobs": 25,
+    "calendar_send": "not expanded",
+    "offsite": "not activated",
+    "alert_receiver": "not selected",
+    "key_custody": "operator decision; no production keys created",
+    "hosting": "not selected; no deployment"
+  },
+  "next_commands": [
+    "Preflight/apply from docs/KURO_CANDIDATE_UPGRADE.md preserving user changes",
+    "A:\\Kuro2\\kuro-main\\scripts\\run_release_gate.ps1",
+    "After native pass: backup/build/migrate 0009/recreate using calendar.write after calendar.read",
+    "docs/KURO_DELTA_ACCEPTANCE.md",
+    "Disposable Stage 5 restore/retrieval drill from docs/KURO_OPERATIONS.md"
+  ],
+  "authoritative_status": "DEVELOPMENT_STATUS.md + docs/WORK_MATRIX.md + this checkpoint; historical manifests/logs are not candidate integrity proof",
+  "runner_fix": {
+    "reason": "user-reported NativeCommandError on ordinary Docker build progress",
+    "implementation": "native stream capture in Python; real child exit preserved",
+    "windows_corrected_runner": "NOT_RUN",
+    "pre_update_user_manifest_check": "USER_REPORTED: all 64 payload files already_current",
+    "user_database_migration": "NOT_RUN according to user; source overwritten only",
+    "host_runner_sha256": "ed4ef57979ed468d78de4840143e220f87a8ebf8db240d80053a0b079a025720",
+    "details": "docs/KURO_RUNNER_FIX.md",
+    "packaging_fix": "root operations artifact exclusion no longer excludes src/jarvis/operations; two omitted source files included",
+    "packaging_evidence": "docs/evidence/stage-4h/runner-fix-package.json"
+  },
+  "windows_dacl_fix": {
+    "user_reported": "96 preflight checks succeeded; apply failed at Set-Acl SeSecurityPrivilege before copy",
+    "implementation": "Access-only .NET persistence with readback; owner/group/audit unchanged",
+    "actual_windows": "NOT_RUN",
+    "bridge_tests": "mock exit/attestation/path separation only",
+    "details": "docs/KURO_WINDOWS_DACL_FIX.md",
+    "next": "apply newest ZIP from A:\\Kuro2\\kuro-acl-fix then native gate; no administrator request"
+  }
+}
