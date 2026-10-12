@@ -43,7 +43,7 @@ capture ~64 dtk, restore ~32 dtk, search dingin <0.1 dtk. RPO/RTO
 
 ## Restore disposable / quarantine
 
-`ops_restore.py` hanya menerima project baru bernama `kuro-restore-*`, schema 0013, checksum ciphertext dan sertifikat public dipin, key recovery privat lokal. Compose standalone `compose.restore.yaml` **tidak** digabung dengan production. Hanya PostgreSQL `_test` internal + helper volume network none; tidak ada scheduler, polling/sending Telegram, LLM, secrets/provider token mounts atau ports publik. Target volume harus kosong; tar traversal, device, symlink keluar dan duplicate member ditolak. Ini bukan clone produksi yang langsung diaktifkan.
+`ops_restore.py` hanya menerima project baru bernama `kuro-restore-*`, schema 0016, checksum ciphertext dan sertifikat public dipin, key recovery privat lokal. Compose standalone `compose.restore.yaml` **tidak** digabung dengan production. Hanya PostgreSQL `_test` internal + helper volume network none; tidak ada scheduler, polling/sending Telegram, LLM, secrets/provider token mounts atau ports publik. Target volume harus kosong; tar traversal, device, symlink keluar dan duplicate member ditolak. Ini bukan clone produksi yang langsung diaktifkan.
 
 ```powershell
 python '.\scripts\ops_restore.py' '.\backups\encrypted\NAMA_BACKUP.tar.cms' --sha256 HASH_DARI_REPORT_TERPERCAYA --project kuro-restore-drill01 --recipient-cert $kuroCert --cert-sha256 $kuroCertPin --private-key 'D:\PrivateRecovery\kuro-private.pem' --key-passphrase-file 'D:\PrivateRecovery\passphrase.txt' --report '.\backups\restore-drill01.json'
@@ -52,7 +52,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Restore drill gagal; jangan aktifkan executor/
 
 Nama/path/hash di atas harus diganti dengan artefak aktual. Key/passphrase tidak dicetak atau ditaruh bersama arsip. PyYAML host diperlukan untuk validasi konfigurasi. Restore mempertahankan owner/identity/profile/dokumen/chunks/result/task/notification/receipt, mencatat hitungan **sebelum** quarantine, lalu menonaktifkan assistant/grants, membuat dispatching uncertain, mengembalikan claimed ke queued untuk review, dan membuat send ambigu uncertain. Grant revision/pepper tidak diganti. PostgreSQL clone selalu dihentikan pada akhir drill; volume retained untuk review, bukan dihancurkan otomatis.
 
-**Terukur 9–10 Okt 2026:** restore DB/volume Docker nyata hijau (drill02 schema 0013, drill03/04 schema 0014, counts identik pre/post quarantine, executor/transports absent, ~32 dtk); retrieval query dingin hijau (drill04: koleksi `jarvis_knowledge_v1` status green, 6 points 384-dim Cosine, filter owner/document ada, search mandiri 1.0 + tetangga; cache model embedding ada di volume). **Sisa:** pending job/approval setelah restore, RTO/data-loss window penuh, load model embedding + search bahasa alami di clone. Report runner mengukur durasi aktual jika dijalankan; tidak mengisi hasil yang belum ada. Sebelum aktivasi, lakukan reconciliation GET stable ID untuk solo-create uncertain, pemeriksaan manual invite/delete, verifikasi retrieval dan secret original. Restore DB tidak membatalkan event Google. Perlu persetujuan terpisah sebelum restore ke volume produksi; helper ini tidak mempunyai target production.
+**Terukur 9–10 Okt 2026:** restore DB/volume Docker nyata hijau (drill02 schema 0013, drill03/04 schema 0014, counts identik pre/post quarantine, executor/transports absent, ~32 dtk); retrieval query dingin hijau (drill04: koleksi `jarvis_knowledge_v1` status green, 6 points 384-dim Cosine, filter owner/document ada, search mandiri 1.0 + tetangga; cache model embedding ada di volume). **Wajib ulang sekali di schema 0016** (drill lama tidak mencakup tabel `projects`/`project_state`): backup terenkripsi baru + drill disposable + catat pending-job-after-restore. **Sisa:** RTO/data-loss window penuh, load model embedding + search bahasa alami di clone. Report runner mengukur durasi aktual jika dijalankan; tidak mengisi hasil yang belum ada. Sebelum aktivasi, lakukan reconciliation GET stable ID untuk solo-create uncertain, pemeriksaan manual invite/delete, verifikasi retrieval dan secret original. Restore DB tidak membatalkan event Google. Perlu persetujuan terpisah sebelum restore ke volume produksi; helper ini tidak mempunyai target production.
 
 ## Monitoring lokal dan alarm
 
@@ -69,7 +69,7 @@ Hilangkan `--once` untuk loop. Tambahkan overlay existing jika diperlukan. Alarm
 
 ## Rollback, secret lifecycle dan incident response
 
-Rollback aplikasi hanya dengan image ID/digest dan schema compatibility record yang benar; guard menolak image baseline lama pada schema di bawah 0013. Migration downgrade disabled. Setelah 0013, gunakan roll-forward atau tested data restore dengan reconciliation. Backup tidak memberi alasan untuk mengeksekusi ulang write yang mungkin sudah terjadi.
+Rollback aplikasi hanya dengan image ID/digest dan schema compatibility record yang benar; guard menolak image/schema lama yang tidak tercatat kompatibel. Migration downgrade disabled. Setelah 0013, gunakan roll-forward atau tested data restore dengan reconciliation. Backup tidak memberi alasan untuk mengeksekusi ulang write yang mungkin sudah terjadi.
 
 | Insiden/secret | Tindakan operator dan dampak |
 |---|---|

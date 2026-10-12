@@ -143,14 +143,42 @@ async def test_artifact_commit_uses_event_sequence_grant(test_db):
 
 
 async def test_intake_batch_records_and_succeeds(test_db):
+    from uuid import uuid4 as _uuid4
+
     from jarvis.orchestration.intake import process_intake_batch
     from jarvis.orchestration.task_manager import create_plan_tasks
-    from jarvis.storage.models import ProfileMemory, Task
+    from jarvis.storage.models import Document, DocumentChunk, ProfileMemory, Task
 
     oid = await owner(test_db)
     root = await submit_goal(test_db, goal(oid, "catat ini", key="int-1"))
     # Intake tidak menyentuh root planner; hanya subtask research/knowledge.
     assert await process_intake_batch(test_db, oid, "test-loop", 3) == []
+    # Stage 7: research dieksekusi nyata → seed 1 dokumen agar ada evidence.
+    async with test_db.tenant(oid) as session:
+        doc = _uuid4()
+        session.add(
+            Document(
+                id=doc,
+                owner_id=oid,
+                title="Arsip",
+                kind="pdf",
+                data_class="private",
+                pipeline="knowledge-1-minilm384",
+                ocr="never",
+                status="ready",
+                byte_size=10,
+            )
+        )
+        session.add(
+            DocumentChunk(
+                id=_uuid4(),
+                owner_id=oid,
+                document_id=doc,
+                ordinal=0,
+                locator="paragraf 1",
+                content="kumpulkan fakta arsip untuk intake",
+            )
+        )
     kids = await create_plan_tasks(
         test_db,
         oid,

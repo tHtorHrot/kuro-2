@@ -1,10 +1,10 @@
 # Stage 4 — Tools and Scheduling verification
 
-Stage 4 is **not yet complete**. Docker regression and migration to
-`0008_executor_binding` are necessary but insufficient. The product gates in
-`STAGE_4_8_ACCEPTANCE.md` must also pass on the exact release being considered.
-The current Stage 4G candidate has the evidence listed in
-`../DEVELOPMENT_STATUS.md`; no full Docker or real-provider pass is claimed.
+Stage 4 ditutup bertahap: native gate schema `0016_memory_projects` hijau di
+host pengguna (660 passed, XML 749, 10 Okt 2026, bukti
+`docs/evidence/native-candidate/run/verification.json`); delta live kalender uji
+mengikuti `KURO_DELTA_ACCEPTANCE.md`. Dokumen ini versi rujukan lama (head 0008);
+angka head yang berlaku kini `0016_memory_projects`.
 
 Calendar activation commands below are operator reference for a later accepted
 build. Do not use them as a shortcut around the open authorization, result-delivery
@@ -41,7 +41,7 @@ docker compose -f compose.yaml -f compose.assistant.yaml -f compose.knowledge.ya
 docker compose -f compose.yaml -f compose.assistant.yaml -f compose.knowledge.yaml run --rm api jarvis doctor
 ```
 
-Expected head/current: `0008_executor_binding`; doctor reports stage 4 and forced RLS.
+Expected head/current: `0016_memory_projects`; doctor reports stage 4 and forced RLS.
 
 ## Calendar activation
 For the complete grant/activation procedure, use `STAGE_4G_CALENDAR_CHAT.md`.

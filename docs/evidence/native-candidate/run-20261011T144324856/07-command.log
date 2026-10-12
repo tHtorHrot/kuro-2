@@ -1,0 +1,170 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0
+rootdir: /app
+configfile: pyproject.toml
+testpaths: tests
+plugins: langsmith-0.14.1, anyio-4.15.1, cov-7.1.0, asyncio-1.4.0, platformdirs-4.12.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 665 items
+
+tests/integration/test_assistant.py ..........................           [  3%]
+tests/integration/test_assistant_status.py .                             [  4%]
+tests/integration/test_calendar_chat.py ......................           [  7%]
+tests/integration/test_calendar_tasks.py .............                   [  9%]
+tests/integration/test_knowledge.py ............                         [ 11%]
+tests/integration/test_memory.py .....                                   [ 11%]
+tests/integration/test_memory_project_scope.py ...                       [ 12%]
+tests/integration/test_postgres.py ...........                           [ 13%]
+tests/integration/test_research.py F.                                    [ 14%]
+tests/integration/test_tasks.py ........F..........                      [ 17%]
+tests/integration/test_telegram.py ............                          [ 18%]
+tests/integration/test_tool_actions.py .....                             [ 19%]
+tests/integration/test_vector_service.py .                               [ 19%]
+tests/offline/test_calendar_directive.py ..........                      [ 21%]
+tests/offline/test_ingress_contract.py ..............                    [ 23%]
+tests/unit/test_action_journal.py ..                                     [ 23%]
+tests/unit/test_action_scheduler.py ...                                  [ 24%]
+tests/unit/test_agent_registry.py .                                      [ 24%]
+tests/unit/test_api.py ................                                  [ 26%]
+tests/unit/test_assistant_diagnostics.py ................                [ 29%]
+tests/unit/test_assistant_graph_setup.py .....................           [ 32%]
+tests/unit/test_assistant_ledger.py ...                                  [ 32%]
+tests/unit/test_assistant_router.py .................................... [ 38%]
+.                                                                        [ 38%]
+tests/unit/test_calendar_activation.py ..                                [ 38%]
+tests/unit/test_calendar_boundaries.py ................................. [ 43%]
+..                                                                       [ 43%]
+tests/unit/test_calendar_confirm.py .....                                [ 44%]
+tests/unit/test_calendar_display.py ..............                       [ 46%]
+tests/unit/test_calendar_oauth.py .....                                  [ 47%]
+tests/unit/test_calendar_recovery.py ........                            [ 48%]
+tests/unit/test_calendar_service.py ...                                  [ 49%]
+tests/unit/test_calendar_setup.py ...................................... [ 54%]
+.....                                                                    [ 55%]
+tests/unit/test_calendar_slots.py ...................................    [ 60%]
+tests/unit/test_calendar_specialist.py ......                            [ 61%]
+tests/unit/test_configuration_logging.py ..............                  [ 63%]
+tests/unit/test_crypto_policy.py .................                       [ 66%]
+tests/unit/test_dashboard.py ..                                          [ 66%]
+tests/unit/test_documents_cli.py ....                                    [ 67%]
+tests/unit/test_execution_broker.py ....                                 [ 67%]
+tests/unit/test_google_calendar_provider.py ....                         [ 68%]
+tests/unit/test_knowledge_compose.py ...                                 [ 69%]
+tests/unit/test_knowledge_content.py .............                       [ 70%]
+tests/unit/test_knowledge_extraction.py ......                           [ 71%]
+tests/unit/test_knowledge_services.py .............                      [ 73%]
+tests/unit/test_memory_eval.py ....                                      [ 74%]
+tests/unit/test_memory_projects.py .....                                 [ 75%]
+tests/unit/test_native_capture.py ....                                   [ 75%]
+tests/unit/test_operations.py ......................                     [ 79%]
+tests/unit/test_research_report.py ...                                   [ 79%]
+tests/unit/test_stage4_completion.py ....                                [ 80%]
+tests/unit/test_telegram_callbacks.py ...                                [ 80%]
+tests/unit/test_telegram_client.py .............................         [ 84%]
+tests/unit/test_telegram_commands.py ................................    [ 89%]
+tests/unit/test_telegram_setup.py ......                                 [ 90%]
+tests/unit/test_tool_policy.py ....                                      [ 91%]
+tests/unit/test_tool_registry.py ..                                      [ 91%]
+tests/unit/test_tool_runtime.py ..                                       [ 91%]
+tests/unit/test_trusted_intent.py .......................                [ 95%]
+tests/unit/test_ultimate_tasks.py ......................                 [ 98%]
+tests/unit/test_windows_secrets.py .........                             [100%]
+
+=================================== FAILURES ===================================
+____ test_research_cites_local_evidence_and_ignores_restricted_and_foreign _____
+
+test_db = <jarvis.storage.database.Database object at 0x746b12a04770>
+
+    async def test_research_cites_local_evidence_and_ignores_restricted_and_foreign(test_db):
+        oid = await owner(test_db)
+        await seed_doc(db=test_db, oid=oid, title="Catatan Kopi", words=["kopi tubruk", "kopi seduh"])
+        await seed_doc(
+            db=test_db, oid=oid, title="Rahasia", words=["kopi tubruk rahasia"], data_class="restricted"
+        )
+        other = (await make_repo(test_db)).config.owner_id
+        await seed_doc(db=test_db, oid=other, title="Asing", words=["kopi tubruk asing"])
+        root = await submit_goal(test_db, goal(oid, "riset kopi tubruk", key="rs-1"))
+        await create_plan_tasks(
+            test_db,
+            oid,
+            root.id,
+            [
+                {
+                    "key": "r0",
+                    "title": "riset kopi tubruk",
+                    "role": "research",
+                    "acceptance": {"criteria": ["sitasi"]},
+                }
+            ],
+        )
+        items = await process_intake_batch(test_db, oid, "research-loop", 3)
+>       assert len(items) == 1 and items[0]["status"] == "succeeded"
+E       AssertionError: assert (3 == 1)
+E        +  where 3 = len([{'task_id': '8a04dd52-7150-4989-8957-8aefbace0840', 'status': 'run_failed', 'error': 'TypeError'}, {'task_id': '8a04d...rror': 'TypeError'}, {'task_id': '8a04dd52-7150-4989-8957-8aefbace0840', 'status': 'run_failed', 'error': 'TypeError'}])
+
+tests/integration/test_research.py:84: AssertionError
+____________________ test_intake_batch_records_and_succeeds ____________________
+
+test_db = <jarvis.storage.database.Database object at 0x746b182c6c60>
+
+    async def test_intake_batch_records_and_succeeds(test_db):
+        from uuid import uuid4 as _uuid4
+    
+        from jarvis.orchestration.intake import process_intake_batch
+        from jarvis.orchestration.task_manager import create_plan_tasks
+        from jarvis.storage.models import Document, DocumentChunk, ProfileMemory, Task
+    
+        oid = await owner(test_db)
+        root = await submit_goal(test_db, goal(oid, "catat ini", key="int-1"))
+        # Intake tidak menyentuh root planner; hanya subtask research/knowledge.
+        assert await process_intake_batch(test_db, oid, "test-loop", 3) == []
+        # Stage 7: research dieksekusi nyata → seed 1 dokumen agar ada evidence.
+        async with test_db.tenant(oid) as session:
+            doc = _uuid4()
+            session.add(
+                Document(
+                    id=doc,
+                    owner_id=oid,
+                    title="Arsip",
+                    kind="pdf",
+                    data_class="private",
+                    pipeline="knowledge-1-minilm384",
+                    ocr="never",
+                    status="ready",
+                    byte_size=10,
+                )
+            )
+            session.add(
+                DocumentChunk(
+                    id=_uuid4(),
+                    owner_id=oid,
+                    document_id=doc,
+                    ordinal=0,
+                    locator="paragraf 1",
+                    content="kumpulkan fakta arsip untuk intake",
+                )
+            )
+        kids = await create_plan_tasks(
+            test_db,
+            oid,
+            root.id,
+            [
+                {
+                    "key": "r0",
+                    "title": "kumpulkan fakta",
+                    "role": "research",
+                    "acceptance": {"criteria": ["3 fakta"]},
+                }
+            ],
+        )
+        items = await process_intake_batch(test_db, oid, "test-loop", 3)
+>       assert len(items) == 1 and items[0]["status"] == "succeeded"
+E       AssertionError: assert (3 == 1)
+E        +  where 3 = len([{'task_id': 'fd4427ed-c334-4610-89be-c7fa3968ce1d', 'status': 'run_failed', 'error': 'TypeError'}, {'task_id': 'fd442...rror': 'TypeError'}, {'task_id': 'fd4427ed-c334-4610-89be-c7fa3968ce1d', 'status': 'run_failed', 'error': 'TypeError'}])
+
+tests/integration/test_tasks.py:196: AssertionError
+----------------- generated xml file: /evidence/run/pytest.xml -----------------
+=========================== short test summary info ============================
+FAILED tests/integration/test_research.py::test_research_cites_local_evidence_and_ignores_restricted_and_foreign
+FAILED tests/integration/test_tasks.py::test_intake_batch_records_and_succeeds
+======================== 2 failed, 663 passed in 32.86s ========================

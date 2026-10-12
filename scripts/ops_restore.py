@@ -20,6 +20,7 @@ SELECT json_build_object(
  'owners',(SELECT count(*) FROM app.users),
  'identities',(SELECT count(*) FROM app.external_identities),
  'profile_memory',(SELECT count(*) FROM app.profile_memory),
+ 'projects',(SELECT count(*) FROM app.projects),
  'documents',(SELECT count(*) FROM app.documents),
  'chunks',(SELECT count(*) FROM app.document_chunks),
  'drafts',(SELECT count(*) FROM app.calendar_tasks),
@@ -105,8 +106,8 @@ def drill(
         )
         parts = temp / "parts"
         manifest = verify_bundle(bundle, parts)
-        if manifest["schema"] != "0015_memory_kinds":
-            raise OpsError("This restore runner requires schema 0015; use matching release tooling")
+        if manifest["schema"] != "0017_task_role_documents":
+            raise OpsError("This restore runner requires schema 0017; use matching release tooling")
         try:
             touched = True
             compose.run("up", "-d", "--wait", "postgres", timeout=120)

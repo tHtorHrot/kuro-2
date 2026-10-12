@@ -1,6 +1,6 @@
-# Gate Stage 4 setelah batch kandidat 0009
+# Gate Stage 4 setelah kandidat schema 0016
 
-Stage 4 tetap OPEN. Klarifikasi durable dan scheduled execution **sudah diimplementasikan** pada kandidat, dengan unit/offline checks; keduanya tidak lagi daftar “belum ada di source”. Native/transaksi dan live delta kandidat masih harus diterima sebelum freeze. Daftar/status per item ada di `WORK_MATRIX.md`, bukti di `../docs/evidence/stage-4h/` dan checkpoint root.
+Stage 4 ditutup bertahap. Klarifikasi durable dan scheduled execution **sudah diimplementasikan** pada kandidat, dengan unit/offline checks; keduanya tidak lagi daftar "belum ada di source". Native gate schema 0016 hijau di host pengguna (660 passed, XML 749, 10 Okt 2026, bukti `docs/evidence/native-candidate/run/verification.json`); tersisa delta live kandidat sebelum freeze. Daftar/status per item ada di `WORK_MATRIX.md` (snapshot 5 Okt, dibaca bersama `DEVELOPMENT_STATUS.md` terbaru), bukti di `docs/evidence/native-candidate/run/`.
 
 - S4-01–03: natural ingress/binding/read existing dipertahankan, offline regression kandidat; prior read/agenda user_reported. Natural-chat LLM live belum diketahui, perlu satu smoke jika belum pernah dibuktikan.
 - S4-04/06/07/09/10: durable draft, scoped provenance/expiry/correction, exact approval binding schedule, target cancel, detached job + separate completion, UTC/DST/window tersedia. Native tests ditulis dan dikoleksi; perlu native PG + acceptance delta.

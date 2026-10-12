@@ -1,0 +1,137 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0
+rootdir: /app
+configfile: pyproject.toml
+testpaths: tests
+plugins: langsmith-0.14.1, anyio-4.15.1, cov-7.1.0, asyncio-1.4.0, platformdirs-4.12.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 686 items
+
+tests/integration/test_assistant.py ..........................           [  3%]
+tests/integration/test_assistant_status.py .                             [  3%]
+tests/integration/test_calendar_chat.py ......................           [  7%]
+tests/integration/test_calendar_nudge.py ..                              [  7%]
+tests/integration/test_calendar_tasks.py .............                   [  9%]
+tests/integration/test_knowledge.py ............                         [ 11%]
+tests/integration/test_memory.py .....                                   [ 11%]
+tests/integration/test_memory_project_scope.py ...                       [ 12%]
+tests/integration/test_postgres.py ...........                           [ 13%]
+tests/integration/test_research.py ...                                   [ 14%]
+tests/integration/test_task_complete_review.py F                         [ 14%]
+tests/integration/test_tasks.py ...................                      [ 17%]
+tests/integration/test_telegram.py ............                          [ 18%]
+tests/integration/test_tool_actions.py .....                             [ 19%]
+tests/integration/test_vector_service.py .                               [ 19%]
+tests/offline/test_calendar_directive.py ..........                      [ 21%]
+tests/offline/test_ingress_contract.py ..............                    [ 23%]
+tests/unit/test_action_journal.py ..                                     [ 23%]
+tests/unit/test_action_scheduler.py ...                                  [ 24%]
+tests/unit/test_agent_registry.py .                                      [ 24%]
+tests/unit/test_api.py ................                                  [ 26%]
+tests/unit/test_artifact_review.py ..                                    [ 26%]
+tests/unit/test_assistant_diagnostics.py ................                [ 29%]
+tests/unit/test_assistant_graph_setup.py .....................           [ 32%]
+tests/unit/test_assistant_ledger.py ...                                  [ 32%]
+tests/unit/test_assistant_router.py .................................... [ 37%]
+.                                                                        [ 38%]
+tests/unit/test_calendar_activation.py ..                                [ 38%]
+tests/unit/test_calendar_boundaries.py ................................. [ 43%]
+..                                                                       [ 43%]
+tests/unit/test_calendar_confirm.py .....                                [ 44%]
+tests/unit/test_calendar_display.py ..............                       [ 46%]
+tests/unit/test_calendar_oauth.py .....                                  [ 46%]
+tests/unit/test_calendar_recovery.py ........                            [ 48%]
+tests/unit/test_calendar_service.py ...                                  [ 48%]
+tests/unit/test_calendar_setup.py ...................................... [ 54%]
+.....                                                                    [ 54%]
+tests/unit/test_calendar_slots.py ...................................    [ 59%]
+tests/unit/test_calendar_specialist.py ......                            [ 60%]
+tests/unit/test_configuration_logging.py ..............                  [ 62%]
+tests/unit/test_crypto_policy.py .................                       [ 65%]
+tests/unit/test_dashboard.py ..                                          [ 65%]
+tests/unit/test_documents_cli.py ....                                    [ 66%]
+tests/unit/test_execution_broker.py ....                                 [ 66%]
+tests/unit/test_gate_verdict.py ....                                     [ 67%]
+tests/unit/test_google_calendar_provider.py ....                         [ 67%]
+tests/unit/test_knowledge_compose.py ...                                 [ 68%]
+tests/unit/test_knowledge_content.py .............                       [ 70%]
+tests/unit/test_knowledge_extraction.py ......                           [ 71%]
+tests/unit/test_knowledge_services.py .............                      [ 73%]
+tests/unit/test_memory_eval.py ....                                      [ 73%]
+tests/unit/test_memory_projects.py .....                                 [ 74%]
+tests/unit/test_native_capture.py ....                                   [ 74%]
+tests/unit/test_operations.py .......................                    [ 78%]
+tests/unit/test_research_report.py ...                                   [ 78%]
+tests/unit/test_route_baseline.py ..                                     [ 79%]
+tests/unit/test_skills_catalog.py .....                                  [ 79%]
+tests/unit/test_stage4_completion.py ....                                [ 80%]
+tests/unit/test_task_detail.py ...                                       [ 80%]
+tests/unit/test_telegram_callbacks.py ...                                [ 81%]
+tests/unit/test_telegram_client.py .............................         [ 85%]
+tests/unit/test_telegram_commands.py ................................    [ 90%]
+tests/unit/test_telegram_setup.py ......                                 [ 90%]
+tests/unit/test_tool_policy.py ....                                      [ 91%]
+tests/unit/test_tool_registry.py ..                                      [ 91%]
+tests/unit/test_tool_runtime.py ..                                       [ 92%]
+tests/unit/test_trusted_intent.py .......................                [ 95%]
+tests/unit/test_ultimate_tasks.py ......................                 [ 98%]
+tests/unit/test_windows_secrets.py .........                             [100%]
+
+=================================== FAILURES ===================================
+_______________ test_complete_accepts_only_passed_own_artifacts ________________
+
+test_db = <jarvis.storage.database.Database object at 0x746b51936960>
+settings = Settings(environment='test', database_url=SecretStr('**********'), token_pepper=SecretStr('**********'), default_timez...docs_enabled=False, infrastructure_target_idr=100000, premium_mode='confirm_each_use', cloud_privacy='no_training_zdr')
+
+    async def test_complete_accepts_only_passed_own_artifacts(test_db, settings):
+        oid = await owner(test_db)
+        task = await seed_task(test_db, oid)
+        good = await seed_artifact(test_db, oid, task.id, "passed")
+        stale = await seed_artifact(test_db, oid, task.id, "pending")
+        bad = await seed_artifact(test_db, oid, task.id, "failed")
+        other_task = await seed_task(test_db, oid, key="rev-2")
+        foreign = await seed_artifact(test_db, oid, other_task.id, "passed")
+        ghost = "00000000-0000-4000-8000-000000000099"
+    
+        async with await app_client(test_db, settings, oid) as client:
+            ok = await client.post(
+                f"/api/v1/tasks/{task.id}/complete",
+                json={"status": "succeeded", "artifact_ids": [str(good)]},
+            )
+            assert ok.status_code == 200, ok.text
+            for bad_ids, name in (
+                ([str(stale)], "pending"),
+                ([str(bad)], "failed"),
+                ([str(foreign)], "foreign-task"),
+                ([ghost], "ghost"),
+                (["bukan-uuid"], "malformed"),
+                ([str(good), str(stale)], "mixed"),
+            ):
+                response = await client.post(
+                    f"/api/v1/tasks/{task.id}/complete",
+                    json={"status": "succeeded", "artifact_ids": bad_ids},
+                )
+>               assert response.status_code == 422, (name, response.text)
+E               AssertionError: ('malformed', '{"type": "about:blank", "title": "internal_error", "status": 500, "code": "internal_error", "request_id": "9c6ae807-a5c7-498f-b345-723d4377b759"}')
+E               assert 500 == 422
+E                +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/integration/test_task_complete_review.py:75: AssertionError
+----------------------------- Captured stderr call -----------------------------
+{"timestamp": "2026-10-11T16:36:03.532835+00:00", "level": "INFO", "logger": "jarvis.api.middleware", "message": "http_request", "request_id": "ea98568f-9f5c-4f24-9849-231d8955dbe4", "route": "/api/v1/tasks/{task_id}/complete", "method": "POST", "status": 200, "duration_ms": 24.53}
+{"timestamp": "2026-10-11T16:36:03.533392+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: POST [REDACTED_URL] \"HTTP/1.1 200 OK\""}
+{"timestamp": "2026-10-11T16:36:03.539281+00:00", "level": "INFO", "logger": "jarvis.api.middleware", "message": "http_request", "request_id": "0a9ceea3-442c-4bfc-bfe3-27a0144b1d1f", "route": "/api/v1/tasks/{task_id}/complete", "method": "POST", "status": 422, "duration_ms": 5.37}
+{"timestamp": "2026-10-11T16:36:03.539679+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: POST [REDACTED_URL] \"HTTP/1.1 422 Unprocessable Entity\""}
+{"timestamp": "2026-10-11T16:36:03.545372+00:00", "level": "INFO", "logger": "jarvis.api.middleware", "message": "http_request", "request_id": "3cc3d20a-76ae-4748-9181-bd38b0200355", "route": "/api/v1/tasks/{task_id}/complete", "method": "POST", "status": 422, "duration_ms": 5.2}
+{"timestamp": "2026-10-11T16:36:03.545863+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: POST [REDACTED_URL] \"HTTP/1.1 422 Unprocessable Entity\""}
+{"timestamp": "2026-10-11T16:36:03.551803+00:00", "level": "INFO", "logger": "jarvis.api.middleware", "message": "http_request", "request_id": "51f702c1-bee6-4387-8d8a-586700d71f8f", "route": "/api/v1/tasks/{task_id}/complete", "method": "POST", "status": 422, "duration_ms": 5.07}
+{"timestamp": "2026-10-11T16:36:03.552325+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: POST [REDACTED_URL] \"HTTP/1.1 422 Unprocessable Entity\""}
+{"timestamp": "2026-10-11T16:36:03.558195+00:00", "level": "INFO", "logger": "jarvis.api.middleware", "message": "http_request", "request_id": "6323c541-a0ad-4696-ab3f-34b1e2f75aba", "route": "/api/v1/tasks/{task_id}/complete", "method": "POST", "status": 422, "duration_ms": 5.39}
+{"timestamp": "2026-10-11T16:36:03.558493+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: POST [REDACTED_URL] \"HTTP/1.1 422 Unprocessable Entity\""}
+{"timestamp": "2026-10-11T16:36:03.564501+00:00", "level": "ERROR", "logger": "jarvis.api.middleware", "message": "unhandled_error", "request_id": "9c6ae807-a5c7-498f-b345-723d4377b759", "error_type": "DataError"}
+{"timestamp": "2026-10-11T16:36:03.564672+00:00", "level": "INFO", "logger": "jarvis.api.middleware", "message": "http_request", "request_id": "9c6ae807-a5c7-498f-b345-723d4377b759", "route": "/api/v1/tasks/{task_id}/complete", "method": "POST", "status": 500, "duration_ms": 5.56}
+{"timestamp": "2026-10-11T16:36:03.564948+00:00", "level": "INFO", "logger": "httpx", "message": "HTTP Request: POST [REDACTED_URL] \"HTTP/1.1 500 Internal Server Error\""}
+----------------- generated xml file: /evidence/run/pytest.xml -----------------
+=========================== short test summary info ============================
+FAILED tests/integration/test_task_complete_review.py::test_complete_accepts_only_passed_own_artifacts
+======================== 1 failed, 685 passed in 40.67s ========================

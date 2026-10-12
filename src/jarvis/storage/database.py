@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from jarvis.core.config import Settings
 from jarvis.core.errors import UnsafeDatabaseRole
 
-SCHEMA_REVISION = "0015_memory_kinds"
+SCHEMA_REVISION = "0017_task_role_documents"
 TENANT_TABLES = (
     "users",
     "api_tokens",
@@ -19,6 +19,8 @@ TENANT_TABLES = (
     "telegram_receipts",
     "assistant_state",
     "profile_memory",
+    "projects",
+    "project_state",
     "assistant_requests",
     "conversation_messages",
     "llm_calls",

@@ -171,6 +171,7 @@ def parse_update(
             if len(pieces) == 2 and command not in {
                 "restricted",
                 "memory",
+                "project",
                 "ai",
                 "new",
                 "clear",

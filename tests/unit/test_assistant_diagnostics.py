@@ -94,12 +94,12 @@ async def test_catalog_success_preserves_metadata_only_contract(monkeypatch, set
     _, router, _ = fake_cli(monkeypatch, settings)
     router.plan.return_value = {"kind": "free", "reserve_usd": "0E-10"}
     result = await cli.operate_assistant("assistant-catalog")
-    assert result == {
-        "metadata_only": True,
-        "inference_sent": False,
-        "diagnostics_version": DIAGNOSTICS_VERSION,
-        "free_plan": router.plan.return_value,
-    }
+    assert result["metadata_only"] is True
+    assert result["inference_sent"] is False
+    assert result["diagnostics_version"] == DIAGNOSTICS_VERSION
+    assert result["free_plan"] == router.plan.return_value
+    assert "checked_at_utc" in result and "config_hash" in result
+    assert result["baseline"]["on_baseline"] is False
     router.complete.assert_not_awaited()
 
 

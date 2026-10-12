@@ -41,6 +41,24 @@ from jarvis.storage.models import (
 ACTIVE = ("queued", "preparing", "awaiting_approval", "approved", "dispatching")
 COMMANDS = SLASH_COMMANDS  # Compatibility for existing transport consumers.
 RETENTION = timedelta(days=30)
+TERMINAL_REQUEST_STATUSES = ("succeeded", "failed", "cancelled", "uncertain")
+
+
+def split_ledger(calls) -> dict:
+    """Pure ledger split: actual spend vs held reservation. No DB, no secrets."""
+    actual, held, by_status = Decimal(0), Decimal(0), {}
+    for status, actual_usd, reserved_usd in calls:
+        by_status[status] = by_status.get(status, 0) + 1
+        if status == "succeeded" and actual_usd is not None:
+            actual += actual_usd
+        elif status in {"dispatching", "uncertain"}:
+            held += reserved_usd or Decimal(0)
+    return {
+        "month_actual_usd": str(actual),
+        "month_held_usd": str(held),
+        "calls": by_status,
+        "unreconciled": sum(by_status.get(s, 0) for s in ("dispatching", "uncertain")),
+    }
 
 
 def now_utc():
@@ -224,8 +242,9 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
         )
         return
     if cmd == "memory":
-        from jarvis.memory.service import live_condition
+        from jarvis.memory.service import active_project, live_condition
 
+        current = await active_project(session, owner_id)
         rows = (
             await session.scalars(
                 select(ProfileMemory)
@@ -234,20 +253,43 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
                 .order_by(ProfileMemory.kind, ProfileMemory.key)
             )
         ).all()
+
+        def show(row):
+            scope = row.project or "global"
+            value = row.value if row.data_class == "private" else "[restricted]"
+            return f"{row.key} [{row.kind}/{scope}]: {value}"
+
+        if current:
+            mine = [r for r in rows if r.project == current]
+            other = [r for r in rows if r.project not in (None, current)]
+            body = "Proyek {}:\n{}\n\nGlobal:\n{}".format(
+                current,
+                "\n".join(show(r) for r in mine) if mine else "(kosong)",
+                "\n".join(show(r) for r in rows if r.project is None) or "(kosong)",
+            )
+            if other:
+                body += "\n\nProyek lain: " + ", ".join(
+                    sorted({r.project for r in other if r.project})
+                )
+        else:
+            body = "Profil tersimpan:\n" + "\n".join(show(r) for r in rows)
         set_reply(
             receipt,
-            "Profil tersimpan:\n"
-            + "\n".join(
-                f"{r.key} [{r.kind}]: {r.value if r.data_class == 'private' else '[restricted]'}"
-                for r in rows
-            )
-            if rows
-            else "Profil belum berisi fakta. /remember kunci nilai untuk menyimpan.",
+            body if rows else "Profil belum berisi fakta. /remember kunci nilai untuk menyimpan.",
         )
         return
     if cmd in {"remember", "forget"}:
-        parts = arg.split(maxsplit=1)
+        from jarvis.memory.service import active_project
+
+        scope = arg
+        project = None
+        if scope.startswith("@"):
+            head, _, tail = scope[1:].partition(" ")
+            project, scope = head, tail
+        parts = scope.split(maxsplit=1)
         key = parts[0] if parts else ""
+        if project is None and cmd == "remember":
+            project = await active_project(session, owner_id)
         if not re.fullmatch(r"[a-z][a-z0-9_]{0,39}", key):
             set_reply(
                 receipt, "Kunci harus huruf kecil/angka/underscore, diawali huruf (maks. 40)."
@@ -272,7 +314,7 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
                 receipt, "Nilai profil harus 1–500 karakter tanpa kredensial atau data restricted."
             )
             return
-        from jarvis.memory.repository import MemoryFact
+        from jarvis.memory.repository import MemoryFact, MemoryPolicyError
         from jarvis.memory.service import apply_fact, live_condition
 
         count = await session.scalar(
@@ -285,16 +327,74 @@ async def handle_command(session, owner_id, bot_id, incoming, receipt, pepper: s
         if row is None and count >= 20:
             set_reply(receipt, "Batas 20 fakta profil tercapai. Hapus dengan /forget kunci.")
             return
-        await apply_fact(
-            session,
-            owner_id,
-            MemoryFact(key=key, value=value, provenance="user:telegram", source="user"),
-        )
+        try:
+            await apply_fact(
+                session,
+                owner_id,
+                MemoryFact(
+                    key=key, value=value, provenance="user:telegram", source="user", project=project
+                ),
+            )
+        except MemoryPolicyError:
+            set_reply(receipt, "Proyek tidak terdaftar. Daftarkan dulu: /project-add nama.")
+            return
         await cancel_pending(session, state)
+        where = f" di proyek {project}" if project else ""
         set_reply(
-            receipt, "Fakta disimpan. Nilainya akan disertakan dalam percakapan AI berikutnya."
+            receipt,
+            f"Fakta disimpan{where}. Nilainya akan disertakan dalam percakapan AI berikutnya.",
         )
         audit(session, owner_id, "memory.updated", None)
+        return
+    if cmd in {"project", "project-add", "project-del"}:
+        from jarvis.memory.service import (
+            active_project,
+            delete_project,
+            list_projects,
+            register_project,
+            set_active_project,
+        )
+
+        if cmd == "project" and not arg:
+            names = await list_projects(session, owner_id)
+            current = await active_project(session, owner_id)
+            text = "Proyek aktif: {}\nDaftar: {}\nGanti: /project nama.".format(
+                current or "(tidak ada — semua global)",
+                ", ".join(names) if names else "(belum ada)",
+            )
+            set_reply(receipt, text + " Baru: /project-add nama.")
+            return
+        if cmd == "project-add":
+            try:
+                await register_project(session, owner_id, arg)
+            except ValueError:
+                set_reply(receipt, "Nama tidak valid / sudah ada / batas 20 tercapai.")
+                return
+            set_reply(receipt, f"Proyek {arg} terdaftar.")
+            return
+        if cmd == "project-del":
+            try:
+                await delete_project(session, owner_id, arg)
+            except ValueError as exc:
+                set_reply(
+                    receipt,
+                    {
+                        "project_is_active": "Masih aktif; pindah dulu.",
+                        "project_has_facts": "Masih ada fakta; /forget dulu.",
+                    }.get(
+                        str(exc),
+                        "Proyek tidak ditemukan.",
+                    ),
+                )
+                return
+            set_reply(receipt, f"Proyek {arg} dihapus.")
+            return
+        try:
+            await set_active_project(session, owner_id, arg)
+        except ValueError:
+            set_reply(receipt, "Proyek tidak terdaftar. Lihat: /project.")
+            return
+        set_reply(receipt, f"Proyek aktif: {arg}. /memory kini memilah ruang ini.")
         return
     if (
         not state.enabled
@@ -526,8 +626,9 @@ class AssistantRepository:
                     row.messages, row.context_hash = messages, digest(messages)
             if row.messages is None:
                 from jarvis.memory.repository import MAX_CONTEXT_CHARS, rank_facts
-                from jarvis.memory.service import live_condition
+                from jarvis.memory.service import active_project, live_condition
 
+                current_project = await active_project(session, self.owner)
                 profile = (
                     await session.scalars(
                         select(ProfileMemory)
@@ -548,10 +649,14 @@ class AssistantRepository:
                             "importance": p.importance,
                             "updated_at": p.updated_at,
                             "data_class": p.data_class,
+                            "project": p.project,
+                            "status": p.status,
+                            "expires_at": p.expires_at,
                         }
                         for p in profile
                     ],
                     budget_chars=MAX_CONTEXT_CHARS,
+                    project=current_project,
                 )
                 history = (
                     await session.scalars(
@@ -891,6 +996,39 @@ class AssistantRepository:
                     .group_by(AssistantRequest.status)
                 )
             ).all()
+            month = now_utc().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            call_rows = (
+                await session.execute(
+                    select(LLMCall.status, LLMCall.actual_usd, LLMCall.reserved_usd).where(
+                        LLMCall.owner_id == self.owner, LLMCall.created_at >= month
+                    )
+                )
+            ).all()
+            ledger = split_ledger(call_rows)
+            day = now_utc().replace(hour=0, minute=0, second=0, microsecond=0)
+            daily_free_used = (
+                await session.scalar(
+                    select(func.count())
+                    .select_from(LLMCall)
+                    .where(
+                        LLMCall.owner_id == self.owner,
+                        LLMCall.kind == "free",
+                        LLMCall.created_at >= day,
+                    )
+                )
+                or 0
+            )
+            recent_terminal = (
+                await session.scalars(
+                    select(AssistantRequest)
+                    .where(
+                        AssistantRequest.owner_id == self.owner,
+                        AssistantRequest.status.in_(TERMINAL_REQUEST_STATUSES),
+                    )
+                    .order_by(AssistantRequest.finished_at.desc())
+                    .limit(5)
+                )
+            ).all()
             return {
                 "stage": "3",
                 "configured": state is not None,
@@ -902,5 +1040,18 @@ class AssistantRepository:
                 "premium_mode": "confirm_each_use",
                 "monthly_budget_usd": str(self.config.monthly_budget_usd),
                 "month_spent_or_held_usd": str(await self.spent(session)),
+                "month_actual_usd": ledger["month_actual_usd"],
+                "month_held_usd": ledger["month_held_usd"],
+                "unreconciled_calls": ledger["unreconciled"],
+                "calls": ledger["calls"],
+                "daily_free_used": daily_free_used,
+                "daily_free_limit": self.config.daily_free_calls,
+                "recent_terminal": [
+                    {
+                        "status": row.status,
+                        "finished_at": row.finished_at.isoformat() if row.finished_at else None,
+                    }
+                    for row in recent_terminal
+                ],
                 "requests": dict(counts),
             }

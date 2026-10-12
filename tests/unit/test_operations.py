@@ -233,6 +233,17 @@ def test_monitor_future_job_is_not_stale_and_alarm_recovery_is_deduplicated():
     assert transitions(current, set(), now)[0]["state"] == "recovered"
 
 
+def test_monitor_signal_derives_ok_no_signal_idle_without_persisting():
+    from jarvis.operations.monitor import derive_signal
+
+    assert derive_signal(True, 10) == "ok"
+    assert derive_signal(True, 90) == "ok"
+    assert derive_signal(True, 90.1) == "no_signal"
+    assert derive_signal(True, None) == "no_signal"
+    assert derive_signal(False, 10) == "idle"
+    assert derive_signal(False, None) == "idle"
+
+
 def test_rollback_guard_rejects_old_image_new_schema():
     from rollback_guard import compatible
 

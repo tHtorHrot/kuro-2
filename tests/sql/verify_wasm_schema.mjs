@@ -32,7 +32,7 @@ try {
     SET ROLE jarvis_migrator;
   `);
   await db.exec(migration);
-  check((await db.query('SELECT version_num FROM public.jarvis_schema_version')).rows[0].version_num === '0015_memory_kinds');
+  check((await db.query('SELECT version_num FROM public.jarvis_schema_version')).rows[0].version_num === '0017_task_role_documents');
   // SET ROLE alone would leave a superuser session authorized to switch roles again.
   await db.exec('RESET ROLE; SET SESSION AUTHORIZATION jarvis_app');
   const a = '00000000-0000-4000-8000-000000000001';
@@ -63,7 +63,7 @@ try {
   }
   check((await db.query("SELECT app.current_owner_id() AS id")).rows[0].id === null);
   const security = await db.query("SELECT bool_and(relrowsecurity AND relforcerowsecurity) AS secured, count(*)::int AS n FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='app' AND c.relkind='r'");
-  check(security.rows[0].secured && security.rows[0].n === 26);
+  check(security.rows[0].secured && security.rows[0].n === 28);
   await tenant(a);
   await db.query("INSERT INTO app.telegram_state(owner_id,bot_id,rate_window_at) VALUES ($1,100,now())", [a]);
   await db.query("INSERT INTO app.telegram_receipts(owner_id,bot_id,update_id,chat_id,reply_kind,delivery_status,next_attempt_at) VALUES ($1,100,1000,111,'status','pending',now())", [a]);
@@ -181,6 +181,18 @@ try {
   await tenant(a);
   await db.query("INSERT INTO app.assistant_requests(id,owner_id,bot_id,source_update_id,reply_update_id,conversation_id,revision,config_hash,status) VALUES (gen_random_uuid(),$1,100,300,300,$1,1,'hash','queued')", [a]);
   check(await count('assistant_requests') === 2); // Detached job does not consume the LLM slot.
+  await db.exec('COMMIT');
+  await tenant(a);
+  await db.query("INSERT INTO app.projects(owner_id,name) VALUES ($1,'proyek-a')", [a]);
+  await db.query("INSERT INTO app.project_state(owner_id,active_project) VALUES ($1,'proyek-a')", [a]);
+  await db.query("INSERT INTO app.profile_memory(owner_id,key,value,project) VALUES ($1,'tugas-a','rahasia a','proyek-a')", [a]);
+  check(await count('projects') === 1);
+  await db.exec('COMMIT');
+  await tenant(b);
+  check(await count('projects') === 0);
+  check(await count('profile_memory') === 0);
+  await mustFail(`INSERT INTO app.profile_memory(owner_id,key,value,project) VALUES ('${b}','tugas-a','forbidden','proyek-a')`);
+  await tenant(a);
   await db.exec('COMMIT');
   console.log(JSON.stringify({ status: 'passed', checks, engine, limitation: 'WASM SQL only; not native PostgreSQL 16, networking, pooling or concurrency verification' }));
 } finally {

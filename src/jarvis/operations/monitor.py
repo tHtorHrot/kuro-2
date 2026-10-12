@@ -9,12 +9,29 @@ from jarvis.storage.models import (
     CalendarNotification,
     Document,
     KnowledgeState,
+    ProfileMemory,
+    Project,
     TelegramReceipt,
     TelegramState,
     ToolAction,
     ToolGrant,
 )
 from jarvis.tools.journal import now_utc
+
+# Grace AO-style: worker yang diharapkan tapi diam lebih lama dari ini
+# dilaporkan no_signal (lebih awal dari ambang recent 2 menit di bawah).
+NO_SIGNAL_GRACE_SECONDS = 90.0
+
+
+def derive_signal(
+    expected: bool, age_seconds: float | None, grace: float = NO_SIGNAL_GRACE_SECONDS
+) -> str:
+    """Display murni: ok | no_signal | idle. Tidak pernah dipersist."""
+    if not expected:
+        return "idle"
+    if age_seconds is None or age_seconds > grace:
+        return "no_signal"
+    return "ok"
 
 
 async def snapshot(db, owner):
@@ -71,6 +88,23 @@ async def snapshot(db, owner):
                 )
             ).all()
         )
+        memory_live = await session.scalar(
+            select(func.count())
+            .select_from(ProfileMemory)
+            .where(
+                ProfileMemory.owner_id == owner,
+                ProfileMemory.status == "active",
+                (ProfileMemory.expires_at.is_(None)),
+            )
+        )
+        memory_deleted = await session.scalar(
+            select(func.count())
+            .select_from(ProfileMemory)
+            .where(ProfileMemory.owner_id == owner, ProfileMemory.status == "deleted")
+        )
+        project_count = await session.scalar(
+            select(func.count()).select_from(Project).where(Project.owner_id == owner)
+        )
         states = {
             "telegram": await session.get(TelegramState, owner),
             "assistant": await session.get(AssistantState, owner),
@@ -89,15 +123,25 @@ async def snapshot(db, owner):
                 "expected": expected,
                 "age_seconds": age,
                 "recent": age is not None and age <= timedelta(minutes=2).total_seconds(),
+                "signal": derive_signal(expected, age),
             }
+        no_signal = sorted(
+            name for name, beat in heartbeat.items() if beat["signal"] == "no_signal"
+        )
     return {
         "database_ready": ready,
         "heartbeat": heartbeat,
+        "no_signal": no_signal,
         "actions": actions,
         "due_age_seconds": max(0, (now - due).total_seconds()) if due else None,
         "stale_leases": stale,
         "delivery_backlog": delivery + notifications,
         "documents": documents,
+        "memory": {
+            "live_active_no_expiry": memory_live,
+            "tombstones": memory_deleted,
+            "projects": project_count,
+        },
         "provider_auth": "not_verified_by_heartbeat",
         "tasks": await _task_snapshot(session, owner),
     }

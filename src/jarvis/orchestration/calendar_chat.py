@@ -509,9 +509,10 @@ async def approve_from_chat(session, owner, incoming, receipt):
 async def deliver_completed(session, owner, state):
     """Replay-safe terminal notification from committed results, never an LLM claim."""
     from jarvis.assistant.repository import authorized, deliver
-    from jarvis.orchestration.calendar_tasks import complete_tasks
+    from jarvis.orchestration.calendar_tasks import complete_tasks, remind_approvals
 
     await complete_tasks(session, owner, state)
+    await remind_approvals(session, owner, state)
     rows = (
         await session.execute(
             select(AssistantRequest, ToolAction)

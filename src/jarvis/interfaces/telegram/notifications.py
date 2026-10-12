@@ -41,6 +41,14 @@ async def claim_notification(repo, session, now):
     task = await session.get(CalendarTask, row.task_id)
     state = await session.get(AssistantState, repo.config.owner_id)
     user, identity = await session.get(User, repo.config.owner_id), await repo.identity(session)
+    if row.event_key.startswith("nudge:"):
+        # Pengingat basi (mis. disetujui tepat sebelum terkirim) tidak boleh keluar.
+        from jarvis.storage.models import ToolAction
+
+        action = await session.get(ToolAction, row.action_id)
+        if action is None or action.status != "awaiting_approval":
+            row.delivery_status, row.reply_text = "blocked", None
+            return None
     if (
         not task
         or task.current_action_id != row.action_id

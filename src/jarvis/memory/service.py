@@ -11,6 +11,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from uuid import UUID
 
+from sqlalchemy import func, select
+
 from jarvis.memory.repository import MemoryFact, default_expiry, validate_fact
 
 _PRECEDENCE = {"user": 3, "validated": 2, "inference": 1}
@@ -32,9 +34,91 @@ async def propose_fact(db, owner: UUID, fact: MemoryFact) -> None:
         await apply_fact(session, owner, fact)
 
 
+async def register_project(session, owner: UUID, name: str) -> None:
+    import re
+
+    from jarvis.memory.repository import PROJECT_PATTERN
+    from jarvis.storage.models import Project
+
+    if not re.fullmatch(PROJECT_PATTERN, name or ""):
+        raise ValueError("project_name_invalid")
+    count = await session.scalar(
+        select(func.count()).select_from(Project).where(Project.owner_id == owner)
+    )
+    if count >= 20:
+        raise ValueError("project_limit_reached")
+    session.add(Project(owner_id=owner, name=name))
+    try:
+        await session.flush()
+    except Exception:
+        raise ValueError("project_exists") from None
+
+
+async def list_projects(session, owner: UUID) -> list[str]:
+    from jarvis.storage.models import Project
+
+    return list(
+        (
+            await session.scalars(
+                select(Project.name).where(Project.owner_id == owner).order_by(Project.name)
+            )
+        ).all()
+    )
+
+
+async def active_project(session, owner: UUID) -> str | None:
+    from jarvis.storage.models import Project, ProjectState
+
+    state = await session.get(ProjectState, owner)
+    if state is None or state.active_project is None:
+        return None
+    exists = await session.get(Project, (owner, state.active_project))
+    return state.active_project if exists is not None else None
+
+
+async def set_active_project(session, owner: UUID, name: str | None) -> None:
+    from jarvis.storage.models import Project, ProjectState
+
+    if name is not None and await session.get(Project, (owner, name)) is None:
+        raise ValueError("project_unknown")
+    state = await session.get(ProjectState, owner)
+    if state is None:
+        session.add(ProjectState(owner_id=owner, active_project=name))
+    else:
+        state.active_project = name
+        state.updated_at = datetime.now(UTC)
+
+
+async def delete_project(session, owner: UUID, name: str) -> None:
+    from jarvis.storage.models import ProfileMemory, Project, ProjectState
+
+    state = await session.get(ProjectState, owner)
+    if state is not None and state.active_project == name:
+        raise ValueError("project_is_active")
+    remaining = await session.scalar(
+        select(func.count())
+        .select_from(ProfileMemory)
+        .where(
+            ProfileMemory.owner_id == owner,
+            ProfileMemory.project == name,
+            ProfileMemory.status != "deleted",
+        )
+    )
+    if remaining:
+        raise ValueError("project_has_facts")
+    row = await session.get(Project, (owner, name))
+    if row is None:
+        raise ValueError("project_unknown")
+    await session.delete(row)
+
+
 async def apply_fact(session, owner: UUID, fact: MemoryFact) -> str:
     """Core upsert on a caller-owned session. Returns inserted|kept|superseded."""
-    from jarvis.storage.models import ProfileMemory
+    from jarvis.memory.repository import MemoryPolicyError
+    from jarvis.storage.models import ProfileMemory, Project
+
+    if fact.project is not None and await session.get(Project, (owner, fact.project)) is None:
+        raise MemoryPolicyError("project_unknown")
 
     expires = fact.expires_at
     if expires is None and fact.source != "user":
@@ -48,6 +132,7 @@ async def apply_fact(session, owner: UUID, fact: MemoryFact) -> str:
                 value=fact.value,
                 data_class="private",
                 kind=fact.kind,
+                project=fact.project,
                 provenance=fact.provenance,
                 expires_at=expires,
                 status="active",
@@ -59,6 +144,7 @@ async def apply_fact(session, owner: UUID, fact: MemoryFact) -> str:
         # Re-learn after forget/expiry overwrites in place; the PK row persists.
         existing.value = fact.value
         existing.kind = fact.kind
+        existing.project = fact.project
         existing.provenance = fact.provenance
         existing.expires_at = expires
         existing.status = "active"

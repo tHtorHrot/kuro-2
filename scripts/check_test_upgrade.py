@@ -89,7 +89,7 @@ def main():
         db.execute("SELECT set_config('jarvis.owner_id', %s, true)", (str(owner),))
         assert (
             db.execute("SELECT version_num FROM public.jarvis_schema_version").fetchone()[0]
-            == "0015_memory_kinds"
+            == "0017_task_role_documents"
         )
         assert db.execute("SELECT id,title FROM app.documents").fetchone() == (
             document,
@@ -116,6 +116,35 @@ def main():
             "keep-existing-memory",
             "profile",
             "active",
+        )
+        # Stage 6 slice 3: projects registry exists, empty, RLS forced; memory project nullable.
+        assert db.execute("SELECT count(*) FROM app.projects").fetchone()[0] == 0
+        assert db.execute("SELECT count(*) FROM app.project_state").fetchone()[0] == 0
+        assert (
+            db.execute(
+                "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON c.relnamespace=n.oid "
+                "WHERE n.nspname='app' AND c.relname IN ('projects','project_state') "
+                "AND c.relrowsecurity AND c.relforcerowsecurity"
+            ).fetchone()[0]
+            == 2
+        )
+        assert (
+            db.execute(
+                "SELECT is_nullable FROM information_schema.columns WHERE table_schema='app' "
+                "AND table_name='profile_memory' AND column_name='project'"
+            ).fetchone()[0]
+            == "YES"
+        )
+        # Stage 7 documents: role baru lolos CHECK, role lama tetap ada.
+        task_id = uuid4()
+        db.execute(
+            "INSERT INTO app.tasks(id,owner_id,title,role,status) "
+            "VALUES (%s,%s,'doc check','documents','queued')",
+            (task_id, owner),
+        )
+        assert (
+            db.execute("SELECT role FROM app.tasks WHERE id=%s", (task_id,)).fetchone()[0]
+            == "documents"
         )
     print(
         "Populated stage 2B -> 4B native migration: "

@@ -30,40 +30,90 @@ def counts(xml):
     return result
 
 
+INFRA_MARKERS = (
+    "connection refused",
+    "connection failed",
+    "connection timed out",
+    "timed out",
+    "no such host",
+    "temporary failure",
+    "network is unreachable",
+    "docker",
+    "daemon",
+    "operationalerror",
+    "nodename nor servname",
+)
+APP_MARKERS = (
+    "traceback",
+    "assertionerror",
+    "alembic",
+    "constraint",
+    "already exists",
+    "failed",
+    "error",
+    "mismatch",
+    "ruff",
+)
+
+
+def classify(step: str, returncode: int, log_text: str) -> str:
+    """passed | app_failed | infra — diagnosis only; exit codes unchanged."""
+    if returncode == 0:
+        return "passed"
+    low = log_text.lower()
+    infra = any(marker in low for marker in INFRA_MARKERS)
+    app = any(marker in low for marker in APP_MARKERS)
+    if step in ("bootstrap", "migrate") and infra and not app:
+        return "infra"
+    if step == "pytest" and infra and "failed" not in low and "error" not in low:
+        return "infra"
+    return "app_failed"
+
+
 def run(mode, root, evidence):
     evidence.mkdir(parents=True, exist_ok=False)
     before = source_fingerprint(root)
     started = datetime.now(UTC).isoformat()
     env = dict(os.environ, PYTHONPATH=str(root / "src"))
     steps = [
-        [sys.executable, "-m", "ruff", "check", "src", "migrations", "scripts", "tests"],
-        [
-            sys.executable,
-            "-m",
-            "ruff",
-            "format",
-            "--check",
-            "src",
-            "migrations",
-            "scripts",
-            "tests",
-        ],
+        ("secret_scan", [sys.executable, "scripts/scan_secrets.py", "--root", "."]),
+        (
+            "ruff_check",
+            [sys.executable, "-m", "ruff", "check", "src", "migrations", "scripts", "tests"],
+        ),
+        (
+            "ruff_format",
+            [
+                sys.executable,
+                "-m",
+                "ruff",
+                "format",
+                "--check",
+                "src",
+                "migrations",
+                "scripts",
+                "tests",
+            ],
+        ),
     ]
     if mode == "native":
         steps += [
-            [sys.executable, "scripts/bootstrap_test_db.py"],
-            [sys.executable, "scripts/check_test_upgrade.py"],
-            [sys.executable, "-m", "jarvis.cli", "migrate"],
-            [sys.executable, "-m", "jarvis.cli", "migrate"],
+            ("bootstrap", [sys.executable, "scripts/bootstrap_test_db.py"]),
+            ("upgrade", [sys.executable, "scripts/check_test_upgrade.py"]),
+            ("migrate", [sys.executable, "-m", "jarvis.cli", "migrate"]),
+            ("migrate", [sys.executable, "-m", "jarvis.cli", "migrate"]),
         ]
         env["JARVIS_REQUIRE_INTEGRATION"] = "1"
         env["JARVIS_TEST_QDRANT"] = "1"
     steps += [
-        [sys.executable, "-m", "pytest", "--junitxml=" + str(evidence / "pytest.xml")]
-        + (["-m", "not integration"] if mode == "offline" else [])
+        (
+            "pytest",
+            [sys.executable, "-m", "pytest", "--junitxml=" + str(evidence / "pytest.xml")]
+            + (["-m", "not integration"] if mode == "offline" else []),
+        )
     ]
-    runs, gate_exit = [], 0
-    for number, command in enumerate(steps, start=1):
+    runs, gate_exit, verdict, failed_step = [], 0, "passed", None
+    for number, (name, command) in enumerate(steps, start=1):
         clock = time.monotonic()
         log = evidence / f"{number:02}-command.log"
         with log.open("wb") as output:
@@ -72,19 +122,25 @@ def run(mode, root, evidence):
             )
         runs.append(
             {
+                "name": name,
                 "command": command,
                 "exit_code": result.returncode,
                 "seconds": round(time.monotonic() - clock, 3),
                 "log": log.name,
             }
         )
-        print(f"{number}/{len(steps)} exit={result.returncode} log={log.name}", flush=True)
+        print(f"{number}/{len(steps)} {name} exit={result.returncode} log={log.name}", flush=True)
         if result.returncode:
             gate_exit = result.returncode
+            failed_step = name
+            verdict = classify(name, result.returncode, log.read_text(errors="replace"))
+            print(f"verdict={verdict} failed_step={name}", flush=True)
             break
     after = source_fingerprint(root)
     if after["hash"] != before["hash"]:
         gate_exit = gate_exit or 2
+        if verdict == "passed":
+            verdict, failed_step = "app_failed", "source_changed"
     pytest_log = evidence / f"{len(steps):02}-command.log"
     pytest_text = pytest_log.read_text(errors="replace") if pytest_log.exists() else ""
     item_counts = {}
@@ -104,6 +160,8 @@ def run(mode, root, evidence):
         "started_utc": started,
         "finished_utc": datetime.now(UTC).isoformat(),
         "exit_code": gate_exit,
+        "verdict": verdict,
+        "failed_step": failed_step,
         "commands": runs,
         "xml_testcases": xml_counts,
         "pytest_items": item_counts,
@@ -111,7 +169,7 @@ def run(mode, root, evidence):
         "subtest_count_method": "terminal summary or extra passed JUnit cases beyond pytest items",
         "source": before,
         "source_unchanged": before["hash"] == after["hash"],
-        "schema": "0015_memory_kinds",
+        "schema": "0017_task_role_documents",
         "environment": {
             "python": platform.python_version(),
             "system": platform.platform(),

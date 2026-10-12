@@ -52,14 +52,10 @@ Total plafon service tersebut adalah 4784m, belum termasuk OS, Docker, build, mi
 
 ## Yang menghalangi deployment sekarang
 
-- Jalur Calendar chat, pemeriksaan izin, hasil durable dan solo reconciliation sudah
-  diimplementasikan; acceptance native kandidat final dan smoke Google nyata belum lulus.
-- Unit/offline kandidat final lulus 366 tes dan 83 subtes. Native baseline lama lulus
-  389/81; hasil itu tidak mencakup seluruh perubahan akhir. Lingkungan terbaru tidak
-  dapat menjalankan PostgreSQL non-root, dan eskalasi ditolak oleh policy sesi.
-- Clarification/follow-up bebas dan scheduled execution melalui chat belum lengkap.
-- Backup lengkap terenkripsi, restore drill, rollback, alert dan operasi host belum dibuktikan.
-- Target server, provider specialist dan akses deployment belum ditentukan.
+- Delta live kalender uji (`KURO_DELTA_ACCEPTANCE.md` 5 langkah) + drill restore fresh schema 0016 + keputusan hosting/alert/key-custody eksplisit.
+- Beban chat+OCR+scheduler bersamaan dan failure-load disk penuh/DB down/provider timeout belum diukur sebagai kapasitas; angka plafon Compose bukan hasil sizing.
+- Clarification/follow-up bebas di luar grammar berlabel dan scheduled invite/delete tetap di luar slice (bukan blocker pilot).
+- Rotasi secret live tidak diuji demonstratif (runbook saja); `calendar:send` tetap nonaktif.
 
 Tidak ada tambahan tahap tanpa batas di luar roadmap: pekerjaan di atas adalah isi konkret Stage 4 dan Stage 5. Setelah itu pilot dapat berjalan sambil Stage 6–8 dikembangkan, dengan perubahan tetap melalui staging dan release gate.
 

@@ -1,0 +1,621 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0
+rootdir: /app
+configfile: pyproject.toml
+testpaths: tests
+plugins: langsmith-0.14.1, anyio-4.15.1, cov-7.1.0, asyncio-1.4.0, platformdirs-4.12.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 699 items
+
+tests/integration/test_assistant.py ..........................           [  3%]
+tests/integration/test_assistant_status.py .                             [  3%]
+tests/integration/test_calendar_chat.py ......................           [  7%]
+tests/integration/test_calendar_nudge.py ..                              [  7%]
+tests/integration/test_calendar_tasks.py .............                   [  9%]
+tests/integration/test_documents.py FF                                   [  9%]
+tests/integration/test_knowledge.py ............                         [ 11%]
+tests/integration/test_memory.py .....                                   [ 11%]
+tests/integration/test_memory_project_scope.py ...                       [ 12%]
+tests/integration/test_postgres.py ...........                           [ 13%]
+tests/integration/test_research.py ...                                   [ 14%]
+tests/integration/test_task_complete_review.py .                         [ 14%]
+tests/integration/test_tasks.py ...................                      [ 17%]
+tests/integration/test_telegram.py ............                          [ 18%]
+tests/integration/test_tool_actions.py .....                             [ 19%]
+tests/integration/test_vector_service.py .                               [ 19%]
+tests/offline/test_calendar_directive.py ..........                      [ 21%]
+tests/offline/test_ingress_contract.py ..............                    [ 23%]
+tests/unit/test_action_journal.py ..                                     [ 23%]
+tests/unit/test_action_scheduler.py ...                                  [ 23%]
+tests/unit/test_agent_registry.py .                                      [ 24%]
+tests/unit/test_api.py ................                                  [ 26%]
+tests/unit/test_artifact_review.py ..                                    [ 26%]
+tests/unit/test_assistant_diagnostics.py ................                [ 28%]
+tests/unit/test_assistant_graph_setup.py .....................           [ 31%]
+tests/unit/test_assistant_ledger.py ...                                  [ 32%]
+tests/unit/test_assistant_router.py .................................... [ 37%]
+.                                                                        [ 37%]
+tests/unit/test_calendar_activation.py ..                                [ 37%]
+tests/unit/test_calendar_boundaries.py ................................. [ 42%]
+..                                                                       [ 42%]
+tests/unit/test_calendar_confirm.py .....                                [ 43%]
+tests/unit/test_calendar_display.py ..............                       [ 45%]
+tests/unit/test_calendar_oauth.py .....                                  [ 46%]
+tests/unit/test_calendar_recovery.py ........                            [ 47%]
+tests/unit/test_calendar_service.py ...                                  [ 47%]
+tests/unit/test_calendar_setup.py ...................................... [ 53%]
+.....                                                                    [ 54%]
+tests/unit/test_calendar_slots.py ...................................    [ 59%]
+tests/unit/test_calendar_specialist.py ......                            [ 59%]
+tests/unit/test_configuration_logging.py ..............                  [ 61%]
+tests/unit/test_crypto_policy.py .................                       [ 64%]
+tests/unit/test_dashboard.py ..                                          [ 64%]
+tests/unit/test_documents_cli.py ....                                    [ 65%]
+tests/unit/test_documents_write.py ...........                           [ 66%]
+tests/unit/test_execution_broker.py ....                                 [ 67%]
+tests/unit/test_gate_verdict.py ....                                     [ 67%]
+tests/unit/test_google_calendar_provider.py ....                         [ 68%]
+tests/unit/test_knowledge_compose.py ...                                 [ 68%]
+tests/unit/test_knowledge_content.py .............                       [ 70%]
+tests/unit/test_knowledge_extraction.py ......                           [ 71%]
+tests/unit/test_knowledge_services.py .............                      [ 73%]
+tests/unit/test_memory_eval.py ....                                      [ 74%]
+tests/unit/test_memory_projects.py .....                                 [ 74%]
+tests/unit/test_native_capture.py ....                                   [ 75%]
+tests/unit/test_operations.py .......................                    [ 78%]
+tests/unit/test_research_report.py ...                                   [ 79%]
+tests/unit/test_route_baseline.py ..                                     [ 79%]
+tests/unit/test_skills_catalog.py .....                                  [ 80%]
+tests/unit/test_stage4_completion.py ....                                [ 80%]
+tests/unit/test_task_detail.py ...                                       [ 81%]
+tests/unit/test_telegram_callbacks.py ...                                [ 81%]
+tests/unit/test_telegram_client.py .............................         [ 85%]
+tests/unit/test_telegram_commands.py ................................    [ 90%]
+tests/unit/test_telegram_setup.py ......                                 [ 91%]
+tests/unit/test_tool_policy.py ....                                      [ 91%]
+tests/unit/test_tool_registry.py ..                                      [ 91%]
+tests/unit/test_tool_runtime.py ..                                       [ 92%]
+tests/unit/test_trusted_intent.py .......................                [ 95%]
+tests/unit/test_ultimate_tasks.py ......................                 [ 98%]
+tests/unit/test_windows_secrets.py .........                             [100%]
+
+=================================== FAILURES ===================================
+____________________ test_write_and_overwrite_keep_versions ____________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x77286ed9fc80>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialectAsync_psycopg object at 0x77286ea53140>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x77286f1f67b0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x77286ed9c6b0>
+parameters = [{'id': UUID('11d49779-0ddc-4d23-8e33-64e824698fe9'), 'owner_id': UUID('ab5464ea-24a1-4d9c-b21e-a65432bb4719'), 'parent_id': UUID('e7da0f2b-9764-456f-9051-f361ac6a3c6d'), 'root_id': UUID('e7da0f2b-9764-456f-9051-f361ac6a3c6d'), ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:642: in execute
+    result = self.await_(self._cursor.execute(query, params, **kw))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.AsyncCursor [closed] [IDLE] (host=postgres-test user=jarvis_app database=jarvis_test) at 0x772872192ed0>
+query = 'INSERT INTO app.tasks (id, owner_id, parent_id, root_id, client_request_key, payload_hash, title, goal, role, input_r...spent_usd)s, %(repair_passes)s::INTEGER, %(error_code)s::VARCHAR) RETURNING app.tasks.created_at, app.tasks.updated_at'
+params = {'id': UUID('11d49779-0ddc-4d23-8e33-64e824698fe9'), 'owner_id': UUID('ab5464ea-24a1-4d9c-b21e-a65432bb4719'), 'parent_id': UUID('e7da0f2b-9764-456f-9051-f361ac6a3c6d'), 'root_id': UUID('e7da0f2b-9764-456f-9051-f361ac6a3c6d'), ...}
+prepare = None, binary = None
+
+    async def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            async with self._conn.lock:
+                await self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.CheckViolation: new row for relation "tasks" violates check constraint "tasks_role_check"
+
+.venv/lib/python3.12/site-packages/psycopg/cursor_async.py:117: CheckViolation
+
+The above exception was the direct cause of the following exception:
+
+test_db = <jarvis.storage.database.Database object at 0x77286ea69070>
+
+    async def test_write_and_overwrite_keep_versions(test_db):
+        oid = await owner(test_db)
+        root = await submit_goal(test_db, goal(oid, "arsipkan catatan", key="doc-1"))
+>       await create_plan_tasks(
+            test_db,
+            oid,
+            root.id,
+            [node("w0", {"criteria": ["file ada"], "path": "catatan.md", "content": "versi satu"})],
+        )
+
+tests/integration/test_documents.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/jarvis/orchestration/task_manager.py:194: in create_plan_tasks
+    await session.flush()
+.venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:787: in flush
+    await greenlet_spawn(self.sync_session.flush, objects=objects)
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:203: in greenlet_spawn
+    result = context.switch(value)
+             ^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:642: in execute
+    result = self.await_(self._cursor.execute(query, params, **kw))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.AsyncCursor [closed] [IDLE] (host=postgres-test user=jarvis_app database=jarvis_test) at 0x772872192ed0>
+query = 'INSERT INTO app.tasks (id, owner_id, parent_id, root_id, client_request_key, payload_hash, title, goal, role, input_r...spent_usd)s, %(repair_passes)s::INTEGER, %(error_code)s::VARCHAR) RETURNING app.tasks.created_at, app.tasks.updated_at'
+params = {'id': UUID('11d49779-0ddc-4d23-8e33-64e824698fe9'), 'owner_id': UUID('ab5464ea-24a1-4d9c-b21e-a65432bb4719'), 'parent_id': UUID('e7da0f2b-9764-456f-9051-f361ac6a3c6d'), 'root_id': UUID('e7da0f2b-9764-456f-9051-f361ac6a3c6d'), ...}
+prepare = None, binary = None
+
+    async def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            async with self._conn.lock:
+                await self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "tasks" violates check constraint "tasks_role_check"
+E           [SQL: INSERT INTO app.tasks (id, owner_id, parent_id, root_id, client_request_key, payload_hash, title, goal, role, input_refs, acceptance, plan_json, plan_revision, status, priority, not_before, deadline_at, cost_ceiling_usd, cost_spent_usd, repair_passes, error_code) VALUES (%(id)s::UUID, %(owner_id)s::UUID, %(parent_id)s::UUID, %(root_id)s::UUID, %(client_request_key)s::VARCHAR, %(payload_hash)s::VARCHAR, %(title)s::VARCHAR, %(goal)s::VARCHAR, %(role)s::VARCHAR, %(input_refs)s::JSONB, %(acceptance)s::JSONB, %(plan_json)s::JSONB, %(plan_revision)s::INTEGER, %(status)s::VARCHAR, %(priority)s::INTEGER, %(not_before)s::TIMESTAMP WITH TIME ZONE, %(deadline_at)s::TIMESTAMP WITH TIME ZONE, %(cost_ceiling_usd)s, %(cost_spent_usd)s, %(repair_passes)s::INTEGER, %(error_code)s::VARCHAR) RETURNING app.tasks.created_at, app.tasks.updated_at]
+E           [SQL parameters hidden due to hide_parameters=True]
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+.venv/lib/python3.12/site-packages/psycopg/cursor_async.py:117: IntegrityError
+_____________________ test_invalid_payload_fails_honestly ______________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x77286ec6ee70>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialectAsync_psycopg object at 0x77286ec5ddf0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x77286eca5fd0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x77286f05dc40>
+parameters = [{'id': UUID('3fcc6d88-2398-4ad1-8415-2f9425502060'), 'owner_id': UUID('c720aeff-9117-44b7-b1f6-84ed7c6b56ad'), 'parent_id': UUID('ec6317ef-e7e8-473d-8517-829bb8ad20cb'), 'root_id': UUID('ec6317ef-e7e8-473d-8517-829bb8ad20cb'), ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:642: in execute
+    result = self.await_(self._cursor.execute(query, params, **kw))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.AsyncCursor [closed] [IDLE] (host=postgres-test user=jarvis_app database=jarvis_test) at 0x77286eebc950>
+query = 'INSERT INTO app.tasks (id, owner_id, parent_id, root_id, client_request_key, payload_hash, title, goal, role, input_r...spent_usd)s, %(repair_passes)s::INTEGER, %(error_code)s::VARCHAR) RETURNING app.tasks.created_at, app.tasks.updated_at'
+params = {'id': UUID('3fcc6d88-2398-4ad1-8415-2f9425502060'), 'owner_id': UUID('c720aeff-9117-44b7-b1f6-84ed7c6b56ad'), 'parent_id': UUID('ec6317ef-e7e8-473d-8517-829bb8ad20cb'), 'root_id': UUID('ec6317ef-e7e8-473d-8517-829bb8ad20cb'), ...}
+prepare = None, binary = None
+
+    async def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            async with self._conn.lock:
+                await self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.CheckViolation: new row for relation "tasks" violates check constraint "tasks_role_check"
+
+.venv/lib/python3.12/site-packages/psycopg/cursor_async.py:117: CheckViolation
+
+The above exception was the direct cause of the following exception:
+
+test_db = <jarvis.storage.database.Database object at 0x77286ec7fef0>
+
+    async def test_invalid_payload_fails_honestly(test_db):
+        oid = await owner(test_db)
+        root = await submit_goal(test_db, goal(oid, "tulis jahat", key="doc-3"))
+>       await create_plan_tasks(
+            test_db,
+            oid,
+            root.id,
+            [node("w0", {"criteria": ["x"], "path": "../escape.md", "content": "jahat"})],
+        )
+
+tests/integration/test_documents.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/jarvis/orchestration/task_manager.py:194: in create_plan_tasks
+    await session.flush()
+.venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:787: in flush
+    await greenlet_spawn(self.sync_session.flush, objects=objects)
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:203: in greenlet_spawn
+    result = context.switch(value)
+             ^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:642: in execute
+    result = self.await_(self._cursor.execute(query, params, **kw))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.AsyncCursor [closed] [IDLE] (host=postgres-test user=jarvis_app database=jarvis_test) at 0x77286eebc950>
+query = 'INSERT INTO app.tasks (id, owner_id, parent_id, root_id, client_request_key, payload_hash, title, goal, role, input_r...spent_usd)s, %(repair_passes)s::INTEGER, %(error_code)s::VARCHAR) RETURNING app.tasks.created_at, app.tasks.updated_at'
+params = {'id': UUID('3fcc6d88-2398-4ad1-8415-2f9425502060'), 'owner_id': UUID('c720aeff-9117-44b7-b1f6-84ed7c6b56ad'), 'parent_id': UUID('ec6317ef-e7e8-473d-8517-829bb8ad20cb'), 'root_id': UUID('ec6317ef-e7e8-473d-8517-829bb8ad20cb'), ...}
+prepare = None, binary = None
+
+    async def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            async with self._conn.lock:
+                await self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "tasks" violates check constraint "tasks_role_check"
+E           [SQL: INSERT INTO app.tasks (id, owner_id, parent_id, root_id, client_request_key, payload_hash, title, goal, role, input_refs, acceptance, plan_json, plan_revision, status, priority, not_before, deadline_at, cost_ceiling_usd, cost_spent_usd, repair_passes, error_code) VALUES (%(id)s::UUID, %(owner_id)s::UUID, %(parent_id)s::UUID, %(root_id)s::UUID, %(client_request_key)s::VARCHAR, %(payload_hash)s::VARCHAR, %(title)s::VARCHAR, %(goal)s::VARCHAR, %(role)s::VARCHAR, %(input_refs)s::JSONB, %(acceptance)s::JSONB, %(plan_json)s::JSONB, %(plan_revision)s::INTEGER, %(status)s::VARCHAR, %(priority)s::INTEGER, %(not_before)s::TIMESTAMP WITH TIME ZONE, %(deadline_at)s::TIMESTAMP WITH TIME ZONE, %(cost_ceiling_usd)s, %(cost_spent_usd)s, %(repair_passes)s::INTEGER, %(error_code)s::VARCHAR) RETURNING app.tasks.created_at, app.tasks.updated_at]
+E           [SQL parameters hidden due to hide_parameters=True]
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+.venv/lib/python3.12/site-packages/psycopg/cursor_async.py:117: IntegrityError
+----------------- generated xml file: /evidence/run/pytest.xml -----------------
+=========================== short test summary info ============================
+FAILED tests/integration/test_documents.py::test_write_and_overwrite_keep_versions
+FAILED tests/integration/test_documents.py::test_invalid_payload_fails_honestly
+======================== 2 failed, 697 passed in 39.37s ========================

@@ -13,6 +13,8 @@ KINDS = frozenset({"profile", "preference", "project", "episodic", "task"})
 SOURCES = frozenset({"user", "validated", "inference"})
 STATUSES = frozenset({"active", "superseded", "deleted"})
 
+PROJECT_PATTERN = r"[a-z][a-z0-9_-]{0,39}"
+
 KIND_WEIGHT = {"preference": 30, "profile": 20, "project": 20, "task": 10, "episodic": 10}
 MAX_CONTEXT_CHARS = 4000
 MAX_CONTEXT_FACTS = 20
@@ -27,6 +29,7 @@ class MemoryFact:
     importance: float = 0.5
     kind: str = "profile"
     source: str = "inference"
+    project: str | None = None
 
 
 class MemoryPolicyError(Exception):
@@ -48,19 +51,30 @@ def validate_fact(fact: MemoryFact) -> None:
         raise MemoryPolicyError("memory_kind_invalid")
     if fact.source not in SOURCES:
         raise MemoryPolicyError("memory_source_invalid")
+    if fact.project is not None:
+        import re
+
+        if not re.fullmatch(PROJECT_PATTERN, fact.project):
+            raise MemoryPolicyError("memory_project_invalid")
 
 
 def default_expiry(*, days: int = 90) -> datetime:
     return datetime.now(UTC) + timedelta(days=days)
 
 
-def rank_facts(facts: list[dict], *, budget_chars: int = MAX_CONTEXT_CHARS, now=None) -> list[dict]:
+def rank_facts(
+    facts: list[dict],
+    *,
+    budget_chars: int = MAX_CONTEXT_CHARS,
+    now=None,
+    project: str | None = None,
+) -> list[dict]:
     """Deterministic context selection: kind priors, importance, recency, char budget.
 
-    Defense in depth: only explicit private facts are ever selected, even if
-    the caller forgets to filter. Query-similarity and project scoping arrive
-    in a later slice; ranking inputs and budgets are fixed here so behavior is
-    measurable from the start.
+    Project scoping: global facts (project None) always compete; facts tagged
+    to another project never surface. A fact of the active project outranks an
+    otherwise equal global one. Defense in depth: only explicit private facts
+    are ever selected, even if the caller forgets to filter.
     """
     moment = now or datetime.now(UTC)
     scored = []
@@ -72,12 +86,18 @@ def rank_facts(facts: list[dict], *, budget_chars: int = MAX_CONTEXT_CHARS, now=
         expires = fact.get("expires_at")
         if expires is not None and expires <= moment:
             continue
+        tag = fact.get("project")
+        if tag is not None and tag != project:
+            continue
         updated = fact.get("updated_at")
         recent = (
             10 if isinstance(updated, datetime) and (moment - updated) <= timedelta(days=7) else 0
         )
         score = (
-            KIND_WEIGHT.get(fact.get("kind"), 0) + float(fact.get("importance") or 0) * 5 + recent
+            KIND_WEIGHT.get(fact.get("kind"), 0)
+            + float(fact.get("importance") or 0) * 5
+            + recent
+            + (25 if tag is not None and project is not None else 0)
         )
         scored.append((score, fact.get("key") or "", fact))
     scored.sort(key=lambda item: (-item[0], item[1]))

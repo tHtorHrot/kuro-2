@@ -31,6 +31,25 @@ def _short(value) -> str:
     return str(value).replace("-", "")[:8]
 
 
+def format_task_detail(task, *, children=(), excerpt=None, sources=None, document=None) -> str:
+    """Detail /task murni: judul + status + anak + kutipan riset + versi dokumen."""
+    lines = [f"{task.title} [{task.status}] — {_short(task.id)}"]
+    kids = list(children)[:5]
+    if kids:
+        lines.append("Anak:")
+        lines += [f"- {t.title[:60]} [{t.status}] — {_short(t.id)}" for t in kids]
+    if excerpt:
+        shown = str(excerpt)[:800]
+        head = f"Hasil riset ({sources} sumber):" if sources else "Hasil riset:"
+        lines.append(head + "\n" + shown)
+    if document:
+        lines.append(
+            f"Dokumen: {document.get('path')} (versi {document.get('version')}, "
+            f"sha {str(document.get('sha256') or '')[:8]})"
+        )
+    return "\n".join(lines)
+
+
 async def _resolve_task(session, owner_id, ref):
     from uuid import UUID
 
@@ -82,7 +101,48 @@ async def handle_task_command(session, owner_id, incoming, receipt) -> None:
         if task is None:
             _reply(receipt, "Task tidak ditemukan. Cek 8 char di /tasks.")
             return
-        _reply(receipt, f"{task.title} [{task.status}] — {_short(task.id)}")
+        kids = (
+            await session.scalars(
+                select(Task)
+                .where(Task.owner_id == owner_id, Task.parent_id == task.id)
+                .order_by(Task.created_at)
+                .limit(5)
+            )
+        ).all()
+        excerpt, sources, document = None, None, None
+        event = await session.scalar(
+            select(TaskEvent)
+            .where(
+                TaskEvent.owner_id == owner_id,
+                TaskEvent.task_id == task.id,
+                TaskEvent.event_type == "research.completed",
+            )
+            .order_by(TaskEvent.id.desc())
+        )
+        if event is not None and isinstance(event.payload, dict):
+            excerpt = event.payload.get("excerpt")
+            sources = event.payload.get("sources")
+        doc_event = await session.scalar(
+            select(TaskEvent)
+            .where(
+                TaskEvent.owner_id == owner_id,
+                TaskEvent.task_id == task.id,
+                TaskEvent.event_type == "documents.completed",
+            )
+            .order_by(TaskEvent.id.desc())
+        )
+        if doc_event is not None and isinstance(doc_event.payload, dict):
+            document = {
+                "path": doc_event.payload.get("path"),
+                "version": doc_event.payload.get("version"),
+                "sha256": doc_event.payload.get("sha256"),
+            }
+        _reply(
+            receipt,
+            format_task_detail(
+                task, children=kids, excerpt=excerpt, sources=sources, document=document
+            ),
+        )
         return
     if cmd == "goal":
         if not arg or len(arg) > 2000:

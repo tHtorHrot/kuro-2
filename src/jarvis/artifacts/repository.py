@@ -92,3 +92,40 @@ async def mark_evaluated(db, owner: UUID, artifact_id: UUID, status: str) -> Non
         if row is None or row.owner_id != owner:
             raise TaskError("artifact_not_found")
         row.evaluation_status = status
+
+
+def artifact_accepted(artifact, owner: UUID, task_id: UUID) -> bool:
+    """Review planner murni: hanya artifact passed milik task ini yang lolos.
+
+    Selain itu (hilang, milik orang/task lain, pending/failed/needs_human)
+    seragam ditolak TANPA membocorkan mana yang ada — anti oracle.
+    """
+    return (
+        artifact is not None
+        and artifact.owner_id == owner
+        and artifact.task_id == task_id
+        and artifact.evaluation_status == "passed"
+    )
+
+
+async def require_accepted(session, owner: UUID, task_id: UUID, artifact_ids: list) -> None:
+    """Sukses hanya untuk artifact committed dan checks passed (kontrak modul).
+
+    ID malformed ditolak SEBELUM menyentuh SQL agar driver tidak
+    melempar error driver (500); semua penolakan seragam 422 di API.
+    """
+    from sqlalchemy import select
+
+    parsed: list[UUID] = []
+    for raw in artifact_ids or []:
+        try:
+            parsed.append(raw if isinstance(raw, UUID) else UUID(str(raw)))
+        except (ValueError, AttributeError, TypeError):
+            raise TaskError("artifact_not_accepted") from None
+    if not parsed:
+        raise TaskError("artifact_not_accepted")
+    rows = (await session.scalars(select(Artifact).where(Artifact.id.in_(parsed)))).all()
+    found = {row.id: row for row in rows}
+    for aid in parsed:
+        if not artifact_accepted(found.get(aid), owner, task_id):
+            raise TaskError("artifact_not_accepted")

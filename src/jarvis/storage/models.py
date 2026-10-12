@@ -164,11 +164,28 @@ class ProfileMemory(Base):
     value: Mapped[str] = mapped_column(Text)
     data_class: Mapped[str] = mapped_column(String(16), default="private")
     kind: Mapped[str] = mapped_column(String(16), default="profile")
+    project: Mapped[str | None] = mapped_column(String(40))
     provenance: Mapped[str | None] = mapped_column(Text)
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     status: Mapped[str] = mapped_column(String(16), default="active")
     importance: Mapped[float] = mapped_column(default=0.5)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Project(Base):
+    __tablename__ = "projects"
+    __table_args__ = ({"schema": "app"},)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), primary_key=True)
+    name: Mapped[str] = mapped_column(String(40), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ProjectState(Base):
+    __tablename__ = "project_state"
+    __table_args__ = ({"schema": "app"},)
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("app.users.id"), primary_key=True)
+    active_project: Mapped[str | None] = mapped_column(String(40))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

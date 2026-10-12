@@ -63,8 +63,8 @@ def test_stage4_migration_head_records_source_timezone():
 def test_stage4_schema_revision_is_consistent_across_runtime_and_upgrade_gates():
     from jarvis.storage.database import SCHEMA_REVISION
 
-    assert SCHEMA_REVISION == "0015_memory_kinds"
+    assert SCHEMA_REVISION == "0017_task_role_documents"
     upgrade = open("scripts/check_test_upgrade.py", encoding="utf-8").read()
     wasm = open("tests/sql/verify_wasm_schema.mjs", encoding="utf-8").read()
-    assert '== "0015_memory_kinds"' in upgrade
-    assert "=== '0015_memory_kinds'" in wasm
+    assert '== "0017_task_role_documents"' in upgrade
+    assert "=== '0017_task_role_documents'" in wasm

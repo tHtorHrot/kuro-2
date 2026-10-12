@@ -35,6 +35,93 @@ from jarvis.tools.journal import ActionJournal, ActionJournalError, now_utc
 TERMINAL = {"succeeded", "failed", "cancelled", "uncertain"}
 CANCELLABLE = {"queued", "claimed", "awaiting_approval"}
 
+# Pengingat approval: sekali per usulan, hanya menjelang kedaluwarsa.
+# Kunci mengikat fingerprint exact; approval baru = kunci baru.
+NUDGE_PREFIX = "nudge:"
+NUDGE_BEFORE_EXPIRY_MINUTES = 3
+
+
+def _nudge_key(action) -> str:
+    return f"{NUDGE_PREFIX}{action.id}:{(action.action_fingerprint or '')[:12]}"
+
+
+def _nudge_text(action) -> str:
+    short = str(action.id).replace("-", "")[:8]
+    expires = action.approval_expires_at.isoformat() if action.approval_expires_at else "segera"
+    return (
+        f"Pengingat 1x: usulan {short} menunggu persetujuan, kedaluwarsa {expires}.\n"
+        f"/toolapprove {action.id} {action.action_fingerprint}\n"
+        f"Batal: /cancel {short}. Abaikan jika sudah diproses."
+    )
+
+
+async def remind_approvals(session, owner, state) -> int:
+    """Satu pengingat per usulan task yang mau kedaluwarsa.
+
+    Idempoten via event_key (tidak pernah spam); hanya untuk
+    awaiting_approval yang masih valid — tidak pernah untuk
+    frozen/uncertain/cancelled. Solo-create tanpa task tidak diingatkan
+    (lihat batas di bawah).
+    """
+    from datetime import timedelta
+
+    rows = (
+        await session.execute(
+            select(CalendarTask, ToolAction)
+            .join(
+                ToolAction,
+                (ToolAction.owner_id == CalendarTask.owner_id)
+                & (ToolAction.id == CalendarTask.current_action_id),
+            )
+            .where(
+                CalendarTask.owner_id == owner,
+                CalendarTask.status == "submitted",
+                ToolAction.status == "awaiting_approval",
+            )
+            .limit(10)
+        )
+    ).all()
+    now = now_utc()
+    window = timedelta(minutes=NUDGE_BEFORE_EXPIRY_MINUTES)
+    reminded = 0
+    for task, action in rows:
+        if not await task_valid(session, task, state):
+            continue
+        expires = action.approval_expires_at
+        if expires is None or not timedelta(0) < (expires - now) <= window:
+            continue
+        # Hitung via cek-eksistensi (rowcount DO NOTHING tidak menentu
+        # lintas driver); constraint unik tetap jadi penjaga race.
+        key = _nudge_key(action)
+        exists = await session.scalar(
+            select(CalendarNotification.id).where(
+                CalendarNotification.owner_id == owner,
+                CalendarNotification.event_key == key,
+            )
+        )
+        if exists is not None:
+            continue
+        await session.execute(
+            insert(CalendarNotification)
+            .values(
+                id=uuid4(),
+                owner_id=owner,
+                bot_id=task.bot_id,
+                chat_id=task.chat_id,
+                task_id=task.id,
+                action_id=action.id,
+                event_key=key,
+                reply_text=_nudge_text(action),
+                delivery_status="pending",
+                attempts=0,
+                next_attempt_at=now,
+                created_at=now,
+            )
+            .on_conflict_do_nothing(index_elements=["owner_id", "event_key"])
+        )
+        reminded += 1
+    return reminded
+
 
 def _salvage_edit(raw: str) -> tuple[SlotEdit, str | None] | None:
     """Partial validated fields from a message the strict parser rejected.

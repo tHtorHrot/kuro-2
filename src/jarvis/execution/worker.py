@@ -24,10 +24,15 @@ class WorkerResult:
 async def run_read_only(
     db, *, owner: UUID, worker_instance: str, roles: list[str] | None = None, knowledge_search=None
 ) -> WorkerResult | None:
-    """Satu worker in-process untuk read-only Research/Knowledge (Phase 1)."""
-    run = await claim_task(
-        db, owner, worker_instance=worker_instance, roles=roles or ["research", "knowledge"]
-    )
+    """Satu worker in-process untuk read-only Research/Knowledge (Phase 1).
+
+    Gerbang capability: role tanpa read_only ditolak sebelum claim apa pun.
+    """
+    from jarvis.agents.roles import require_capability
+
+    wanted = roles or ["research", "knowledge"]
+    require_capability(wanted, "read_only")
+    run = await claim_task(db, owner, worker_instance=worker_instance, roles=wanted)
     if run is None:
         return None
     try:

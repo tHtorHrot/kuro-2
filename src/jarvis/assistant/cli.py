@@ -1,9 +1,11 @@
 import logging
+from datetime import UTC, datetime
 
 from jarvis.assistant.config import load_assistant_config, load_router_key
 from jarvis.assistant.diagnostics import DIAGNOSTICS_VERSION, report_error
 from jarvis.assistant.policy import PolicyError
 from jarvis.assistant.repository import AssistantRepository, authorized, cancel_pending, owner_state
+from jarvis.assistant.route_baseline import baseline_status
 from jarvis.assistant.router import OpenRouter, RouterError
 from jarvis.core.config import ConfigurationError, load_settings
 from jarvis.core.logging import configure_logging
@@ -41,6 +43,9 @@ async def operate_assistant(command):
                 "metadata_only": True,
                 "inference_sent": False,
                 "diagnostics_version": DIAGNOSTICS_VERSION,
+                "checked_at_utc": datetime.now(UTC).isoformat(),
+                "config_hash": getattr(config, "fingerprint", None),
+                "baseline": baseline_status(plan),
                 "free_plan": plan,
             }
         if command in {"assistant-status", "assistant-health"}:

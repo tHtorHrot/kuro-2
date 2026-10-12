@@ -1,15 +1,17 @@
 """Intake batch — dipakai CLI tasks-run-once dan tasks-loop.
 
-Memindahkan satu task read-only (planner/research/knowledge) dari queued
-menjadi succeeded dengan intake-record artifact berprovenance. BUKAN hasil
-eksekusi; eksekusi otonom butuh worker backend + sandbox (tahap berikutnya).
+Task research dieksekusi nyata oleh slice Research (research-report.md
+bersitasi atas indeks lokal); task documents ditulis nyata oleh slice
+Documents (artifact berversi dari payload acceptance); task knowledge
+tetap placeholder intake-record (BUKAN hasil eksekusi). Eksekusi otonom
+coding/data butuh worker backend + sandbox (tahap berikutnya).
 """
 
 from __future__ import annotations
 
 from uuid import UUID
 
-INTAKE_ROLES = ["research", "knowledge"]
+INTAKE_ROLES = ["research", "knowledge", "documents"]
 
 
 async def process_intake_batch(db, owner_id: UUID, worker: str, max_n: int) -> list[dict]:
@@ -29,6 +31,26 @@ async def process_intake_batch(db, owner_id: UUID, worker: str, max_n: int) -> l
             async with db.tenant(owner_id) as session:
                 task = await task_repo.get_task(session, owner_id, run.task_id)
                 title = task.title if task else str(run.task_id)
+                role = task.role if task else None
+                acceptance = task.acceptance if task and isinstance(task.acceptance, dict) else {}
+            if role == "research":
+                # Stage 7 slice: riset nyata atas indeks lokal, bukan placeholder.
+                from jarvis.research.service import execute_research
+
+                processed.append(
+                    await execute_research(db, owner_id, worker=worker, run=run, title=title)
+                )
+                continue
+            if role == "documents":
+                # Stage 7 slice: tulis deterministik berversi, bukan placeholder.
+                from jarvis.specialists.documents import execute_document_task
+
+                processed.append(
+                    await execute_document_task(
+                        db, owner_id, worker=worker, run=run, title=title, acceptance=acceptance
+                    )
+                )
+                continue
             record = (
                 "# INTAKE RECORD\n\n"
                 f"Goal: {title}\nWorker: {worker}\nRun: {run.id}\n"

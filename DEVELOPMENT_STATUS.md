@@ -1,14 +1,43 @@
 # KURO — status 10 Oktober 2026 (menggantikan snapshot 5 Okt di bawah)
 
-Release: **PILOT / operasi lokal**. Schema `0015_memory_kinds`, package
-`personal-jarvis` 0.4.0. Gate native **648 passed / 0 failed** (XML 734),
-ruff clean, bukti `docs/evidence/native-candidate/run/verification.json`.
+Release: **PILOT / operasi lokal**. Schema `0017_task_role_documents`, package
+`personal-jarvis` 0.4.0. Gate native **701 passed / 0 failed** (XML 790,
+subtests 89), ruff clean, source `238318534cbe3cad09985b59e7e73b8f3a28b3e26d8e26bb7b8fc151b7286788`,
+bukti `docs/evidence/native-candidate/run/verification.json` (11 Okt,
+`native_integration: tested`, `verdict: passed`, live Google/Telegram `not_run`).
+Stage 7 slice Research fase indeks lokal SELESAI (bukti
+`docs/evidence/stage7/research-local.md`): riset atas dokumen sendiri
+bersitasi, tanpa fetch/LLM/kredensial; provider eksternal menyusul.
+Pelajaran AO #1 SELESAI (bukti `docs/evidence/stage7/ao-lesson-1-nudge.md`):
+sinyal macet + pengingat approval 1x anti-spam.
+Pelajaran AO #2–#3 SELESAI (bukti
+`docs/evidence/stage7/ao-lesson-2-3-gate-skills.md`): verdict gate
+3-state + pindai rahasia + direktori skills + capabilities.
+Pelajaran AO #4 SELESAI (bukti
+`docs/evidence/stage7/ao-lesson-4-baseline.md`): baseline 1 aktif +
+2 standby, tanpa fallback otomatis.
+Pelajaran AO #5 SELESAI (bukti
+`docs/evidence/stage7/ao-lesson-5-review.md`): `complete(succeeded)`
+menolak artifact pending/failed/asing/hantu (422), workspace/sandbox
+sudah ada + teruji.
+Stage 7 slice Documents fase artifact store SELESAI (bukti
+`docs/evidence/stage7/documents-local.md`): tulis deterministik
+berversi dari payload eksplisit, tanpa LLM/filesystem/kredensial.
+`/task` kini tampilkan anak + kutipan riset (format murni + wiring,
+teruji native via bot-transport).
 Sejak 5 Okt: Stage 4 delta live hijau, Stage 5 pilot-lengkap (backup
 terenkripsi + offsite microsd + restore drill03/04 + retrieval dingin hijau),
 UX kalender Fase A–C + tombol inline + kata waktu Indonesia + salvage +
-kontrak konfirmasi (`docs/UX_CONFIRMATION_CONTRACT.md`), Stage 6 slice 1–2
-(memory bertipe/presedence/tombstone + konteks selektif + evaluasi).
-Sisa: hosting (ditunda), scoping proyek, specialist/voice, RPO/RTO penuh.
+kontrak konfirmasi (`docs/UX_CONFIRMATION_CONTRACT.md`), Stage 6 slice 1–3
+SELESAI (memory bertipe/precedence/tombstone + konteks selektif project-aware
++ evaluasi bounded + registry proyek + RLS 28 tabel + restore probe projects),
+fix 2B observability (ledger actual-vs-held + unreconciled + kuota harian +
+5 terminal terakhir di `assistant-status`, `checked_at_utc` di
+`assistant-catalog`; policy retry/fallback tidak dilonggarkan).
+Sisa: hosting (ditunda), specialist/voice (Stage 7), RPO/RTO penuh + live
+Google/Telegram (acceptance Stage 4/5). Fix 2B live 10 Okt ~15:00 UTC:
+api+telegram restart ok, `/ask` smoke dijawab live via rute gratis
+(apodex via novita), status hold 0 / unreconciled 0 / `daily 3/15`.
 
 # KURO — kandidat Stage 4h / fondasi Stage 5 (5 Oktober 2026)
 

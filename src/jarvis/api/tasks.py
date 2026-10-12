@@ -161,10 +161,18 @@ async def complete(task_id: UUID, body: dict, actor: CurrentPrincipal, session: 
             422, "artifact_required", "Succeeded wajib menyertakan artifact_ids."
         )
     try:
+        if status == "succeeded":
+            from jarvis.artifacts.repository import require_accepted
+
+            await require_accepted(session, actor.owner_id, task_id, body.get("artifact_ids"))
         task = await mark_task(
             _Db(session), actor.owner_id, task_id, status, error_code=body.get("error_code")
         )
     except TaskError as exc:
+        if exc.code == "task_not_found":
+            raise ApplicationError(404, exc.code, "Complete ditolak.") from None
+        if exc.code == "artifact_not_accepted":
+            raise ApplicationError(422, exc.code, "Complete ditolak.") from None
         raise ApplicationError(409, exc.code, "Complete ditolak.") from None
     return _view(task)
 
